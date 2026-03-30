@@ -2,13 +2,13 @@
 
 > [Index](./index.md) · [Questions Overview](./questions.md) · [The Repo Is the Mind](./the-repo-is-the-mind.md)
 
-## What is GitHub Minimum Intelligence?
+## What is GitHub GStack Intelligence?
 
-Most AI coding products answer the question *“what is this?”* with deployment vocabulary: platform, workspace, cloud memory, seat management, integration tier. GitHub Minimum Intelligence answers differently. It is not a destination you move your work into. It is a pattern you drop into the place your work already lives: the repository.
+Most AI coding products answer the question *“what is this?”* with deployment vocabulary: platform, workspace, cloud memory, seat management, integration tier. GitHub GStack Intelligence answers differently. It is not a destination you move your work into. It is a pattern you drop into the place your work already lives: the repository.
 
 That seemingly small shift changes almost everything.
 
-If a traditional AI assistant is an external service that occasionally touches your codebase, Minimum Intelligence is a **local intelligence layer** that derives its capabilities from the repository’s existing primitives—issues, workflows, markdown, commits, and permissions. In other words, it is less “new product category” and more “recomposition of tools you already trust.”
+If a traditional AI assistant is an external service that occasionally touches your codebase, GStack Intelligence is a **local intelligence layer** that derives its capabilities from the repository’s existing primitives—issues, workflows, markdown, commits, and permissions. In other words, it is less “new product category” and more “recomposition of tools you already trust.”
 
 ---
 
@@ -16,14 +16,14 @@ If a traditional AI assistant is an external service that occasionally touches y
 
 At its core, the system is composed of:
 
-- a repo-local folder (`.github-minimum-intelligence`) containing prompts, workflow logic, state conventions, and behavior files,
+- a repo-local folder (`.github-gstack-intelligence`) containing prompts, workflow logic, state conventions, and behavior files,
 - a workflow runtime (GitHub Actions) that executes the agent loop,
 - an LLM provider key you supply,
 - and a set of committed artifacts that preserve conversation and behavioral history.
 
 The project description in this repository is explicit: the agent *lives in your GitHub repo*, responds to issues, remembers conversations, and commits its work. That definition is not metaphorical branding; it is an implementation detail reflected in file layout and workflow behavior.
 
-So when we ask **what** Minimum Intelligence is, the most accurate answer is:
+So when we ask **what** GStack Intelligence is, the most accurate answer is:
 
 > It is an installation model for repository-embedded agency, where AI behavior is expressed as versioned configuration and AI memory is persisted as source-controlled state.
 
@@ -51,7 +51,7 @@ This is why “minimum” is a meaningful adjective here. It does not signal wea
 
 ## What problem class it actually solves
 
-Many discussions frame AI coding tools as generation engines (“how well does it write code?”). Minimum Intelligence reframes the core failure mode as **context discontinuity**.
+Many discussions frame AI coding tools as generation engines (“how well does it write code?”). GStack Intelligence reframes the core failure mode as **context discontinuity**.
 
 Developers do not merely need text completion; they need continuity of intent:
 
@@ -67,7 +67,7 @@ So the “what” is not just an agent; it is a **continuity mechanism** for sof
 
 ## What the repository becomes under this model
 
-Minimum Intelligence effectively upgrades the semantic role of the repo.
+GStack Intelligence effectively upgrades the semantic role of the repo.
 
 Traditionally, a repository is treated as:
 
@@ -94,7 +94,7 @@ AI trust is often discussed as model quality, but in engineering organizations t
 - Can we limit who can trigger it?
 - Can we revert bad outcomes?
 
-Minimum Intelligence inherits answers from GitHub itself. Permissions are repository permissions. Review is pull request review. Rollback is git revert. History is commit history.
+GStack Intelligence inherits answers from GitHub itself. Permissions are repository permissions. Review is pull request review. Rollback is git revert. History is commit history.
 
 This is a profound simplification. Rather than introducing new governance machinery, the project piggybacks on existing governance machinery. The result is a lower cognitive burden for adoption, especially for teams with compliance or audit requirements.
 
@@ -116,7 +116,7 @@ A skeptic might say: “Isn’t this just a workflow bot with an LLM call?”
 
 Technically, yes—and that is precisely why it matters.
 
-Great infrastructure patterns often look obvious in hindsight because they compose familiar parts rather than requiring exotic systems. Minimum Intelligence is powerful for the same reason Git itself was powerful: it changes reliability and collaboration properties by changing *where state lives* and *how history is recorded*.
+Great infrastructure patterns often look obvious in hindsight because they compose familiar parts rather than requiring exotic systems. GStack Intelligence is powerful for the same reason Git itself was powerful: it changes reliability and collaboration properties by changing *where state lives* and *how history is recorded*.
 
 The value is not magic cognition alone; it is cognition coupled to durable, reviewable, revertible process.
 
@@ -137,7 +137,7 @@ In that future, “using AI for software” will feel less like consulting an or
 
 ## Final answer: what is it?
 
-GitHub Minimum Intelligence is a repository-native AI collaboration framework.
+GitHub GStack Intelligence is a repository-native AI collaboration framework.
 
 It is **not** primarily a chatbot, nor primarily a platform. It is a disciplined way to bind LLM reasoning to the software delivery substrate teams already operate.
 

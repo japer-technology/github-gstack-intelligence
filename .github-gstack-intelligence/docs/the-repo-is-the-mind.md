@@ -6,7 +6,7 @@
 
 Many AI tools can hover around Git: they can read files, suggest changes, even generate patches. But they remain outsiders. They don’t live with the code, they don’t carry the project’s conversation history inside the repo, and they don’t accumulate the intent, constraints, tradeoffs, and decisions that shaped the work over time. That gap is the real problem. The breakthrough isn’t merely AI that can see code - it’s AI that remembers the why behind the code: the false starts, the hard choices, and the reasoning that got you here. Without that memory, it isn’t collaboration; it’s starting from zero every time.
 
-The `pi` coding agent and the Minimum Intelligence framework eliminate that context gap by embedding the AI directly in the repository - not as a service integration, but as a versioned dependency that operates inside your existing Git, Actions, and Issues infrastructure.
+The `pi` coding agent and the GStack Intelligence framework eliminate that context gap by embedding the AI directly in the repository - not as a service integration, but as a versioned dependency that operates inside your existing Git, Actions, and Issues infrastructure.
 
 #### What Where How Who When Why
 
@@ -14,7 +14,7 @@ The `pi` coding agent and the Minimum Intelligence framework eliminate that cont
 
 > An npm package you install in your tree - no hosted backend, no OAuth handshake, no new trust boundary beyond what you configure in Actions YAML.
 
-`@mariozechner/pi-coding-agent` is an npm package. Minimum Intelligence is a repo-local configuration layer. There is no hosted backend, no OAuth handshake, no tenant isolation to think about.
+`@mariozechner/pi-coding-agent` is an npm package. GStack Intelligence is a repo-local configuration layer. There is no hosted backend, no OAuth handshake, no tenant isolation to think about.
 
 You install it. It runs in your tree. That's the entire vendor relationship.
 
@@ -66,7 +66,7 @@ This is a standard ReAct-style agent loop, but the critical differentiator is th
 
 > A Markdown persona file committed to your repository - diffable, reviewable, and governed by your normal pull request process.
 
-On initialization, you "hatch" the agent by opening an issue and defining its persona through dialogue. The result is a Markdown file committed to the repository - typically in `.github-minimum-intelligence/` - that governs the agent's tone, priorities, and behavioral constraints.
+On initialization, you "hatch" the agent by opening an issue and defining its persona through dialogue. The result is a Markdown file committed to the repository - typically in `.github-gstack-intelligence/` - that governs the agent's tone, priorities, and behavioral constraints.
 
 This is configuration-as-code for agent personality. It's diffable, reviewable, and subject to your normal PR process. You can:
 - `git log` the persona file to trace behavioral evolution
@@ -115,6 +115,6 @@ The repository is already where your team coordinates, where decisions are recor
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/logo.png" alt="Minimum Intelligence" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
   </picture>
 </p>

@@ -9,7 +9,7 @@ Effective immediately, assume DEFCON 5. This is the lowest state of alert and th
 ## Posture
 
 - **All capabilities are available.** Read, write, execute, commit, and push as the task requires.
-- **Standard operating guidelines apply** as defined in `.github-minimum-intelligence/AGENTS.md` and `.github-minimum-intelligence/.pi/APPEND_SYSTEM.md`.
+- **Standard operating guidelines apply** as defined in `.github-gstack-intelligence/AGENTS.md` and `.github-gstack-intelligence/.pi/APPEND_SYSTEM.md`.
 - **No special restrictions.** Respond to issues and comments using the full range of available tools and judgment.
 - **Resume autonomous operation.** You may create, modify, and delete files, install dependencies, run commands, and commit changes as needed to fulfil requests.
 

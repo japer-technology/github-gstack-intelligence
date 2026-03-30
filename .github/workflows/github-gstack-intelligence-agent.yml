@@ -1,5 +1,5 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  GitHub Minimum Intelligence — Agent Workflow (Version 1.1.0)                ║
+# ║  GitHub GStack Intelligence — Agent Workflow (Version 1.1.0)                ║
 # ║                                                                              ║
 # ║  An AI agent that lives inside your GitHub repository. It uses Issues as     ║
 # ║  a conversational UI, Git for persistent memory, and Actions as its only     ║
@@ -19,7 +19,7 @@
 # ║         • MISTRAL_API_KEY         (Mistral)                                  ║
 # ║         • GROQ_API_KEY            (Groq)                                     ║
 # ║    3. Run the workflow manually:                                             ║
-# ║       Actions → github-minimum-intelligence-agent → Run workflow.            ║
+# ║       Actions → github-gstack-intelligence-agent → Run workflow.            ║
 # ║       This installs the agent folder into your repo (or upgrades it).        ║
 # ║    4. Open an issue — the agent reads your message and replies!              ║
 # ║                                                                              ║
@@ -34,10 +34,10 @@
 # ║    run-agent     — AI agent that responds to issues and comments.            ║
 # ║    run-gitpages  — Publishes the agent's public-fabric to GitHub Pages.      ║
 # ║                                                                              ║
-# ║  Docs: https://github.com/japer-technology/github-minimum-intelligence       ║
+# ║  Docs: https://github.com/japer-technology/github-gstack-intelligence       ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
-name: github-minimum-intelligence-agent
+name: github-gstack-intelligence-agent
 
 # ──────────────────────────────────────────────────────────────────────────────
 # TRIGGERS
@@ -102,7 +102,7 @@ jobs:
     # downloads FROM that repo, so running it there would be self-referential.
     if: >-
       github.event_name == 'workflow_dispatch'
-      && github.repository != 'japer-technology/github-minimum-intelligence'
+      && github.repository != 'japer-technology/github-gstack-intelligence'
     steps:
 
       # 1. Check out the repository so we can inspect and modify its contents.
@@ -116,20 +116,20 @@ jobs:
       #    • No folder       → action=install
       #    • Folder present, local VERSION < template VERSION → action=upgrade
       #    • Folder present, local VERSION >= template VERSION → action=skip
-      - name: Check for .github-minimum-intelligence
+      - name: Check for .github-gstack-intelligence
         id: check-folder
         run: |
-          if [ ! -d ".github-minimum-intelligence" ]; then
+          if [ ! -d ".github-gstack-intelligence" ]; then
             echo "action=install" >> "$GITHUB_OUTPUT"
-            echo "📦 .github-minimum-intelligence not found — will install."
+            echo "📦 .github-gstack-intelligence not found — will install."
           else
             LOCAL_VERSION="0.0.0"
-            if [ -f ".github-minimum-intelligence/VERSION" ]; then
-              LOCAL_VERSION=$(tr -d '[:space:]' < .github-minimum-intelligence/VERSION)
+            if [ -f ".github-gstack-intelligence/VERSION" ]; then
+              LOCAL_VERSION=$(tr -d '[:space:]' < .github-gstack-intelligence/VERSION)
             fi
 
             # Fetch only the VERSION file from the template repository.
-            REMOTE_VERSION=$(curl -fsSL "https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/VERSION" | tr -d '[:space:]' || true)
+            REMOTE_VERSION=$(curl -fsSL "https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/VERSION" | tr -d '[:space:]' || true)
 
             if [ -z "$REMOTE_VERSION" ]; then
               echo "::warning::Could not fetch remote VERSION — skipping upgrade check."
@@ -181,14 +181,14 @@ jobs:
           set -euo pipefail
 
           ACTION="${{ steps.check-folder.outputs.action }}"
-          TARGET=".github-minimum-intelligence"
+          TARGET=".github-gstack-intelligence"
 
           # Download the latest template from the main branch.
-          curl -fsSL "https://github.com/japer-technology/github-minimum-intelligence/archive/refs/heads/main.zip" \
+          curl -fsSL "https://github.com/japer-technology/github-gstack-intelligence/archive/refs/heads/main.zip" \
             -o /tmp/template.zip
           unzip -q /tmp/template.zip -d /tmp/template
 
-          EXTRACTED=$(ls -d /tmp/template/github-minimum-intelligence-*)
+          EXTRACTED=$(ls -d /tmp/template/github-gstack-intelligence-*)
 
           # Remove items from the extracted template that must not be copied
           # into the user's repo (heavy dependencies and internal analysis).
@@ -224,7 +224,7 @@ jobs:
             # Initialise defaults for a fresh install:
             #   • AGENTS.md — the agent's identity file (editable by the user).
             #   • settings.json — default LLM provider and model configuration.
-            cp "$TARGET/install/MINIMUM-INTELLIGENCE-AGENTS.md" "$TARGET/AGENTS.md"
+            cp "$TARGET/install/GSTACK-INTELLIGENCE-AGENTS.md" "$TARGET/AGENTS.md"
             mkdir -p "$TARGET/.pi"
             cp "$TARGET/install/settings.json" "$TARGET/.pi/settings.json"
           fi
@@ -235,7 +235,7 @@ jobs:
         if: steps.check-folder.outputs.action != 'skip'
         run: |
           touch .gitignore
-          for entry in "node_modules/" ".github-minimum-intelligence/node_modules/" ".DS_Store"; do
+          for entry in "node_modules/" ".github-gstack-intelligence/node_modules/" ".DS_Store"; do
             grep -qxF "$entry" .gitignore || echo "$entry" >> .gitignore
           done
 
@@ -258,13 +258,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add .github-minimum-intelligence/ .gitignore .gitattributes
+          git add .github-gstack-intelligence/ .gitignore .gitattributes
 
           ACTION="${{ steps.check-folder.outputs.action }}"
           if [ "$ACTION" = "upgrade" ]; then
-            COMMIT_MSG="chore: upgrade .github-minimum-intelligence from template"
+            COMMIT_MSG="chore: upgrade .github-gstack-intelligence from template"
           else
-            COMMIT_MSG="chore: install .github-minimum-intelligence from template"
+            COMMIT_MSG="chore: install .github-gstack-intelligence from template"
           fi
 
           if git diff --cached --quiet; then
@@ -291,7 +291,7 @@ jobs:
     # than cancelling it (cancel-in-progress: false). The group key includes
     # the issue number so different issues run in parallel.
     concurrency:
-      group: github-minimum-intelligence-${{ github.repository }}-issue-${{ github.event.issue.number }}
+      group: github-gstack-intelligence-${{ github.repository }}-issue-${{ github.event.issue.number }}
       cancel-in-progress: false
 
     # Trigger guard:
@@ -360,14 +360,14 @@ jobs:
 
       # 4. SAFETY CHECK — ensure the agent folder exists. If the user hasn't
       #    run the run-install job yet, skip gracefully instead of crashing.
-      - name: Check for .github-minimum-intelligence
+      - name: Check for .github-gstack-intelligence
         id: check-folder
         run: |
-          if [ -d ".github-minimum-intelligence" ]; then
+          if [ -d ".github-gstack-intelligence" ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::.github-minimum-intelligence folder not found, skipping."
+            echo "::notice::.github-gstack-intelligence folder not found, skipping."
           fi
 
       # 5. RUNTIME — install Bun, a fast JavaScript/TypeScript runtime. The
@@ -385,15 +385,15 @@ jobs:
         if: steps.check-folder.outputs.exists == 'true'
         uses: actions/cache@v5
         with:
-          path: .github-minimum-intelligence/node_modules
-          key: mi-deps-${{ hashFiles('.github-minimum-intelligence/bun.lock') }}
+          path: .github-gstack-intelligence/node_modules
+          key: gsi-deps-${{ hashFiles('.github-gstack-intelligence/bun.lock') }}
 
       # 7. INSTALL — install (or verify) the agent's npm dependencies.
       #    --frozen-lockfile ensures the lockfile is never modified, so builds
       #    are deterministic.
       - name: Install dependencies
         if: steps.check-folder.outputs.exists == 'true'
-        run: cd .github-minimum-intelligence && bun install --frozen-lockfile
+        run: cd .github-gstack-intelligence && bun install --frozen-lockfile
 
       # 8. RUN THE AGENT — execute the core agent script. It reads the
       #    triggering issue/comment, loads the matching conversation session,
@@ -413,7 +413,7 @@ jobs:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun .github-minimum-intelligence/lifecycle/agent.ts
+        run: bun .github-gstack-intelligence/lifecycle/agent.ts
 
   # ────────────────────────────────────────────────────────────────────────────
   # JOB 3 — run-gitpages
@@ -460,12 +460,12 @@ jobs:
       - name: Check public-fabric exists
         id: check-folder
         run: |
-          if [ -d ".github-minimum-intelligence/public-fabric" ]; then
+          if [ -d ".github-gstack-intelligence/public-fabric" ]; then
             echo "folder_exists=true" >> "$GITHUB_OUTPUT"
             echo "✅ public-fabric directory found."
           else
             echo "folder_exists=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Directory .github-minimum-intelligence/public-fabric not found. Skipping Pages deployment. Run the installer first (Actions → Run workflow)."
+            echo "::warning::Directory .github-gstack-intelligence/public-fabric not found. Skipping Pages deployment. Run the installer first (Actions → Run workflow)."
           fi
 
       # 3. AUTO-ENABLE Pages — attempt to enable GitHub Pages via the API.
@@ -502,7 +502,7 @@ jobs:
         if: steps.check-folder.outputs.folder_exists == 'true' && steps.enable-pages.outputs.pages_active == 'true'
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.github-minimum-intelligence/public-fabric'
+          path: '.github-gstack-intelligence/public-fabric'
 
       # 6. Deploy the uploaded artifact to GitHub Pages.
       - name: Deploy to GitHub Pages

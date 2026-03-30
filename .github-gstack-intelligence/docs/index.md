@@ -1,6 +1,6 @@
 # Index
 
-> Comprehensive guide to all GitHub Minimum Intelligence documentation.
+> Comprehensive guide to all GitHub GStack Intelligence documentation.
 >
 > **Start here:** [README](../../README.md) · **Before You Begin:** [Important Information](./final-warning.md) · **Laws:** [The Four Laws of AI](./the-four-laws-of-ai.md)
 
@@ -56,7 +56,7 @@ Six questions define the philosophical and architectural foundation of this proj
 
 | Question | Document | Core Inquiry |
 |----------|----------|--------------|
-| **What?** | [question-what.md](./question-what.md) | What is GitHub Minimum Intelligence? A repository-native AI collaboration framework. |
+| **What?** | [question-what.md](./question-what.md) | What is GitHub GStack Intelligence? A repository-native AI collaboration framework. |
 | **Who?** | [question-who.md](./question-who.md) | Who speaks, executes, remembers, and governs when the repository becomes the mind? |
 | **When?** | [question-when.md](./question-when.md) | How Git commits replace ephemeral sessions — memory becomes durable, trust becomes auditable. |
 | **Where?** | [question-where.md](./question-where.md) | Where intelligence lives — runtime, memory, identity, and authorization. |
@@ -80,8 +80,8 @@ Six questions define the philosophical and architectural foundation of this proj
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| [AGENTS.md](../AGENTS.md) | `.github-minimum-intelligence/` | Agent identity — name, personality, and behavioral guidance. |
-| [PACKAGES.md](../PACKAGES.md) | `.github-minimum-intelligence/` | Runtime dependencies and required packages. |
+| [AGENTS.md](../AGENTS.md) | `.github-gstack-intelligence/` | Agent identity — name, personality, and behavioral guidance. |
+| [PACKAGES.md](../PACKAGES.md) | `.github-gstack-intelligence/` | Runtime dependencies and required packages. |
 
 ---
 
@@ -97,6 +97,6 @@ Six questions define the philosophical and architectural foundation of this proj
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/logo.png" alt="Minimum Intelligence" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
   </picture>
 </p>

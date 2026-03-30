@@ -127,7 +127,7 @@ When mistakes are preserved in context, intelligence can mature historically. Yo
 
 ## 7) “Minimum” Intelligence Is a Strategy, Not a Limitation
 
-The name is easy to misread. “Minimum Intelligence” is not a claim about weak capability; it is a claim about minimal infrastructure assumptions:
+The name is easy to misread. “GStack Intelligence” is not a claim about weak capability; it is a claim about minimal infrastructure assumptions:
 
 - no dedicated control plane,
 - no external memory service,

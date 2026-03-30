@@ -6,7 +6,7 @@
 
 If *[The Repo Is the Mind](the-repo-is-the-mind.md)* asks us to relocate intelligence from an external platform into the repository, then the natural follow-up is not merely technical. It is existential: **who is acting when work is done?**
 
-In most software systems, that question is easy. A person authors code, a bot runs checks, and infrastructure executes automation. Minimum Intelligence deliberately blurs those boundaries—but in a disciplined way. It does not pretend the agent is human, and it does not treat humans as interchangeable with automation. Instead, it introduces a new participant in the development process: a repository-native actor whose identity, memory, and authority are all governed by the same artifacts developers already trust.
+In most software systems, that question is easy. A person authors code, a bot runs checks, and infrastructure executes automation. GStack Intelligence deliberately blurs those boundaries—but in a disciplined way. It does not pretend the agent is human, and it does not treat humans as interchangeable with automation. Instead, it introduces a new participant in the development process: a repository-native actor whose identity, memory, and authority are all governed by the same artifacts developers already trust.
 
 "Who" in this architecture is not a single being. It is a layered identity stack.
 
@@ -33,7 +33,7 @@ So, if we ask "who changed the code?" the answer is nuanced but precise:
 - an LLM reasoned,
 - and the workflow—under declared permissions—performed concrete operations.
 
-Minimum Intelligence clarifies that execution authority is infrastructural, not mystical.
+GStack Intelligence clarifies that execution authority is infrastructural, not mystical.
 
 ---
 
@@ -70,7 +70,7 @@ The `app-manifest.json` reveals a core truth often hidden in AI tooling marketin
 
 In other words, identity in this system is inseparable from authority. "Who" is never just personality. "Who" is what token can do.
 
-Minimum Intelligence is strongest where it is least romantic: it maps power to explicit config, and config to repository ownership. This is why the model can be swappable, the package can be pinned, and behavior can remain under local control.
+GStack Intelligence is strongest where it is least romantic: it maps power to explicit config, and config to repository ownership. This is why the model can be swappable, the package can be pinned, and behavior can remain under local control.
 
 ---
 
@@ -110,4 +110,4 @@ At any given moment: the current tree, the current history, the current instruct
 
 That answer is refreshingly untheatrical. It does not depend on anthropomorphism. It depends on artifacts.
 
-In Minimum Intelligence, identity is not hidden in a proprietary backend. It is staged, negotiated, and persisted in the same medium as software itself. The repository does not merely *contain* intelligence. It defines who that intelligence is allowed to become.
+In GStack Intelligence, identity is not hidden in a proprietary backend. It is staged, negotiated, and persisted in the same medium as software itself. The repository does not merely *contain* intelligence. It defines who that intelligence is allowed to become.

@@ -4,7 +4,7 @@
 
 ## Where does intelligence actually live?
 
-If *[The Repo Is the Mind](the-repo-is-the-mind.md)* is the thesis, then this repository is its field evidence. The “where” is not metaphorical. Minimum Intelligence answers it with a physical address: inside the repository’s own boundaries, executed by the same automation that already builds and ships code.
+If *[The Repo Is the Mind](the-repo-is-the-mind.md)* is the thesis, then this repository is its field evidence. The “where” is not metaphorical. GStack Intelligence answers it with a physical address: inside the repository’s own boundaries, executed by the same automation that already builds and ships code.
 
 Most AI tooling treats your codebase like an export format. You copy snippets out, paste context in, and hope nothing important gets lost in transit. This project refuses that architecture. Here, the repo is not an attachment to intelligence—it is the substrate of intelligence.
 
@@ -12,7 +12,7 @@ Most AI tooling treats your codebase like an export format. You copy snippets ou
 
 ## Where does runtime happen? In your CI, not in someone else’s product
 
-The workflow template (`.github-minimum-intelligence/install/github-minimum-intelligence-agent.yml`) is explicit: issue events and issue comments trigger a job, collaborator permissions are checked, the repository is checked out, Bun is installed, and the agent scripts run locally in the Actions runner.
+The workflow template (`.github-gstack-intelligence/install/github-gstack-intelligence-agent.yml`) is explicit: issue events and issue comments trigger a job, collaborator permissions are checked, the repository is checked out, Bun is installed, and the agent scripts run locally in the Actions runner.
 
 That matters because it collapses the distance between “assistant” and “environment.” The agent doesn’t infer your project structure from a pasted tree; it executes in a fresh clone of the actual tree. It sees what your developers would see at HEAD.
 
@@ -30,12 +30,12 @@ This is infrastructure locality: computation happens where governance already ex
 
 The strongest architectural move in this repo is that memory has a directory.
 
-The orchestrator (`.github-minimum-intelligence/lifecycle/agent.ts`) persists issue-to-session mappings and session transcripts under `.github-minimum-intelligence/state/`. The README repeats the same mapping model: issue number → state file → session transcript. This is not decorative documentation; it is the mechanism of continuity.
+The orchestrator (`.github-gstack-intelligence/lifecycle/agent.ts`) persists issue-to-session mappings and session transcripts under `.github-gstack-intelligence/state/`. The README repeats the same mapping model: issue number → state file → session transcript. This is not decorative documentation; it is the mechanism of continuity.
 
 So “where memory lives” is no longer a hand-wavy concept about context windows. It lives in:
 
-- `.github-minimum-intelligence/state/issues/<number>.json`
-- `.github-minimum-intelligence/state/sessions/<session>.jsonl`
+- `.github-gstack-intelligence/state/issues/<number>.json`
+- `.github-gstack-intelligence/state/sessions/<session>.jsonl`
 
 Because these artifacts are committed, memory inherits git properties by default: inspectability, rollback, branchability, and diffability. If context drifts, you can audit it like any other code-adjacent artifact. “Long-term memory” becomes a repository primitive, not a hosted feature.
 
@@ -61,9 +61,9 @@ That design choice answers “where is trust enforced?” with impressive restra
 
 ## Where does installation land? As a folder, not an onboarding process
 
-The installer script (`MINIMUM-INTELLIGENCE-INSTALLER.ts`) shows the project’s ergonomics: copy workflow template, copy hatch template, initialize `AGENTS.md`, install dependencies. The `setup.sh` script inside `.github-minimum-intelligence/script/` mirrors that one-command posture.
+The installer script (`GSTACK-INTELLIGENCE-INSTALLER.ts`) shows the project’s ergonomics: copy workflow template, copy hatch template, initialize `AGENTS.md`, install dependencies. The `setup.sh` script inside `.github-gstack-intelligence/script/` mirrors that one-command posture.
 
-This is subtle but essential. By making installation file-centric, the project ensures the answer to “where is the product?” remains simple: in `.github-minimum-intelligence/` plus generated `.github/` workflow/template files. The “platform” is a commit.
+This is subtle but essential. By making installation file-centric, the project ensures the answer to “where is the product?” remains simple: in `.github-gstack-intelligence/` plus generated `.github/` workflow/template files. The “platform” is a commit.
 
 ---
 
@@ -109,6 +109,6 @@ In this architecture, it is distributed but coherent:
 - **in permissions** for governance,
 - **in commits** for truth over time.
 
-Minimum Intelligence’s deepest claim is that intelligence should not orbit the repository as an external service. It should inhabit the repository as a first-class, auditable participant. This codebase demonstrates that claim concretely: the “where” of AI is not a dashboard, not a chat tab, not a vendor silo.
+GStack Intelligence’s deepest claim is that intelligence should not orbit the repository as an external service. It should inhabit the repository as a first-class, auditable participant. This codebase demonstrates that claim concretely: the “where” of AI is not a dashboard, not a chat tab, not a vendor silo.
 
 It is the repo itself.
