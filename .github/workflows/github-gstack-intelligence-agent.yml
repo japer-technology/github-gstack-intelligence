@@ -1,5 +1,5 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  GitHub GStack Intelligence — Agent Workflow (Version 1.1.0)                ║
+# ║  GitHub GStack Intelligence — Agent Workflow (Version 1.1.0)                 ║
 # ║                                                                              ║
 # ║  An AI agent that lives inside your GitHub repository. It uses Issues as     ║
 # ║  a conversational UI, Git for persistent memory, and Actions as its only     ║
@@ -19,7 +19,7 @@
 # ║         • MISTRAL_API_KEY         (Mistral)                                  ║
 # ║         • GROQ_API_KEY            (Groq)                                     ║
 # ║    3. Run the workflow manually:                                             ║
-# ║       Actions → github-gstack-intelligence-agent → Run workflow.            ║
+# ║       Actions → github-gstack-intelligence-agent → Run workflow.             ║
 # ║       This installs the agent folder into your repo (or upgrades it).        ║
 # ║    4. Open an issue — the agent reads your message and replies!              ║
 # ║                                                                              ║
@@ -34,7 +34,7 @@
 # ║    run-agent     — AI agent that responds to issues and comments.            ║
 # ║    run-gitpages  — Publishes the agent's public-fabric to GitHub Pages.      ║
 # ║                                                                              ║
-# ║  Docs: https://github.com/japer-technology/github-gstack-intelligence       ║
+# ║  Docs: https://github.com/japer-technology/github-gstack-intelligence        ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 name: github-gstack-intelligence-agent
