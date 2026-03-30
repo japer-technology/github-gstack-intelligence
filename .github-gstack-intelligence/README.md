@@ -1,4 +1,4 @@
-# GitHub Minimum Intelligence
+# GitHub GStack Intelligence
 
 A repository-local AI framework that plugs into a developer’s existing workflow. Instead of external chat tools, it uses GitHub Issues for conversation, Git for persistent versioned memory, and GitHub Actions for execution. Installed by adding one folder to a repo, it delivers low-infrastructure, auditable, user-owned automation by committing every prompt/response and code change to the codebase.
 
@@ -6,19 +6,19 @@ A repository-local AI framework that plugs into a developer’s existing workflo
 
 ## Installation
 
-1. Copy [`.github/workflows/github-minimum-intelligence-agent.yml`](../.github/workflows/github-minimum-intelligence-agent.yml) into your repo's `.github/workflows/` directory.
+1. Copy [`.github/workflows/github-gstack-intelligence-agent.yml`](../.github/workflows/github-gstack-intelligence-agent.yml) into your repo's `.github/workflows/` directory.
 2. Add the LLM API key `OPENAI_API_KEY` as a **repository secret** under **[Settings → Secrets and variables → Actions]**. Any [supported LLM provider](#supported-providers) can work but to quick start OpenAI GPT 5.4 is pre-configured.
-3. Go to **[Actions → github-minimum-intelligence-agent → Run workflow]** to install the agent files automatically, subsequent runs perform upgrades.
+3. Go to **[Actions → github-gstack-intelligence-agent → Run workflow]** to install the agent files automatically, subsequent runs perform upgrades.
 4. Open an issue — the agent will reply.
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/logo.png" alt="Minimum Intelligence" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
   </picture>
 </p>
 
 ## An AI agent that lives in your GitHub Repo
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![AI](https://img.shields.io/badge/Assisted-Development-2b2bff?logo=openai&logoColor=white) [![github-minimum-intelligence-agent](https://github.com/japer-technology/github-minimum-intelligence/actions/workflows/github-minimum-intelligence-agent.yml/badge.svg)](https://github.com/japer-technology/github-minimum-intelligence/actions/workflows/github-minimum-intelligence-agent.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![AI](https://img.shields.io/badge/Assisted-Development-2b2bff?logo=openai&logoColor=white) [![github-gstack-intelligence-agent](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml/badge.svg)](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml)
 
 Powered by [pi-mono](https://github.com/badlogic/pi-mono), conversation history is committed to git, giving your agent long-term memory across sessions. It can search prior context, edit or summarize past conversations, and all changes are versioned.
 
@@ -28,7 +28,7 @@ Powered by [pi-mono](https://github.com/badlogic/pi-mono), conversation history 
 
 With a typical LLM, a developer constantly moves between their repository and someone else’s interface. They ask the model to explain code, trace bugs, suggest refactors, write tests, draft documentation, or plan changes, but each prompt and response lives outside the repo itself. Code is copied out of chat windows and pasted back into editors, while the reasoning, decisions, and project-specific knowledge built along the way end up scattered across browser tabs, chat histories, and third-party platforms instead of being preserved with the code.
 
-**Minimum Intelligence flips that model.** Every prompt you write and every response the agent produces is committed directly to your repository as part of its normal workflow. There is nothing to copy, nothing to paste, and nothing stored outside your control.
+**GStack Intelligence flips that model.** Every prompt you write and every response the agent produces is committed directly to your repository as part of its normal workflow. There is nothing to copy, nothing to paste, and nothing stored outside your control.
 
 - **Ask a question** → the answer is already in your repo.
 - **Request a file change** → the agent commits the edit for you.
@@ -38,7 +38,7 @@ Your repository _is_ the AI workspace. The questions, the results, the code, the
 
 ---
 
-## Why GitHub Minimum Intelligence
+## Why GitHub GStack Intelligence
 
 | Capability | Why it matters |
 |---|---|
@@ -103,7 +103,7 @@ A technical framework designed to integrate a repository-local AI agent directly
 All state lives in the repo:
 
 ```
-.github-minimum-intelligence/state/
+.github-gstack-intelligence/state/
   issues/
     1.json          # maps issue #1 → its session file
   sessions/
@@ -162,14 +162,14 @@ This is optional. The agent works without hatching, but it's more fun with a per
 ## Project Structure
 
 ```
-.github-minimum-intelligence/
+.github-gstack-intelligence/
   .pi/                              # Agent personality & skills config
     settings.json                   # LLM provider, model, and thinking level
     APPEND_SYSTEM.md                # System prompt loaded every session
     BOOTSTRAP.md                    # First-run identity prompt
     skills/                         # Modular skill packages
   install/
-    MINIMUM-INTELLIGENCE-AGENTS.md               # Default agent identity template (copied to AGENTS.md on install)
+    GSTACK-INTELLIGENCE-AGENTS.md               # Default agent identity template (copied to AGENTS.md on install)
     settings.json                                # Default LLM settings template (copied to .pi/settings.json on install)
   lifecycle/
     agent.ts                # Core agent orchestrator
@@ -186,7 +186,7 @@ This is optional. The agent works without hatching, but it's more fun with a per
 
 ## Configuration
 
-**Change the model** - edit `.github-minimum-intelligence/.pi/settings.json`:
+**Change the model** - edit `.github-gstack-intelligence/.pi/settings.json`:
 
 <details>
 <summary><strong>OpenAI - GPT-5.4 (default)</strong></summary>
@@ -358,7 +358,7 @@ Requires `OPENROUTER_API_KEY`. Browse available models at [openrouter.ai](https:
 
 **Make it read-only** - add `--tools read,grep,find,ls` to the agent args in `lifecycle/agent.ts`.
 
-**Filter by label** - edit `.github/workflows/github-minimum-intelligence-agent.yml` to only trigger on issues with a specific label.
+**Filter by label** - edit `.github/workflows/github-gstack-intelligence-agent.yml` to only trigger on issues with a specific label.
 
 **Adjust thinking level** - set `defaultThinkingLevel` to `"low"`, `"medium"`, or `"high"` in `settings.json` for different task complexities.
 
@@ -366,7 +366,7 @@ Requires `OPENROUTER_API_KEY`. Browse available models at [openrouter.ai](https:
 
 ## Supported Providers
 
-`.pi` supports a wide range of LLM providers out of the box. Set `defaultProvider` and `defaultModel` in `.github-minimum-intelligence/.pi/settings.json` and add the matching API key to your workflow:
+`.pi` supports a wide range of LLM providers out of the box. Set `defaultProvider` and `defaultModel` in `.github-gstack-intelligence/.pi/settings.json` and add the matching API key to your workflow:
 
 | Provider | `defaultProvider` | Example model | API key env var |
 |----------|-------------------|---------------|-----------------|
@@ -387,7 +387,7 @@ Requires `OPENROUTER_API_KEY`. Browse available models at [openrouter.ai](https:
 
 The workflow only responds to repository **owners, members, and collaborators**. Random users cannot trigger the agent on public repos.
 
-If you plan to use minimum-intelligence for anything private, **make the repo private**. Public repos mean your conversation history is visible to everyone, but get generous GitHub Actions usage.
+If you plan to use gstack-intelligence for anything private, **make the repo private**. Public repos mean your conversation history is visible to everyone, but get generous GitHub Actions usage.
 
 ---
 
@@ -399,6 +399,6 @@ The repo is overwhelmingly dominated by node_modules (~99%). The actual project 
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/logo.png" alt="Minimum Intelligence" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
   </picture>
 </p>

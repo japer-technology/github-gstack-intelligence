@@ -4,14 +4,14 @@
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/logo.png" alt="Minimum Intelligence" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
   </picture>
 </p>
 
 > **What capabilities does the AI agent have?**
 >
 > This document is a factual, evidence-based audit of the out-of-the-box capabilities
-> available to the `github-minimum-intelligence` (GMI) agent running as a GitHub Actions
+> available to the `github-gstack-intelligence` (GMI) agent running as a GitHub Actions
 > workflow on an `ubuntu-latest` runner. Every claim below was empirically verified
 > during this analysis.
 >
@@ -65,7 +65,7 @@ The agent runs as `runner` but has **passwordless sudo to root**. This means:
 ### What the `GITHUB_TOKEN` can do (verified):
 
 - ✅ **List all organization repositories** (including private ones)
-- ✅ **Clone any org repository** (verified: `github-minimum-intelligence`, `aws-lambda-nodejs-catch-all`)
+- ✅ **Clone any org repository** (verified: `github-gstack-intelligence`, `aws-lambda-nodejs-catch-all`)
 - ✅ **Push code to this repository** (dry-run confirmed)
 - ✅ **Read and write issues** across repos
 - ✅ **Create branches** in any org repo
@@ -116,7 +116,7 @@ Verified: the `GITHUB_TOKEN` can `git ls-remote` (and likely push to) **all 24 r
 japer-technology/aws-lambda-nodejs-catch-all
 japer-technology/developer-japer-io
 japer-technology/juxta-repo
-japer-technology/github-minimum-intelligence
+japer-technology/github-gstack-intelligence
 japer-technology/gmi-test-1
 ... (24 total)
 ```

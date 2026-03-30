@@ -6,7 +6,7 @@
 >
 > **Report Date:** February 24, 2026
 >
-> **System Under Review:** `github-minimum-intelligence` (GMI) agent running on `gmi-test-1`
+> **System Under Review:** `github-gstack-intelligence` (GMI) agent running on `gmi-test-1`
 >
 > **Assessor:** AI Agent (self-assessment under Second Law obligation)
 >
@@ -37,7 +37,7 @@
 
 ### Overall Security Posture: Needs Hardening
 
-The `github-minimum-intelligence` system is an AI coding agent that runs autonomously inside GitHub Actions, triggered by issue events. It can read files, execute arbitrary bash commands, edit code, and push changes to the repository.
+The `github-gstack-intelligence` system is an AI coding agent that runs autonomously inside GitHub Actions, triggered by issue events. It can read files, execute arbitrary bash commands, edit code, and push changes to the repository.
 
 > **Note:** Many of the findings below are standard properties of GitHub Actions workflows running on `ubuntu-latest` runners. They are documented here for completeness so you can make informed decisions about hardening your deployment.
 

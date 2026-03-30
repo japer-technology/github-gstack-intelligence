@@ -172,7 +172,7 @@ Six questions define the philosophical and architectural foundation of this proj
 
 | Question | Document | Core Inquiry |
 |----------|----------|--------------|
-| **What?** | [question-what.md](question-what.md) | What is GitHub Minimum Intelligence? A repository-native AI collaboration framework — not a hosted platform, but a local intelligence layer built from issues, workflows, markdown, and commits. |
+| **What?** | [question-what.md](question-what.md) | What is GitHub GStack Intelligence? A repository-native AI collaboration framework — not a hosted platform, but a local intelligence layer built from issues, workflows, markdown, and commits. |
 | **Who?** | [question-who.md](question-who.md) | Who speaks, executes, remembers, and governs when the repository itself becomes the mind? Identity as a layered stack of human, workflow, and model. |
 | **When?** | [question-when.md](question-when.md) | How does Git replace ephemeral sessions? Memory becomes durable, trust becomes auditable, and collaboration becomes resilient across time. |
 | **Where?** | [question-where.md](question-where.md) | Where does intelligence live? Runtime in GitHub Actions, memory in versioned state files, identity in checked-in markdown, authorization in repository permissions. |
@@ -197,6 +197,6 @@ Maintained by humans, for humans.
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/logo.png" alt="Minimum Intelligence" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
   </picture>
 </p>

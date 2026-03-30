@@ -9,7 +9,7 @@
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [@mariozechner/pi-coding-agent](https://github.com/badlogic/pi-mono) | 0.57.1 | Coding agent CLI with read, bash, edit, and write tools and session management. This is the core AI agent that powers the entire Minimum Intelligence system - it processes prompts, interacts with LLM providers, and manages conversation sessions. |
+| [@mariozechner/pi-coding-agent](https://github.com/badlogic/pi-mono) | 0.57.1 | Coding agent CLI with read, bash, edit, and write tools and session management. This is the core AI agent that powers the entire GStack Intelligence system - it processes prompts, interacts with LLM providers, and manages conversation sessions. |
 
 ### pi-mono Feature Surface
 
@@ -50,7 +50,7 @@ These are referenced in `.github/workflows/`:
 | [oven-sh/setup-bun@v2](https://github.com/oven-sh/setup-bun) | agent | Installs the Bun runtime in the GitHub Actions environment. |
 | [actions/cache@v5](https://github.com/actions/cache) | agent | Caches `node_modules` keyed on the `bun.lock` hash to speed up dependency installation. |
 | [actions/configure-pages@v5](https://github.com/actions/configure-pages) | agent | Configures GitHub Pages deployment (auto-enables Pages when the repo is used as a template). |
-| [actions/upload-pages-artifact@v4](https://github.com/actions/upload-pages-artifact) | agent | Uploads the static site artifact from `.github-minimum-intelligence/public-fabric/`. |
+| [actions/upload-pages-artifact@v4](https://github.com/actions/upload-pages-artifact) | agent | Uploads the static site artifact from `.github-gstack-intelligence/public-fabric/`. |
 | [actions/deploy-pages@v4](https://github.com/actions/deploy-pages) | agent | Deploys the uploaded artifact to GitHub Pages. |
 
 ## LLM Provider Dependencies (one required)
@@ -82,6 +82,6 @@ These are pulled in transitively by `@mariozechner/pi-coding-agent`:
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-minimum-intelligence/main/.github-minimum-intelligence/logo.png" alt="Minimum Intelligence" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
   </picture>
 </p>

@@ -1,10 +1,10 @@
 /**
- * agent.ts — Core agent orchestrator for Minimum Intelligence.
+ * agent.ts — Core agent orchestrator for GStack Intelligence.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * PURPOSE
  * ─────────────────────────────────────────────────────────────────────────────
- * This is the main entry point for the Minimum Intelligence AI coding agent.  It receives
+ * This is the main entry point for the GStack Intelligence AI coding agent.  It receives
  * a GitHub issue (or issue comment) event, runs the `pi` AI agent against the
  * user's prompt, and posts the result back as an issue comment.  It also
  * manages all session state so that multi-turn conversations across multiple
@@ -42,9 +42,9 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * SESSION CONTINUITY
  * ─────────────────────────────────────────────────────────────────────────────
- * Minimum Intelligence maintains per-issue session state in:
- *   .github-minimum-intelligence/state/issues/<number>.json   — maps issue # → session file path
- *   .github-minimum-intelligence/state/sessions/<timestamp>.jsonl — the `pi` session transcript
+ * GStack Intelligence maintains per-issue session state in:
+ *   .github-gstack-intelligence/state/issues/<number>.json   — maps issue # → session file path
+ *   .github-gstack-intelligence/state/sessions/<timestamp>.jsonl — the `pi` session transcript
  *
  * On every run the agent checks for an existing mapping.  If the mapped session
  * file is still present, the run "resumes" by passing `--session <path>` to `pi`,
@@ -79,8 +79,8 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { resolve } from "path";
 
 // ─── Paths and event context ───────────────────────────────────────────────────
-// `import.meta.dir` resolves to `.github-minimum-intelligence/lifecycle/`; stepping up one level
-// gives us the `.github-minimum-intelligence/` directory which contains `state/` and `node_modules/`.
+// `import.meta.dir` resolves to `.github-gstack-intelligence/lifecycle/`; stepping up one level
+// gives us the `.github-gstack-intelligence/` directory which contains `state/` and `node_modules/`.
 const minimumIntelligenceDir = resolve(import.meta.dir, "..");
 const stateDir = resolve(minimumIntelligenceDir, "state");
 const issuesDir = resolve(stateDir, "issues");
@@ -89,7 +89,7 @@ const piSettingsPath = resolve(minimumIntelligenceDir, ".pi", "settings.json");
 
 // The `pi` CLI requires a repo-root-relative path for `--session-dir`, not an
 // absolute one, so we keep this as a relative string constant.
-const sessionsDirRelative = ".github-minimum-intelligence/state/sessions";
+const sessionsDirRelative = ".github-gstack-intelligence/state/sessions";
 
 // GitHub enforces a ~65 535 character limit on issue comments; cap at 60 000
 // characters to leave a comfortable safety margin and avoid API rejections.
@@ -238,8 +238,8 @@ async function main() {
 
     // ── Configure git identity ───────────────────────────────────────────────────
     // Set the bot identity for all git commits made during this run.
-    await run(["git", "config", "user.name", "github-minimum-intelligence[bot]"]);
-    await run(["git", "config", "user.email", "github-minimum-intelligence[bot]@users.noreply.github.com"]);
+    await run(["git", "config", "user.name", "github-gstack-intelligence[bot]"]);
+    await run(["git", "config", "user.email", "github-gstack-intelligence[bot]@users.noreply.github.com"]);
 
     // ── Build prompt from event context ─────────────────────────────────────────
     // For `issue_comment` events, use the new comment body as the full prompt so
@@ -392,7 +392,7 @@ async function main() {
     const { exitCode } = await run(["git", "diff", "--cached", "--quiet"]);
     if (exitCode !== 0) {
       // exitCode !== 0 means there are staged changes to commit.
-      const commitResult = await run(["git", "commit", "-m", `minimum-intelligence: work on issue #${issueNumber}`]);
+      const commitResult = await run(["git", "commit", "-m", `gstack-intelligence: work on issue #${issueNumber}`]);
       if (commitResult.exitCode !== 0) {
         console.error("git commit failed with exit code", commitResult.exitCode);
       }

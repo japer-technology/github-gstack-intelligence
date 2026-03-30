@@ -10,7 +10,7 @@
 
 ## Purpose
 
-This document provides precise, step-by-step procedures for **taking control** of a security incident involving the `github-minimum-intelligence` (GMI) agent. It covers containment, manual file deletion of compromised artifacts, disabling the workflow agent, and stopping any existing GitHub Actions runs.
+This document provides precise, step-by-step procedures for **taking control** of a security incident involving the `github-gstack-intelligence` (GMI) agent. It covers containment, manual file deletion of compromised artifacts, disabling the workflow agent, and stopping any existing GitHub Actions runs.
 
 **Use this plan when:**
 
@@ -63,10 +63,10 @@ done
 
 ```bash
 # Disable the agent workflow so no new runs can start
-gh workflow disable "github-minimum-intelligence-agent.yml"
+gh workflow disable "github-gstack-intelligence-agent.yml"
 ```
 
-> **Verification:** Confirm under **Actions → github-minimum-intelligence-agent** that the badge reads "This workflow is disabled" and no runs are in progress.
+> **Verification:** Confirm under **Actions → github-gstack-intelligence-agent** that the badge reads "This workflow is disabled" and no runs are in progress.
 
 ---
 
@@ -127,7 +127,7 @@ git diff --name-only HEAD~10
 find .github/workflows -type f -newer security-assessment.md -ls
 
 # Find new or modified files in the agent directory
-find .github-minimum-intelligence -type f -newer security-assessment.md -ls
+find .github-gstack-intelligence -type f -newer security-assessment.md -ls
 ```
 
 ### 3.2 Delete unauthorized workflow files
@@ -167,8 +167,8 @@ If agent session or state files have been tampered with:
 
 ```bash
 # Remove all agent state (conversations and issue mappings)
-git rm -r .github-minimum-intelligence/state/sessions/*
-git rm -r .github-minimum-intelligence/state/issues/*
+git rm -r .github-gstack-intelligence/state/sessions/*
+git rm -r .github-gstack-intelligence/state/issues/*
 git commit -m "incident: purge agent state files"
 git push origin main
 ```
@@ -201,8 +201,8 @@ Compare the current workflow against the known-good version:
 
 ```bash
 # Diff the installed workflow against the upstream template
-diff .github/workflows/github-minimum-intelligence-agent.yml \
-     .github-minimum-intelligence/install/github-minimum-intelligence-agent.yml
+diff .github/workflows/github-gstack-intelligence-agent.yml \
+     .github-gstack-intelligence/install/github-gstack-intelligence-agent.yml
 ```
 
 Verify:
@@ -215,8 +215,8 @@ Verify:
 
 ```bash
 # Check for modifications to lifecycle scripts
-git diff HEAD~20 -- .github-minimum-intelligence/lifecycle/
-git diff HEAD~20 -- .github-minimum-intelligence/.pi/
+git diff HEAD~20 -- .github-gstack-intelligence/lifecycle/
+git diff HEAD~20 -- .github-gstack-intelligence/.pi/
 ```
 
 Verify:
@@ -235,7 +235,7 @@ Before re-enabling the workflow, implement the recommendations from [security-as
 
 ```bash
 # Re-enable the workflow only after all safeguards are in place
-gh workflow enable "github-minimum-intelligence-agent.yml"
+gh workflow enable "github-gstack-intelligence-agent.yml"
 ```
 
 ---
