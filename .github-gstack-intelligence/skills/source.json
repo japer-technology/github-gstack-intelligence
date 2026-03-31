@@ -1,0 +1,18 @@
+{
+  "extractedAt": "2026-03-31T01:58:59.092Z",
+  "source": {
+    "repo": "garrytan/gstack",
+    "ref": "main",
+    "commit": null
+  },
+  "outputs": [
+    "ETHOS.md",
+    "skills/review.md",
+    "skills/cso.md",
+    "skills/references/gstack-agents.md",
+    "skills/references/gstack-architecture.md",
+    "skills/references/review-checklist.md",
+    "skills/references/review-design-checklist.md",
+    "skills/references/cso-acknowledgements.md"
+  ]
+}

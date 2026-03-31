@@ -67,6 +67,15 @@ on:
   #    repository, or upgrades it when a newer version is available.
   #    Safe to re-run; it installs, upgrades, or skips as appropriate.
   workflow_dispatch:
+    inputs:
+      function:
+        description: "Workflow function to run"
+        required: false
+        default: run-install
+        type: choice
+        options:
+          - run-install
+          - run-refresh-gstack
 
 # ──────────────────────────────────────────────────────────────────────────────
 # PERMISSIONS
@@ -102,6 +111,7 @@ jobs:
     # downloads FROM that repo, so running it there would be self-referential.
     if: >-
       github.event_name == 'workflow_dispatch'
+      && github.event.inputs.function == 'run-install'
       && github.repository != 'japer-technology/github-gstack-intelligence'
     steps:
 
@@ -275,6 +285,61 @@ jobs:
           fi
 
   # ────────────────────────────────────────────────────────────────────────────
+  # JOB 1b — run-refresh-gstack
+  #
+  # Purpose : Refresh the extracted gstack resources that live inside the
+  #           installed .github-gstack-intelligence folder.
+  # Trigger : workflow_dispatch with function=run-refresh-gstack.
+  # ────────────────────────────────────────────────────────────────────────────
+  run-refresh-gstack:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      && github.event.inputs.function == 'run-refresh-gstack'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Check for .github-gstack-intelligence
+        id: check-folder
+        run: |
+          if [ -d ".github-gstack-intelligence" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::error::.github-gstack-intelligence folder not found."
+            exit 1
+          fi
+
+      - name: Setup Bun
+        if: steps.check-folder.outputs.exists == 'true'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.2"
+
+      - name: Run refresh
+        if: steps.check-folder.outputs.exists == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun .github-gstack-intelligence/lifecycle/refresh.ts
+
+      - name: Commit and push refreshed resources
+        if: steps.check-folder.outputs.exists == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github-gstack-intelligence/
+
+          if git diff --cached --quiet; then
+            echo "No refresh changes to commit."
+          else
+            git commit -m "chore: refresh gstack resources"
+            git push
+          fi
+
+  # ────────────────────────────────────────────────────────────────────────────
   # JOB 2 — run-agent
   #
   # Purpose : The core AI agent. Reads the issue (or comment), loads the
@@ -428,7 +493,7 @@ jobs:
   run-gitpages:
     # Run after agent/install jobs finish. On push events those jobs are
     # skipped so run-gitpages starts immediately.
-    needs: [run-agent, run-install]
+    needs: [run-agent, run-install, run-refresh-gstack]
     # always() ensures the job runs even when upstream jobs are skipped;
     # !cancelled() still respects manual cancellation.
     if: always() && !cancelled()

@@ -173,6 +173,10 @@ This is optional. The agent works without hatching, but it's more fun with a per
     settings.json                                # Default LLM settings template (copied to .pi/settings.json on install)
   lifecycle/
     agent.ts                # Core agent orchestrator
+    refresh.ts              # Refresh-time gstack resource extraction
+  skills/                           # Extracted GitHub-native gstack resources
+    references/                     # Extracted checklists and source references
+    source.json                     # Upstream extraction source metadata
   docs/                             # Documentation and analysis
   public-fabric/                    # GitHub Pages static site
   state/                            # Session history and issue mappings (git-tracked)
