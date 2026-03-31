@@ -1,18 +1,28 @@
 {
-  "extractedAt": "2026-03-31T01:58:59.092Z",
+  "extractedAt": "2026-03-31T02:20:14.887Z",
   "source": {
     "repo": "garrytan/gstack",
     "ref": "main",
     "commit": null
   },
+  "inputs": [
+    "ETHOS.md",
+    "ARCHITECTURE.md",
+    "AGENTS.md",
+    "review/SKILL.md.tmpl",
+    "review/checklist.md",
+    "review/design-checklist.md",
+    "cso/SKILL.md.tmpl",
+    "cso/ACKNOWLEDGEMENTS.md"
+  ],
   "outputs": [
     "ETHOS.md",
-    "skills/review.md",
-    "skills/cso.md",
-    "skills/references/gstack-agents.md",
     "skills/references/gstack-architecture.md",
+    "skills/references/gstack-agents.md",
     "skills/references/review-checklist.md",
     "skills/references/review-design-checklist.md",
-    "skills/references/cso-acknowledgements.md"
+    "skills/references/cso-acknowledgements.md",
+    "skills/review.md",
+    "skills/cso.md"
   ]
 }

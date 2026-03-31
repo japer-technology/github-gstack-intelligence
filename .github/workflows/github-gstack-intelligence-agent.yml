@@ -325,6 +325,58 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun .github-gstack-intelligence/lifecycle/refresh.ts
 
+      - name: Verify refreshed gstack files
+        if: steps.check-folder.outputs.exists == 'true'
+        run: |
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          root = pathlib.Path(".github-gstack-intelligence")
+          metadata_path = root / "skills" / "source.json"
+
+          if not metadata_path.exists():
+            print("::error::Missing .github-gstack-intelligence/skills/source.json after refresh.")
+            sys.exit(1)
+
+          metadata = json.loads(metadata_path.read_text())
+          inputs = metadata.get("inputs", [])
+          outputs = metadata.get("outputs", [])
+
+          if not inputs:
+            print("::error::Refresh metadata does not list any checked gstack source files.")
+            sys.exit(1)
+
+          if not outputs:
+            print("::error::Refresh metadata does not list any copied files.")
+            sys.exit(1)
+
+          missing_outputs = []
+          unmarked_outputs = []
+
+          for relative_path in outputs:
+            output_path = root / relative_path
+            if not output_path.exists():
+              missing_outputs.append(relative_path)
+              continue
+
+            if output_path.suffix == ".md":
+              content = output_path.read_text()
+              if "<!-- GSTACK-INTELLIGENCE: GENERATED FILE -->" not in content:
+                unmarked_outputs.append(relative_path)
+
+          if missing_outputs:
+            print(f"::error::Refresh is missing copied gstack files: {', '.join(missing_outputs)}")
+            sys.exit(1)
+
+          if unmarked_outputs:
+            print(f"::error::Generated gstack files are missing the upgrade warning marker: {', '.join(unmarked_outputs)}")
+            sys.exit(1)
+
+          print(f"Validated {len(inputs)} upstream gstack files and {len(outputs)} copied outputs.")
+          PY
+
       - name: Commit and push refreshed resources
         if: steps.check-folder.outputs.exists == 'true'
         run: |
