@@ -247,6 +247,38 @@ describe("route", () => {
     expect(result!.context.branch).toBe("feature-branch");
   });
 
+  // pull_request → review with diffStat
+  test("includes diffStat in pull_request route context", () => {
+    const event = {
+      pull_request: {
+        number: 7,
+        head: { ref: "diff-branch" },
+        labels: [],
+        additions: 42,
+        deletions: 10,
+        changed_files: 3,
+      },
+    };
+    const result = route(event, "pull_request", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("review");
+    expect(result!.context.diffStat).toBe("+42 -10 across 3 files");
+  });
+
+  // pull_request → review without diff stats
+  test("omits diffStat when PR payload lacks additions field", () => {
+    const event = {
+      pull_request: {
+        number: 8,
+        head: { ref: "no-stats" },
+        labels: [],
+      },
+    };
+    const result = route(event, "pull_request", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.context.diffStat).toBeUndefined();
+  });
+
   // pull_request → cso (security-audit label)
   test("routes pull_request with security-audit label to cso", () => {
     const event = {

@@ -195,12 +195,16 @@ export function route(
     const prNumber = pr?.number;
     const branch = pr?.head?.ref;
     const labels: string[] = (pr?.labels || []).map((l: any) => l.name);
+    const diffStat =
+      pr?.additions != null
+        ? `+${pr.additions} -${pr.deletions} across ${pr.changed_files} files`
+        : undefined;
 
     // Check for CSO label (higher specificity than default review).
     if (labels.includes("security-audit")) {
       const result = buildRoute("cso", config, {
         sessionMode: "new",
-        context: { prNumber, branch },
+        context: { prNumber, branch, diffStat },
       });
       if (result) return result;
     }
@@ -209,7 +213,7 @@ export function route(
     if (labels.includes("design-review")) {
       const result = buildRoute("design-review", config, {
         sessionMode: "new",
-        context: { prNumber, branch },
+        context: { prNumber, branch, diffStat },
       });
       if (result) return result;
     }
@@ -217,7 +221,7 @@ export function route(
     // Default: route to review.
     return buildRoute("review", config, {
       sessionMode: "new",
-      context: { prNumber, branch },
+      context: { prNumber, branch, diffStat },
     });
   }
 

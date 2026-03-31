@@ -110,8 +110,12 @@ const isRouteMode = process.argv.includes("--route");
 // Parse the full GitHub Actions event payload (contains issue/comment details).
 const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH!, "utf-8"));
 
-// "issues" for new issues, "issue_comment" for replies on existing issues.
+// "issues" for new issues, "issue_comment" for replies on existing issues,
+// "pull_request" for PR opened/synchronized events.
 const eventName = process.env.GITHUB_EVENT_NAME!;
+
+// Whether this event is a pull_request event (PR review, not an issue).
+const isPullRequest = eventName === "pull_request";
 
 // "owner/repo" format — used when calling the GitHub REST API via `gh api`.
 const repo = process.env.GITHUB_REPOSITORY!;
@@ -119,8 +123,12 @@ const repo = process.env.GITHUB_REPOSITORY!;
 // Fall back to "main" if the repository's default branch is not set in the event.
 const defaultBranch = event.repository?.default_branch ?? "main";
 
-// The issue number is present on both the `issues` and `issue_comment` payloads.
-const issueNumber: number = event.issue.number;
+// The target number is the issue number for issue events, or the PR number for
+// pull_request events. In GitHub, PRs are also issues, so the number can be used
+// with both issue and PR API endpoints.
+const targetNumber: number = isPullRequest
+  ? event.pull_request.number
+  : event.issue.number;
 
 // Read the committed `.pi` defaults and pass them explicitly to the runtime.
 // This prevents provider/model drift from host-level config (for example a
@@ -203,28 +211,38 @@ async function main() {
   let succeeded = false;
 
   try {
-    // ── Read issue title and body from the event payload ──────────────────────────
-    // Use the webhook payload directly to avoid two `gh` API round-trips (~2–4 s).
+    // ── Read title and body from the event payload ───────────────────────────────
+    // For pull_request events, use the PR title and body.
+    // For issue events, use the issue title and body from the webhook payload.
     // GitHub truncates string fields at 65 536 characters in webhook payloads, so
     // we fall back to the API only when the body hits that limit.
-    const title = event.issue.title;
-    let body: string = event.issue.body ?? "";
-    if (body.length >= 65536) {
-      body = await gh("issue", "view", String(issueNumber), "--json", "body", "--jq", ".body");
+    let title: string;
+    let body: string;
+    if (isPullRequest) {
+      title = event.pull_request.title ?? "";
+      body = event.pull_request.body ?? "";
+    } else {
+      title = event.issue.title ?? "";
+      body = event.issue.body ?? "";
+      if (body.length >= 65536) {
+        body = await gh("issue", "view", String(targetNumber), "--json", "body", "--jq", ".body");
+      }
     }
 
     // ── Resolve or create session mapping ───────────────────────────────────────
     // Each issue maps to exactly one `pi` session file via `state/issues/<n>.json`.
     // If a mapping exists AND the referenced session file is still present, we resume
     // the conversation by passing `--session <path>` to `pi`.  Otherwise we start fresh.
+    // For pull_request events, session continuity is not needed — each review is
+    // a one-shot operation that starts fresh.
     mkdirSync(issuesDir, { recursive: true });
     mkdirSync(sessionsDir, { recursive: true });
 
     let mode = "new";
     let sessionPath = "";
-    const mappingFile = resolve(issuesDir, `${issueNumber}.json`);
+    const mappingFile = isPullRequest ? "" : resolve(issuesDir, `${targetNumber}.json`);
 
-    if (existsSync(mappingFile)) {
+    if (!isPullRequest && existsSync(mappingFile)) {
       try {
         const mapping = JSON.parse(readFileSync(mappingFile, "utf-8"));
         if (existsSync(mapping.sessionPath)) {
@@ -289,6 +307,9 @@ async function main() {
             if (routeResult.context.branch) {
               contextParts.push(`Branch: ${routeResult.context.branch}`);
             }
+            if (routeResult.context.diffStat) {
+              contextParts.push(`Diff: ${routeResult.context.diffStat}`);
+            }
             const contextStr = contextParts.length > 0
               ? `\n\nContext:\n${contextParts.join("\n")}`
               : "";
@@ -347,7 +368,7 @@ async function main() {
     const requiredKeyName = providerKeyMap[configuredProvider];
     if (requiredKeyName && !process.env[requiredKeyName]) {
       await gh(
-        "issue", "comment", String(issueNumber),
+        "issue", "comment", String(targetNumber),
         "--body",
         `## ⚠️ Missing API Key: \`${requiredKeyName}\`\n\n` +
         `The configured provider is \`${configuredProvider}\`, but the \`${requiredKeyName}\` secret is not available to this workflow run.\n\n` +
@@ -436,18 +457,45 @@ async function main() {
     // ── Persist issue → session mapping ─────────────────────────────────────────
     // Write (or overwrite) the mapping file so that the next run for this issue
     // can locate the correct session transcript and resume the conversation.
-    if (latestSession) {
+    // For pull_request events, session mapping is skipped — each review is one-shot.
+    if (latestSession && !isPullRequest) {
       writeFileSync(
         mappingFile,
         JSON.stringify({
-          issueNumber,
+          issueNumber: targetNumber,
           sessionPath: latestSession,
           updatedAt: new Date().toISOString(),
         }, null, 2) + "\n"
       );
-      console.log(`Saved mapping: issue #${issueNumber} -> ${latestSession}`);
-    } else {
+      console.log(`Saved mapping: issue #${targetNumber} -> ${latestSession}`);
+    } else if (!latestSession && !isPullRequest) {
       console.log("Warning: no session file found to map");
+    }
+
+    // ── Persist review/security results ──────────────────────────────────────────
+    // Write a structured result file for review and CSO skills so downstream skills
+    // (e.g. /ship) can verify that a review has been completed.
+    if (routeResult && (routeResult.skill === "review" || routeResult.skill === "cso")) {
+      const resultSubdir = routeResult.skill === "cso" ? "security" : routeResult.skill;
+      const resultDir = resolve(stateDir, "results", resultSubdir);
+      mkdirSync(resultDir, { recursive: true });
+
+      // For review/CSO skills routed from PR events, prNumber is always set by
+      // the router. The targetNumber fallback handles the edge case where the
+      // skill is invoked via a slash command on an issue comment.
+      const resultNumber = routeResult.context.prNumber ?? targetNumber;
+      const result = {
+        prNumber: resultNumber,
+        skill: routeResult.skill,
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, `pr-${resultNumber}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted ${routeResult.skill} result for PR #${resultNumber}`);
     }
 
     // ── Commit and push state changes ───────────────────────────────────────────
@@ -460,7 +508,10 @@ async function main() {
     const { exitCode } = await run(["git", "diff", "--cached", "--quiet"]);
     if (exitCode !== 0) {
       // exitCode !== 0 means there are staged changes to commit.
-      const commitResult = await run(["git", "commit", "-m", `gstack-intelligence: work on issue #${issueNumber}`]);
+      const commitMsg = isPullRequest
+        ? `gstack-intelligence: review PR #${targetNumber}`
+        : `gstack-intelligence: work on issue #${targetNumber}`;
+      const commitResult = await run(["git", "commit", "-m", commitMsg]);
       if (commitResult.exitCode !== 0) {
         console.error("git commit failed with exit code", commitResult.exitCode);
       }
@@ -479,11 +530,13 @@ async function main() {
         await new Promise(r => setTimeout(r, pushBackoffs[i - 1]));
       }
     }
-    // ── Post reply as issue comment ──────────────────────────────────────────────
+    // ── Post reply as comment ───────────────────────────────────────────────────
     // Always post the comment first so the user receives the agent's response even
     // if the push later fails.  The push failure throw (below) must come AFTER the
     // comment is posted — otherwise the throw would skip the comment entirely and
     // the user would get no reply.
+    // For pull_request events, post as a PR comment; for issue events, post as an
+    // issue comment. Both use the same underlying GitHub API.
     const trimmedText = agentText.trim();
     let commentBody = trimmedText.length > 0
       ? trimmedText.slice(0, MAX_COMMENT_LENGTH)
@@ -494,7 +547,11 @@ async function main() {
     // Append the agent signature as a hidden HTML comment for bot-loop prevention.
     // The router checks incoming comments for this signature and skips them.
     commentBody += "\n" + AGENT_SIGNATURE;
-    await gh("issue", "comment", String(issueNumber), "--body", commentBody);
+    if (isPullRequest) {
+      await gh("pr", "comment", String(targetNumber), "--body", commentBody);
+    } else {
+      await gh("issue", "comment", String(targetNumber), "--body", commentBody);
+    }
 
     // Throw push failure AFTER the comment has been posted so the user always
     // receives the agent's response.  The throw still causes the workflow step to
@@ -522,8 +579,8 @@ async function main() {
           // Add outcome reaction to the triggering comment.
           await gh("api", `repos/${repo}/issues/comments/${stateCommentId}/reactions`, "-f", `content=${outcomeContent}`);
         } else {
-          // Add outcome reaction to the issue itself.
-          await gh("api", `repos/${repo}/issues/${issueNumber}/reactions`, "-f", `content=${outcomeContent}`);
+          // Add outcome reaction to the issue (or PR — PRs are issues in GitHub).
+          await gh("api", `repos/${repo}/issues/${targetNumber}/reactions`, "-f", `content=${outcomeContent}`);
         }
       } catch (e) {
         // Log but do not re-throw — a failed reaction should not mask the original error.

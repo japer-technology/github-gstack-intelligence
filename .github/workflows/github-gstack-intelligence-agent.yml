@@ -54,7 +54,12 @@ on:
   issue_comment:
     types: [created]
 
-  # 3. Code is pushed to main → triggers a GitHub Pages deployment so the
+  # 3. A pull request is opened or updated → the agent runs a /review skill
+  #    (or /cso if the security-audit label is present).
+  pull_request:
+    types: [opened, synchronize]
+
+  # 4. Code is pushed to main → triggers a GitHub Pages deployment so the
   #    agent's public-fabric site stays up to date.
   #    paths-ignore ensures that editing this workflow file alone does NOT
   #    trigger a redundant Pages deploy.
@@ -63,7 +68,7 @@ on:
     paths-ignore:
       - ".github/workflows/**"
 
-  # 4. Manual "Run workflow" button → installs the agent folder into your
+  # 5. Manual "Run workflow" button → installs the agent folder into your
   #    repository, or upgrades it when a newer version is available.
   #    Safe to re-run; it installs, upgrades, or skips as appropriate.
   workflow_dispatch:
@@ -84,11 +89,12 @@ on:
 # specific reason documented below.
 # ──────────────────────────────────────────────────────────────────────────────
 permissions:
-  contents: write   # Commit agent responses, session state, and installed files to the repo.
-  issues: write     # Post AI replies as issue comments and add reaction indicators (🚀 / 👍).
-  actions: write    # Allow the run-install job to push commits that subsequently trigger workflows.
-  pages: write      # Upload and deploy the agent's public-fabric site to GitHub Pages.
-  id-token: write   # Required by actions/deploy-pages for secure OIDC-based Pages deployment.
+  contents: write        # Commit agent responses, session state, and installed files to the repo.
+  issues: write          # Post AI replies as issue comments and add reaction indicators (🚀 / 👍).
+  pull-requests: write   # Post review findings as PR comments and add reaction indicators.
+  actions: write         # Allow the run-install job to push commits that subsequently trigger workflows.
+  pages: write           # Upload and deploy the agent's public-fabric site to GitHub Pages.
+  id-token: write        # Required by actions/deploy-pages for secure OIDC-based Pages deployment.
 
 # ══════════════════════════════════════════════════════════════════════════════
 # JOBS
@@ -428,34 +434,41 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   # JOB 2 — run-agent
   #
-  # Purpose : The core AI agent. Reads the issue (or comment), loads the
-  #           conversation session from git, sends it to the configured LLM,
-  #           and posts the response back as an issue comment.
-  # Trigger : issues.opened OR issue_comment.created (ignoring bot & PR comments).
+  # Purpose : The core AI agent. Reads the issue (or comment, or PR), loads
+  #           the conversation session from git, sends it to the configured
+  #           LLM, and posts the response back as a comment.  For PRs, the
+  #           /review or /cso skill is invoked and findings appear as PR comments.
+  # Trigger : issues.opened, issue_comment.created, OR pull_request.opened/synchronize.
   # Security: Only collaborators with write/maintain/admin access can trigger.
   # ────────────────────────────────────────────────────────────────────────────
   run-agent:
     runs-on: ubuntu-latest
 
-    # Concurrency: one agent run per issue at a time. If the user posts two
-    # comments quickly, the second run waits for the first to finish rather
-    # than cancelling it (cancel-in-progress: false). The group key includes
-    # the issue number so different issues run in parallel.
+    # Concurrency: one agent run per target (issue or PR) at a time.
+    # For issues: the second comment waits for the first to finish (cancel-in-progress: false).
+    # For PRs: a new push cancels the previous review (cancel-in-progress via expression).
     concurrency:
-      group: github-gstack-intelligence-${{ github.repository }}-issue-${{ github.event.issue.number }}
-      cancel-in-progress: false
+      group: >-
+        github-gstack-intelligence-${{ github.repository }}-${{
+          github.event_name == 'pull_request'
+            && format('pr-{0}', github.event.pull_request.number)
+            || format('issue-{0}', github.event.issue.number)
+        }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
     # Trigger guard:
     #   • Run on new issues.
     #   • Run on issue comments, BUT skip comments posted by bots (the agent
     #     itself) to avoid infinite loops, AND skip comments on pull requests
     #     (issue_comment fires for both issues and PRs).
+    #   • Run on pull_request events (opened, synchronize), skipping bot-authored PRs.
     #   • Reject the github-actions actor to prevent bot-loop escalation.
     if: >-
       github.actor != 'github-actions'
       && (
         (github.event_name == 'issues')
         || (github.event_name == 'issue_comment' && !github.event.issue.pull_request && !endsWith(github.event.comment.user.login, '[bot]'))
+        || (github.event_name == 'pull_request' && !endsWith(github.event.pull_request.user.login, '[bot]'))
       )
     steps:
 
@@ -479,13 +492,18 @@ jobs:
             exit 1
           fi
 
-          # Add a 🚀 "rocket" reaction to the comment or issue as a visual
+          # Add a 🚀 "rocket" reaction to the comment, issue, or PR as a visual
           # indicator that the agent has started processing. Save the reaction
           # ID so the agent can swap it for 👍 when it finishes.
           if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
             REACTION_ID=$(gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
             if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
             echo '{"reactionId":'"$RID_JSON"',"reactionTarget":"comment","commentId":${{ github.event.comment.id }},"issueNumber":${{ github.event.issue.number }},"repo":"${{ github.repository }}"}' > /tmp/reaction-state.json
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # PRs are issues in GitHub — use the issues reactions API with the PR number.
+            REACTION_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
+            if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
+            echo '{"reactionId":'"$RID_JSON"',"reactionTarget":"issue","commentId":null,"issueNumber":${{ github.event.pull_request.number }},"repo":"${{ github.repository }}"}' > /tmp/reaction-state.json
           else
             REACTION_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
             if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
@@ -501,6 +519,8 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
             gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" -f content=-1
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/reactions" -f content=-1
           else
             gh api "repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/reactions" -f content=-1
           fi
