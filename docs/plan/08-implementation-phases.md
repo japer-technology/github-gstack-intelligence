@@ -1,6 +1,6 @@
 # 08 — Implementation Phases
 
-### Five-phase rollout from proof-of-concept to marketplace distribution
+### Five-phase rollout from proof-of-concept to marketplace distribution, plus additional ideas
 
 ---
 
@@ -8,25 +8,25 @@
 
 | Phase | Name | Skills | Deliverable |
 |-------|------|--------|-------------|
-| 1 | Core Review | `/review`, `/cso` | Working PR review + security audit on every PR |
+| 1 | Core Review + Refresh | `/review`, `/cso`, `run-refresh-gstack` | Working PR review + security audit + resource extraction mechanism |
 | 2 | QA + Investigation | `/qa`, `/qa-only`, `/investigate` | Browser-based QA testing and root-cause debugging |
 | 3 | Conversation Skills | `/office-hours`, `/plan-ceo-review`, `/plan-eng-review`, `/plan-design-review` | Multi-turn conversation via issue comments |
 | 4 | Scheduled + Event-Driven | `/retro`, `/benchmark`, `/document-release`, `/canary` | Automated periodic and event-triggered skills |
-| 5 | Distribution | All + installer | GitHub Marketplace action, self-installer workflow |
+| 5 | Distribution | All + installer | Self-installer, documentation, and distribution |
 
-Each phase builds on the previous one. Phase 1 proves the architecture; Phase 5 makes it available to any repository.
+Each phase builds on the previous one. Phase 1 proves the architecture (including the single super yml workflow and resource extraction); Phase 5 makes it available to any repository.
 
 ---
 
-## Phase 1 — Core Review (Proof of Concept)
+## Phase 1 — Core Review + Refresh (Proof of Concept)
 
 ### Goal
 
-`/review` runs automatically on every PR and posts findings as a PR comment. `/cso` runs on PRs with the `security-audit` label.
+The single super yml workflow runs. `run-refresh-gstack` extracts resources. `/review` runs automatically on every PR and posts findings as a PR comment. `/cso` runs on PRs with the `security-audit` label.
 
 ### Tasks
 
-1. **Create `.gstack-actions/` folder structure**
+1. **Create `.github-gstack-intelligence/` folder structure**
    - `package.json` with `@mariozechner/pi-coding-agent` dependency
    - `.pi/settings.json` with Anthropic provider config
    - `.pi/APPEND_SYSTEM.md` with gstack ETHOS principles
@@ -34,50 +34,60 @@ Each phase builds on the previous one. Phase 1 proves the architecture; Phase 5 
    - `AGENTS.md` with agent identity
    - `ETHOS.md` (reference copy from `repo/gstack/ETHOS.md`)
 
-2. **Adapt `/review` skill prompt**
+2. **Write `run-refresh-gstack` mechanism**
+   - `lifecycle/refresh.ts` — fetches gstack source, extracts skills, applies CI adaptations
+   - Tests extraction of `/review` and `/cso` skill prompts as proof of concept
+   - Commits extracted resources to `.github-gstack-intelligence/skills/`
+
+3. **Write the single super yml workflow**
+   - `.github/workflows/github-gstack-intelligence-agent.yml` — handles `pull_request`, `issue_comment`, `workflow_dispatch` events
+   - All event routing in TypeScript, not YAML
+
+4. **Adapt `/review` skill prompt**
    - Take `repo/gstack/review/SKILL.md.tmpl` as source
    - Remove `{{PREAMBLE}}` expansion (replace with CI-specific context injection)
    - Remove `AskUserQuestion` references (ASK items posted as comments)
    - Remove `gstack-review-log` (replace with state file commit)
-   - Replace `~/.claude/skills/review/checklist.md` path with `.gstack-actions/skills/references/review-checklist.md`
+   - Replace `~/.claude/skills/review/checklist.md` path with `.github-gstack-intelligence/skills/references/review-checklist.md`
    - Add GitHub context header (repo, PR number, branch, diff stat)
-   - Output → `.gstack-actions/skills/review.md`
+   - Output → `.github-gstack-intelligence/skills/review.md`
 
-3. **Adapt `/cso` skill prompt**
+5. **Adapt `/cso` skill prompt**
    - Same adaptation pattern as `/review`
-   - Output → `.gstack-actions/skills/cso.md`
+   - Output → `.github-gstack-intelligence/skills/cso.md`
 
-4. **Copy supplementary files**
-   - `repo/gstack/review/checklist.md` → `.gstack-actions/skills/references/review-checklist.md`
-   - `repo/gstack/review/design-checklist.md` → `.gstack-actions/skills/references/review-design-checklist.md`
-   - `repo/gstack/cso/ACKNOWLEDGEMENTS.md` → `.gstack-actions/skills/references/cso-acknowledgements.md`
+6. **Copy supplementary files**
+   - `repo/gstack/review/checklist.md` → `.github-gstack-intelligence/skills/references/review-checklist.md`
+   - `repo/gstack/review/design-checklist.md` → `.github-gstack-intelligence/skills/references/review-design-checklist.md`
+   - `repo/gstack/cso/ACKNOWLEDGEMENTS.md` → `.github-gstack-intelligence/skills/references/cso-acknowledgements.md`
 
-5. **Write lifecycle scripts**
+7. **Write lifecycle scripts**
    - `lifecycle/indicator.ts` — port from GMI (minor path adjustments)
-   - `lifecycle/agent.ts` — extend GMI's agent.ts with `--skill` argument, skill prompt loading, PR context injection
-   - No router needed yet — Phase 1 is single-skill per workflow
+   - `lifecycle/router.ts` — event-to-skill routing (PR → review, dispatch → refresh, etc.)
+   - `lifecycle/agent.ts` — extend GMI's agent.ts with `--route` mode for router-based execution
 
-6. **Write workflow file**
-   - `.github/workflows/gstack-review.yml` — PR-triggered review + security audit
-
-7. **Create state directories**
+8. **Create state directories**
    - `state/issues/` (empty, for future session mapping)
    - `state/results/review/` (for review result persistence)
    - `state/results/security/` (for CSO result persistence)
 
-8. **Test on a real repository**
-   - Install in a test repo
+9. **Test on a real repository**
+   - Install in a test repo (copy workflow file + dot-folder)
+   - Run `run-refresh-gstack` to extract resources
    - Open a PR with intentional issues (SQL injection, race condition, missing validation)
    - Verify review findings appear as PR comment
    - Verify security audit findings appear as separate PR comment
 
 ### Exit Criteria
 
+- ✅ Single super yml workflow handles PR events and workflow_dispatch
+- ✅ `run-refresh-gstack` extracts resources from gstack and commits them
 - ✅ `/review` runs on every PR and posts structured findings
 - ✅ `/cso` runs when label is applied and posts security findings
 - ✅ Results are committed to `state/results/`
 - ✅ Authorization blocks unauthorized actors
 - ✅ Bot loop prevention works (agent comments don't trigger re-runs)
+- ✅ All resources are pre-extracted — no external fetches during skill execution
 
 ---
 
@@ -106,17 +116,18 @@ Each phase builds on the previous one. Phase 1 proves the architecture; Phase 5 
    - Playwright helper functions: navigate, screenshot, health check, responsive test
    - Screenshot upload to GitHub via API
 
-5. **Write `gstack-qa.yml` workflow**
-   - Triggered on `issue_comment` with `/qa` or `/qa-only` prefix
-   - Includes Playwright browser installation step
-   - Includes screenshot artifact upload
+5. **Extend the single super yml workflow**
+   - Add conditional Playwright install step (only for browser-needing skills)
+   - Add `issue_comment` trigger handling for `/qa`, `/qa-only`, `/investigate` commands
+   - All routing in `router.ts`
 
-6. **Add QA to `gstack-agent.yml`**
-   - `/investigate` handled by the general agent workflow (no browser needed)
+6. **Extend router for issue commands**
+   - `/investigate` handled by `router.ts` (no browser needed)
+   - `/qa` and `/qa-only` routed with `needsBrowser: true`
 
-7. **Implement basic router**
+7. **Extend router for skill commands**
    - `lifecycle/router.ts` — parse issue comments for `/qa`, `/investigate` commands
-   - Route to appropriate skill prompt
+   - Route to appropriate skill prompt with browser flag
 
 ### Exit Criteria
 
@@ -198,11 +209,10 @@ Automated skills that run on schedules or in response to GitHub events.
    - Browser-based health checks on deployment URL
    - Create issue if problems found
 
-5. **Write workflow files**
-   - `gstack-retro.yml` — weekly cron + workflow_dispatch
-   - `gstack-benchmark.yml` — daily cron + push to main + workflow_dispatch
-   - `gstack-document-release.yml` — release published trigger
-   - `gstack-canary.yml` — deployment_status success trigger
+5. **Extend the single super yml workflow**
+   - Add `schedule`, `release`, and `deployment_status` triggers to the workflow `on:` block
+   - Router handles schedule → retro/benchmark, release → document-release, deployment_status → canary
+   - All new event types handled by the same `router.ts`
 
 6. **Adapt `/ship` skill prompt**
    - Checks for existing review results in `state/results/review/`
@@ -229,18 +239,19 @@ Automated skills that run on schedules or in response to GitHub events.
 
 ### Goal
 
-Make gstack-actions available to any GitHub repository as a one-step installation.
+Make github-gstack-intelligence available to any GitHub repository as a one-step installation.
 
 ### Tasks
 
-1. **Create self-installer workflow**
-   - `gstack-install.yml` — downloads `.gstack-actions/` folder and workflow files from template repo
-   - User copies one file, runs workflow_dispatch, agent installs itself
+1. **Create self-installer mechanism**
+   - `run-refresh-gstack` already handles extracting resources from the gstack repo
+   - Add an installation mode: download `.github-gstack-intelligence/` folder and the single workflow file from `japer-technology/github-gstack-intelligence`
+   - User copies one workflow file, runs `workflow_dispatch` with `function: run-refresh-gstack`, agent installs itself
 
 2. **Package as distributable**
    - Option A: Template repository — users "Use this template" and get everything
-   - Option B: Composite GitHub Action — `uses: japer-technology/gstack-actions@v1`
-   - Option C: Self-installer (GMI pattern) — copy one workflow file, run it
+   - Option B: Self-installer (GMI pattern) — copy one workflow file, run it
+   - Option C: Composite GitHub Action — `uses: japer-technology/github-gstack-intelligence@v1`
 
 3. **Write installation guide**
    - Step-by-step: add secrets, copy workflow, run installer, verify
@@ -252,7 +263,7 @@ Make gstack-actions available to any GitHub repository as a one-step installatio
    - Marketplace listing with description, screenshots, usage examples
 
 5. **Version management**
-   - Semantic versioning for `.gstack-actions/` package
+   - Semantic versioning for `.github-gstack-intelligence/` package
    - Upgrade workflow that pulls latest version without losing config
    - `VERSION` file tracking installed version
 
@@ -264,7 +275,7 @@ Make gstack-actions available to any GitHub repository as a one-step installatio
 
 ### Exit Criteria
 
-- ✅ Any repository can install gstack-actions in under 5 minutes
+- ✅ Any repository can install github-gstack-intelligence in under 5 minutes (copy one workflow file + run refresh)
 - ✅ Upgrade path preserves user configuration
 - ✅ Documentation covers all seventeen skills
 - ✅ Installation tested on repos with different languages and frameworks
@@ -274,7 +285,7 @@ Make gstack-actions available to any GitHub repository as a one-step installatio
 ## Phase Dependencies
 
 ```
-Phase 1 (Core Review)
+Phase 1 (Core Review + Refresh)
     │
     ├─── Phase 2 (QA + Investigation)
     │        │
@@ -316,3 +327,90 @@ Phase 1 is the foundation. Phases 2 and 3 can proceed in parallel after Phase 1.
 | Session continuity | 100% of resumed conversations retain full context |
 | Installation time | New repo fully operational in <5 minutes |
 | Cost per PR (standard tier) | <$0.15 for review + security audit |
+| Resource refresh time | `run-refresh-gstack` completes in <60 seconds |
+
+---
+
+## Additional Ideas
+
+### 1. Skill Composition / Chaining
+
+Allow skills to be composed in user-defined sequences via `config.json`. Instead of hardcoding `/autoplan` as CEO → design → eng, let teams define their own chains:
+
+```json
+{
+  "chains": {
+    "full-review": ["review", "cso", "design-review"],
+    "ship-ready": ["review", "cso", "qa"],
+    "planning": ["plan-ceo-review", "plan-eng-review"]
+  }
+}
+```
+
+Invoked via `/chain full-review` in an issue comment.
+
+### 2. Skill Marketplace / Community Skills
+
+Allow third-party skill prompts to be installed alongside the core gstack skills. The `run-refresh-gstack` mechanism could be generalised to `run-refresh-skills` that pulls from multiple sources:
+
+```json
+{
+  "skillSources": [
+    { "repo": "garrytan/gstack", "skills": ["review", "cso", "qa"] },
+    { "repo": "community/accessibility-audit", "skills": ["a11y"] },
+    { "repo": "internal/compliance-check", "skills": ["compliance"] }
+  ]
+}
+```
+
+### 3. Cross-Repository Intelligence
+
+A single `japer-technology/github-gstack-intelligence` installation could serve as a "hub" that monitors multiple repositories. Using repository dispatch events, satellite repos could request skill execution from the hub, centralising LLM costs and configuration.
+
+### 4. Skill Learning / Feedback Loop
+
+Track which review findings are accepted vs. dismissed by developers. Over time, use this data to refine skill prompts:
+
+- If a finding type is dismissed 80% of the time → reduce its severity or suppress it
+- If a finding type is always accepted → promote it to critical
+- Store acceptance rates in `state/results/review/feedback/`
+
+### 5. Differential Resource Extraction
+
+Enhance `run-refresh-gstack` to show a diff of what changed between the current extracted skills and the new version before committing. This gives teams visibility into skill prompt changes:
+
+```
+run-refresh-gstack completed:
+  - review.md: 3 lines changed (added edge case for async/await patterns)
+  - cso.md: unchanged
+  - qa.md: 12 lines changed (updated Playwright API calls)
+  - NEW: a11y.md (new accessibility audit skill)
+```
+
+### 6. Lightweight "Dry Run" Mode
+
+Add a `--dry-run` flag to the agent that returns the skill prompt and context injection without actually invoking the LLM. Useful for debugging routing, testing configuration changes, and verifying resource extraction.
+
+### 7. Skill Health Dashboard
+
+A GitHub Pages site (or issue-based dashboard) that shows skill execution statistics:
+
+- Which skills run most frequently
+- Average execution time per skill
+- Cost per skill per week
+- Success/error rates
+- Last `run-refresh-gstack` timestamp and source version
+
+Generated by a weekly cron job reading from `state/results/`.
+
+### 8. Progressive Skill Rollout
+
+When `run-refresh-gstack` pulls new skill versions, don't immediately apply them to all PRs. Instead, use a canary approach:
+
+- Apply new skill version to 10% of PRs initially
+- Compare findings quality between old and new versions
+- Auto-promote to 100% if quality metrics hold
+
+### 9. Offline Skill Execution Cache
+
+Cache the last N LLM responses for identical inputs (same diff, same skill prompt). If a PR is force-pushed with no meaningful changes, skip the LLM call and return the cached result. Significant cost reduction for rebase-heavy workflows.

@@ -1,6 +1,6 @@
 # 01 — Resource Extraction
 
-### What to extract from gstack, what to leave behind, and why
+### What to extract from gstack, what to leave behind, and the `run-refresh-gstack` mechanism
 
 ---
 
@@ -86,15 +86,50 @@ These resources are tightly coupled to gstack's local execution model and have n
 | Tier 4 skills (`/careful`, `/freeze`, `/guard`, `/unfreeze`) | Local editing safety skills. CI has its own safety model: branch protection, CODEOWNERS, required reviews. | Branch protection rules and CODEOWNERS |
 | `/setup-browser-cookies` | Imports cookies from a developer's local browser. No equivalent in CI — authenticated testing uses service accounts or API tokens. | GitHub Secrets for service account credentials |
 | `/setup-deploy` | One-time local configuration | `workflow_dispatch` setup wizard or installation workflow |
-| `/gstack-upgrade` | Local update mechanism | Dependabot/Renovate for action version updates |
+| `/gstack-upgrade` | Local update mechanism | `run-refresh-gstack` function in the single super yml workflow |
 | `/codex` | Multi-AI second opinion via Codex CLI | Potentially reimplementable but high cost per invocation |
-| `/land-and-deploy` | Merge → deploy → canary chain | Decomposed into separate workflows: merge via PR, deploy via existing CD, canary via `/canary` skill |
+| `/land-and-deploy` | Merge → deploy → canary chain | Decomposed into separate workflow functions: merge via PR, deploy via existing CD, canary via `/canary` skill |
 | `design/` binary tooling | Local-only design HTML generation | Not needed — design review posts findings as Markdown comments |
 | `test/` tests | Coupled to local execution model and browse binary | New tests for CI-adapted skills |
-| `bun.lock` | Specific to gstack's dependency tree | New lockfile for the `.gstack-actions/` package |
+| `bun.lock` | Specific to gstack's dependency tree | New lockfile for the `.github-gstack-intelligence/` package |
 | `bin/` dev scripts | Local development tooling | Replaced by workflow dispatch and lifecycle scripts |
 | `supabase/` | Infrastructure-specific | Not applicable |
 | `.env.example` | Local configuration | GitHub Secrets |
+
+---
+
+## The `run-refresh-gstack` Mechanism
+
+A key design principle is that **resource extraction happens at refresh time, not at execution time**. The single super yml workflow includes a `run-refresh-gstack` function that:
+
+1. **Fetches the latest gstack source** from `garrytan/gstack` (or a pinned tag/commit)
+2. **Extracts transferable resources** — skill prompts, checklists, ethos documents, quality standards
+3. **Applies CI adaptations** — replaces local references with GitHub-native equivalents
+4. **Commits the extracted resources** to `.github-gstack-intelligence/skills/` and `.github-gstack-intelligence/skills/references/`
+5. **Updates the VERSION file** — tracks which gstack version the resources were extracted from
+
+```
+run-refresh-gstack trigger (workflow_dispatch or schedule)
+    │
+    ▼
+Fetch latest gstack repo → Extract skill prompts + references
+    │
+    ▼
+Apply CI adaptations (replace local paths, browse commands, etc.)
+    │
+    ▼
+Commit to .github-gstack-intelligence/skills/
+    │
+    ▼
+Update .github-gstack-intelligence/VERSION with source commit/tag
+```
+
+**Why refresh-time extraction, not runtime fetching:**
+- **Zero external fetches during skill execution** — all resources are pre-committed and local
+- **Deterministic behaviour** — the exact skill prompts are version-controlled and auditable
+- **No network dependency** — skill execution works even if the gstack repo is unavailable
+- **Diffable changes** — `git diff` shows exactly what changed between gstack versions
+- **Controlled cadence** — teams decide when to pull new gstack resources, not on every PR
 
 ---
 
@@ -108,11 +143,12 @@ For each extracted resource, the transformation from local to GitHub-native foll
 | `{{BROWSE_SETUP}}` template variable | Playwright setup block with `npx playwright install chromium` |
 | `AskUserQuestion` tool | Post an issue comment requesting input; wait for next `issue_comment` event |
 | `$B <command>` (browse binary) | Playwright API calls in lifecycle TypeScript (`page.goto()`, `page.screenshot()`) |
-| Local file paths (`~/.gstack/`, `~/.claude/skills/`) | Runner workspace paths (`$GITHUB_WORKSPACE/.gstack-actions/`) |
-| `gstack-config` settings | `.gstack-actions/config.json` committed to repo |
-| `gstack-review-log` | State committed to `.gstack-actions/state/results/` |
-| Interactive skill routing (`/review` slash command) | Event-driven routing (PR opened → review, issue labeled → investigate) |
+| Local file paths (`~/.gstack/`, `~/.claude/skills/`) | Runner workspace paths (`$GITHUB_WORKSPACE/.github-gstack-intelligence/`) |
+| `gstack-config` settings | `.github-gstack-intelligence/config.json` committed to repo |
+| `gstack-review-log` | State committed to `.github-gstack-intelligence/state/results/` |
+| Interactive skill routing (`/review` slash command) | Event-driven routing via single super yml workflow (PR opened → review, issue labeled → investigate) |
 | `conductor.json` setup/archive | GitHub Actions `workflow_dispatch` for setup, no teardown needed |
+| `/gstack-upgrade` local command | `run-refresh-gstack` function in the single super yml workflow |
 
 ---
 

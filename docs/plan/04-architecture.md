@@ -1,15 +1,15 @@
 # 04 — Architecture
 
-### Folder structure, lifecycle scripts, skill router, and configuration
+### Folder structure, lifecycle scripts, skill router, and configuration — single workflow design
 
 ---
 
 ## Folder Structure
 
-Following the Githubification convention of a dot-prefixed, self-contained folder:
+Following the Githubification convention of a dot-prefixed, self-contained folder (matching the `github-minimum-intelligence` pattern):
 
 ```
-.gstack-actions/
+.github-gstack-intelligence/
 ├── .pi/                                    # Pi-coding-agent configuration
 │   ├── settings.json                       # LLM provider, model, thinking level
 │   ├── APPEND_SYSTEM.md                    # System prompt — gstack ETHOS injected here
@@ -19,7 +19,8 @@ Following the Githubification convention of a dot-prefixed, self-contained folde
 │   ├── indicator.ts                        # Add 🚀 reaction — signal agent is working
 │   ├── router.ts                           # Skill router — maps GitHub events to skills
 │   ├── agent.ts                            # Core orchestrator — runs pi, posts replies, commits state
-│   └── browser.ts                          # Playwright helper — screenshot, navigate, assert
+│   ├── browser.ts                          # Playwright helper — screenshot, navigate, assert
+│   └── refresh.ts                          # run-refresh-gstack — extract latest resources from gstack repo
 │
 ├── skills/                                 # Adapted skill prompts (CI-ready Markdown)
 │   ├── review.md                           # /review — PR code review
@@ -60,7 +61,7 @@ Following the Githubification convention of a dot-prefixed, self-contained folde
 │
 ├── AGENTS.md                               # Agent identity and personality
 ├── ETHOS.md                                # gstack builder principles (reference copy)
-├── VERSION                                 # Installed version of gstack-actions
+├── VERSION                                 # Installed version of github-gstack-intelligence + gstack source version
 ├── package.json                            # Single dependency: @mariozechner/pi-coding-agent
 └── bun.lock                                # Dependency lockfile
 ```
@@ -70,20 +71,15 @@ Following the Githubification convention of a dot-prefixed, self-contained folde
 ```
 .github/
 ├── workflows/
-│   ├── gstack-review.yml                   # PR review + security audit
-│   ├── gstack-qa.yml                       # QA testing (issue-triggered)
-│   ├── gstack-agent.yml                    # General-purpose issue-driven agent
-│   ├── gstack-retro.yml                    # Weekly retrospective (scheduled)
-│   ├── gstack-benchmark.yml                # Performance benchmarks (scheduled/push)
-│   ├── gstack-document-release.yml         # Post-release doc updates
-│   ├── gstack-canary.yml                   # Post-deploy monitoring
-│   └── gstack-install.yml                  # Self-installer (workflow_dispatch)
+│   └── github-gstack-intelligence-agent.yml    # THE single super yml workflow — handles ALL events
 └── ISSUE_TEMPLATE/
     ├── gstack-qa.yml                       # QA request template (URL field)
     ├── gstack-investigate.yml              # Bug investigation template
     ├── gstack-office-hours.yml             # Product idea template
     └── gstack-review.yml                   # Manual review request template
 ```
+
+**Note:** There is only ONE workflow file by design, just like in `japer-technology/github-minimum-intelligence`. All event routing is handled by the TypeScript lifecycle scripts, not by YAML conditionals.
 
 ---
 
@@ -101,7 +97,7 @@ Persists reaction metadata to `/tmp/reaction-state.json` for `agent.ts` to read 
 
 ### `router.ts` — Skill Router
 
-Maps GitHub events to skill names. This is the new component that doesn't exist in GMI — gstack has seventeen skills, not one.
+Maps GitHub events to skill names. This is the key component that extends beyond GMI — gstack has seventeen skills, not one. The router runs inside the single workflow and determines which skill prompt to load based on the event type, labels, and comment content.
 
 ```typescript
 // router.ts — Maps GitHub events to gstack skills
@@ -166,6 +162,18 @@ function route(event: GitHubEvent, config: GstackConfig): RouteResult | null {
     };
   }
 
+  // Workflow dispatch → could be run-refresh-gstack or manual skill
+  if (event.type === 'workflow_dispatch') {
+    if (event.inputs?.function === 'run-refresh-gstack') {
+      return {
+        skill: 'refresh',
+        prompt: 'Extract latest resources from gstack repo',
+        needsBrowser: false,
+        sessionMode: 'none',
+      };
+    }
+  }
+
   return null; // No matching route
 }
 ```
@@ -195,7 +203,7 @@ function route(event: GitHubEvent, config: GstackConfig): RouteResult | null {
 Extended from GMI's agent.ts with skill-aware execution:
 
 1. **Receive route** from `router.ts` (skill name, prompt, browser flag, session mode)
-2. **Load skill prompt** from `.gstack-actions/skills/{skill}.md`
+2. **Load skill prompt** from `.github-gstack-intelligence/skills/{skill}.md`
 3. **Inject context** — repo name, PR number, branch, diff stat, issue body
 4. **Resolve session** — create new or resume existing based on session mode
 5. **Execute pi-coding-agent** with constructed prompt and skill file as system context
@@ -217,6 +225,46 @@ export async function testResponsiveLayouts(url: string, outputDir: string): Pro
 ```
 
 Used by `agent.ts` when the route specifies `needsBrowser: true`. The agent invokes these via its bash tool during skill execution.
+
+### `refresh.ts` — run-refresh-gstack
+
+The resource extraction script invoked by the `run-refresh-gstack` function in the single super yml workflow:
+
+```typescript
+// refresh.ts — Extract latest resources from gstack repo
+
+async function refreshGstack(options: { source?: string; tag?: string }) {
+  const sourceRepo = options.source ?? 'garrytan/gstack';
+  const tag = options.tag ?? 'latest';
+
+  // 1. Fetch gstack source to temp directory
+  const tmpDir = await fetchGstackSource(sourceRepo, tag);
+
+  // 2. Extract skill prompts
+  for (const skill of SKILL_MANIFEST) {
+    const raw = await readFile(`${tmpDir}/${skill.sourcePath}/SKILL.md.tmpl`);
+    const adapted = applyCIAdaptations(raw, skill);
+    await writeFile(`.github-gstack-intelligence/skills/${skill.name}.md`, adapted);
+  }
+
+  // 3. Extract supplementary references
+  await copyReferences(tmpDir);
+
+  // 4. Extract foundational documents
+  await copyFile(`${tmpDir}/ETHOS.md`, `.github-gstack-intelligence/ETHOS.md`);
+
+  // 5. Update VERSION with source info
+  const version = { gstackSource: sourceRepo, gstackTag: tag, extractedAt: new Date().toISOString() };
+  await writeFile(`.github-gstack-intelligence/VERSION`, JSON.stringify(version, null, 2));
+
+  // 6. Commit and push
+  await git('add', '.github-gstack-intelligence/');
+  await git('commit', '-m', `gstack: refresh resources from ${sourceRepo}@${tag}`);
+  await pushWithRetry();
+}
+```
+
+This ensures all resources are pre-extracted and committed, so skill execution never fetches from external repos.
 
 ---
 
@@ -346,7 +394,7 @@ The Githubified gstack agent gets its own identity, following the GMI "hatching"
 ## Skill System
 
 This agent has seventeen skills. When invoked, load the skill prompt from
-`.gstack-actions/skills/{skill}.md` and follow its instructions precisely.
+`.github-gstack-intelligence/skills/{skill}.md` and follow its instructions precisely.
 The skill has specialized workflows, checklists, and quality gates that produce
 better results than answering inline.
 ```
@@ -357,11 +405,19 @@ better results than answering inline.
 
 ### Why One Folder, Not Seventeen Repos
 
-gstack's skills are interdependent — `/review` is invoked by `/ship`, `/autoplan` chains three skills, the ETHOS principles are shared. A single `.gstack-actions/` folder keeps everything co-located, version-controlled together, and deployable as one unit.
+gstack's skills are interdependent — `/review` is invoked by `/ship`, `/autoplan` chains three skills, the ETHOS principles are shared. A single `.github-gstack-intelligence/` folder keeps everything co-located, version-controlled together, and deployable as one unit.
 
-### Why Separate Workflow Files
+### Why a Single Super YML Workflow
 
-Each workflow file handles a different trigger pattern. Combining all triggers into one workflow would create a complex conditional matrix. Separate files are easier to enable/disable, debug, and understand.
+Following the proven pattern from `japer-technology/github-minimum-intelligence`, there is only ONE workflow file: `github-gstack-intelligence-agent.yml`. This provides:
+
+1. **Simplicity** — one file to copy, one file to maintain, one file to debug
+2. **Event consolidation** — all triggers (`issues`, `issue_comment`, `pull_request`, `schedule`, `release`, `deployment_status`, `workflow_dispatch`) in one `on:` block
+3. **Consistent authorization** — same auth check for all events
+4. **TypeScript routing** — all skill routing complexity lives in `router.ts`, not in YAML conditionals
+5. **Installation ease** — copy one workflow file + the dot-folder, done
+
+The previous consideration of eight separate workflow files has been superseded. Event differentiation happens in the lifecycle scripts via `GITHUB_EVENT_NAME` and `GITHUB_EVENT_PATH` environment variables, exactly as GMI does it.
 
 ### Why Router Instead of Direct Skill Invocation
 
@@ -369,4 +425,4 @@ The router provides a single point of control for skill selection, configuration
 
 ### Why Not Fork GMI
 
-GMI is a minimal agent — one conversation, one skill. gstack-actions extends the pattern with skill routing, browser integration, and multi-skill orchestration. The lifecycle scripts are inspired by GMI but are different enough to be their own implementation.
+GMI is a minimal agent — one conversation, one skill. github-gstack-intelligence extends the pattern with skill routing, browser integration, and multi-skill orchestration. The lifecycle scripts are inspired by GMI but are different enough to be their own implementation.
