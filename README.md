@@ -1,6 +1,6 @@
 ### [GitHub GStack Intelligence](.github-gstack-intelligence/README.md)
 
-### Please read [this](docs/final-warning.md) before you install this AI Agent.
+### Please read [this](.github-gstack-intelligence/README.md) before you install this AI Agent.
 
 <p align="center">
   <picture>
