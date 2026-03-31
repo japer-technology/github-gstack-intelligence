@@ -570,7 +570,27 @@ jobs:
         if: steps.check-folder.outputs.exists == 'true'
         run: cd .github-gstack-intelligence && bun install --frozen-lockfile
 
-      # 8. RUN THE AGENT — execute the core agent script. It reads the
+      # 8. PLAYWRIGHT (CONDITIONAL) — install the Chromium browser only when
+      #    a browser-based skill is being invoked (/qa, /qa-only, /design-review,
+      #    /canary). Adds ~30s and ~200MB to the runner, so we skip it for all
+      #    other skills to keep runs fast.
+      - name: Install Playwright (conditional)
+        if: >-
+          steps.check-folder.outputs.exists == 'true'
+          && (
+            (github.event_name == 'issue_comment' && (
+              startsWith(github.event.comment.body, '/qa ')
+              || startsWith(github.event.comment.body, '/qa-only ')
+              || startsWith(github.event.comment.body, '/design-review')
+              || startsWith(github.event.comment.body, '/canary')
+            ))
+            || github.event_name == 'deployment_status'
+          )
+        run: npx playwright install chromium --with-deps
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+
+      # 9. RUN THE AGENT — execute the core agent script. It reads the
       #    triggering issue/comment, loads the matching conversation session,
       #    calls the configured LLM, posts the reply, and commits state.
       #
@@ -592,6 +612,7 @@ jobs:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
         run: bun .github-gstack-intelligence/lifecycle/agent.ts --route
 
   # ────────────────────────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@mariozechner/pi-coding-agent": "0.57.1"
+    "@mariozechner/pi-coding-agent": "0.57.1",
+    "playwright-core": "1.58.2"
   }
 }
