@@ -402,4 +402,83 @@ describe("route", () => {
     expect(result).not.toBeNull();
     expect(result!.skill).toBe("review");
   });
+
+  // Conversation skill routing (Phase 4)
+
+  test("routes issue with design-consultation label to design-consultation", () => {
+    const event = {
+      issue: {
+        number: 40,
+        labels: [{ name: "design-consultation" }],
+      },
+    };
+    const result = route(event, "issues", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("design-consultation");
+    expect(result!.context.issueNumber).toBe(40);
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  test("routes /plan-ceo-review command from issue comment", () => {
+    const event = {
+      comment: { body: "/plan-ceo-review" },
+      issue: { number: 50 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("plan-ceo-review");
+    expect(result!.context.issueNumber).toBe(50);
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  test("routes /plan-eng-review command from issue comment", () => {
+    const event = {
+      comment: { body: "/plan-eng-review" },
+      issue: { number: 51 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("plan-eng-review");
+    expect(result!.context.issueNumber).toBe(51);
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  test("routes /autoplan command with sessionMode none", () => {
+    const event = {
+      comment: { body: "/autoplan" },
+      issue: { number: 60 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("autoplan");
+    expect(result!.context.issueNumber).toBe(60);
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("none");
+  });
+
+  test("routes /design-consultation command from issue comment", () => {
+    const event = {
+      comment: { body: "/design-consultation" },
+      issue: { number: 70 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("design-consultation");
+    expect(result!.context.issueNumber).toBe(70);
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  test("non-autoplan commands still use sessionMode new", () => {
+    const event = {
+      comment: { body: "/plan-ceo-review" },
+      issue: { number: 80 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.sessionMode).toBe("new");
+  });
 });
