@@ -363,7 +363,7 @@ jobs:
 
             if output_path.suffix == ".md":
               content = output_path.read_text()
-              if "forfeit clean upgrades and re-imports" not in content:
+              if "<!-- GSTACK-INTELLIGENCE: GENERATED FILE -->" not in content:
                 unmarked_outputs.append(relative_path)
 
           if missing_outputs:
