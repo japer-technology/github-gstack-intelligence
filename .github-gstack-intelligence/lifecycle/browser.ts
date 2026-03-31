@@ -313,10 +313,18 @@ export async function getAccessibilitySnapshot(page: Page): Promise<string> {
   return formatAccessibilityNode(snapshot, 0);
 }
 
+/** Shape of a serialised accessibility-tree node returned by Playwright. */
+interface AccessibilityNode {
+  role?: string;
+  name?: string;
+  value?: string;
+  children?: AccessibilityNode[];
+}
+
 /**
  * Recursively format an accessibility node into a readable text tree.
  */
-function formatAccessibilityNode(node: any, depth: number): string {
+function formatAccessibilityNode(node: AccessibilityNode, depth: number): string {
   const indent = "  ".repeat(depth);
   const role = node.role ?? "unknown";
   const name = node.name ? `: "${node.name}"` : "";
