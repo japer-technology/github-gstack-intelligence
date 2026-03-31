@@ -8,14 +8,14 @@
 
 All state lives in the repository, committed to git. No databases, no external storage, no session cookies. Git provides versioning, auditability, and persistence. You can `git log`, `git blame`, and `git revert` any AI-generated output.
 
-This is the same pattern proven by GMI. gstack-actions extends it with skill-specific state types.
+This is the same pattern proven by GMI. github-gstack-intelligence extends it with skill-specific state types.
 
 ---
 
 ## State Directory Structure
 
 ```
-.gstack-actions/state/
+.github-gstack-intelligence/state/
 ├── issues/                          # Issue-to-session mappings
 │   ├── 7.json                       # Issue #7 → session file path + active skill
 │   ├── 12.json                      # Issue #12 → session file path + active skill
@@ -61,7 +61,7 @@ This is the same pattern proven by GMI. gstack-actions extends it with skill-spe
 Each issue gets a mapping file that tracks which skill is active and which session file to resume:
 
 ```json
-// .gstack-actions/state/issues/7.json
+// .github-gstack-intelligence/state/issues/7.json
 {
   "issueNumber": 7,
   "skill": "office-hours",
@@ -100,7 +100,7 @@ Check state/issues/7.json
 Review results are persisted for auditability and for use by the `/ship` skill (which checks if review has already been run):
 
 ```json
-// .gstack-actions/state/results/review/pr-42.json
+// .github-gstack-intelligence/state/results/review/pr-42.json
 {
   "prNumber": 42,
   "skill": "review",
@@ -126,7 +126,7 @@ The `/ship` skill reads this file to determine whether to run `/review` again or
 QA reports include findings, screenshots, and health scores:
 
 ```json
-// .gstack-actions/state/results/qa/report-2026-03-28.json
+// .github-gstack-intelligence/state/results/qa/report-2026-03-28.json
 {
   "url": "https://staging.example.com",
   "timestamp": "2026-03-28T10:15:00Z",
@@ -157,7 +157,7 @@ QA reports include findings, screenshots, and health scores:
 
 **Screenshot handling:**
 
-Screenshots are saved to `.gstack-actions/state/results/qa/screenshots/` and committed to git. They are also uploaded to the issue as comment attachments for inline display. The JSON report references the git-committed paths for permanent record; the issue comment uses the uploaded GitHub URLs for rendering.
+Screenshots are saved to `.github-gstack-intelligence/state/results/qa/screenshots/` and committed to git. They are also uploaded to the issue as comment attachments for inline display. The JSON report references the git-committed paths for permanent record; the issue comment uses the uploaded GitHub URLs for rendering.
 
 ---
 
@@ -166,7 +166,7 @@ Screenshots are saved to `.gstack-actions/state/results/qa/screenshots/` and com
 Benchmark results are committed for regression detection:
 
 ```json
-// .gstack-actions/state/benchmarks/baseline.json
+// .github-gstack-intelligence/state/benchmarks/baseline.json
 {
   "lastUpdated": "2026-03-28T06:00:00Z",
   "commit": "a1b2c3d",
@@ -200,7 +200,7 @@ Benchmark Report: 2 regressions, 1 improvement
 Retro reports are committed as Markdown for trend tracking and human readability:
 
 ```markdown
-<!-- .gstack-actions/state/results/retro/2026-03-28.md -->
+<!-- .github-gstack-intelligence/state/results/retro/2026-03-28.md -->
 # Weekly Retro — March 22–28, 2026
 
 ## Summary
@@ -288,7 +288,7 @@ A periodic maintenance workflow (monthly cron) can handle this automatically.
 Some files should NOT be committed:
 
 ```gitignore
-# In .gstack-actions/.gitignore
+# In .github-gstack-intelligence/.gitignore
 
 # Temporary files from agent execution
 /tmp/

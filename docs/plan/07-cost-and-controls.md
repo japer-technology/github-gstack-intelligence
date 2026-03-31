@@ -1,6 +1,6 @@
 # 07 — Cost and Controls
 
-### Cadence reduction, access control, model tiering, and cost management
+### Cadence optimisation for resource extraction, access control, model tiering, and cost management
 
 ---
 
@@ -8,11 +8,34 @@
 
 Running an LLM on every PR push, every issue comment, and every schedule trigger can be expensive. A busy repository with 20 PRs/day, each triggering `/review` and `/cso`, could generate 40+ LLM invocations daily. Without controls, this is a runaway cost vector.
 
-gstack-actions addresses this through five mechanisms: access control, skill gating, model tiering, cadence reduction, and bot loop prevention.
+github-gstack-intelligence addresses this through six mechanisms: resource extraction cadence, access control, skill gating, model tiering, cadence reduction, and bot loop prevention.
 
 ---
 
-## 1. Access Control
+## 1. Resource Extraction Cadence (Optimised)
+
+The most important cadence optimisation is separating **resource extraction from skill execution**. Resources (skill prompts, checklists, ethos documents) are extracted from the gstack source repo via `run-refresh-gstack` — NOT fetched during every workflow run.
+
+### Why This Matters
+
+| Approach | Cost per Skill Execution | Network Dependency | Predictability |
+|---|---|---|---|
+| ❌ Fetch gstack resources at runtime | Higher (network + parse time) | Requires gstack repo access | Variable (depends on gstack changes) |
+| ✅ Pre-extracted resources via `run-refresh-gstack` | Lower (local file read only) | None | Deterministic (pinned version) |
+
+### Resource Refresh Cadence
+
+| Strategy | When to Refresh | Who Triggers |
+|---|---|---|
+| **Manual** | Team decides when to adopt new gstack skills | `workflow_dispatch` with `function: run-refresh-gstack` |
+| **Scheduled** | Weekly or monthly | Add a schedule cron to `workflow_dispatch` |
+| **Release-driven** | When gstack publishes a new release | Webhook or manual trigger after gstack release |
+
+**Recommendation:** Start with manual refresh. This gives teams full control over when new skill prompts are adopted, avoiding surprise behaviour changes in automated reviews.
+
+---
+
+## 2. Access Control
 
 ### Collaborator Permission Check
 
@@ -58,7 +81,7 @@ This allows restricting destructive skills (`/ship`) to maintainers while keepin
 
 ---
 
-## 2. Skill Gating
+## 3. Skill Gating
 
 ### Label-Gated Skills
 
@@ -115,9 +138,9 @@ Disabled skills are ignored by the router even if their trigger fires.
 
 ---
 
-## 3. Model Tiering
+## 4. Model Tiering
 
-Not all skills need the most expensive model. gstack-actions supports per-skill model selection:
+Not all skills need the most expensive model. github-gstack-intelligence supports per-skill model selection:
 
 | Skill | Recommended Model | Reasoning |
 |-------|-------------------|-----------|
@@ -154,7 +177,7 @@ Not all skills need the most expensive model. gstack-actions supports per-skill 
 
 ---
 
-## 4. Cadence Reduction
+## 5. Cadence Reduction
 
 ### Diff-Based Filtering
 
@@ -213,7 +236,7 @@ These are inherently limited by their trigger frequency.
 
 ---
 
-## 5. Bot Loop Prevention
+## 6. Bot Loop Prevention
 
 The most critical safety mechanism. Without it, the agent's own comments could trigger itself, creating an infinite loop.
 
@@ -233,7 +256,7 @@ The most critical safety mechanism. Without it, the agent's own comments could t
 The agent's comments include a hidden signature that the router checks:
 
 ```typescript
-const AGENT_SIGNATURE = '<!-- gstack-actions-agent -->';
+const AGENT_SIGNATURE = '<!-- github-gstack-intelligence-agent -->';
 
 function isAgentComment(commentBody: string): boolean {
   return commentBody.includes(AGENT_SIGNATURE);

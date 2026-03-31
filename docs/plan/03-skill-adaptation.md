@@ -13,7 +13,7 @@ Every gstack skill follows the same adaptation process:
 3. **Replace AskUserQuestion** — for non-interactive skills, remove entirely; for multi-turn skills, replace with "post a comment and wait for the next `issue_comment` event"
 4. **Inject GitHub context** — add PR number, branch name, diff summary, issue body, repo metadata
 5. **Adapt output format** — ensure output is Markdown suitable for GitHub issue/PR comments (within 60,000 character limit)
-6. **Remove local state paths** — replace `~/.gstack/sessions/`, `gstack-config`, `gstack-review-log` with `.gstack-actions/state/` equivalents
+6. **Remove local state paths** — replace `~/.gstack/sessions/`, `gstack-config`, `gstack-review-log` with `.github-gstack-intelligence/state/` equivalents
 
 ---
 
@@ -25,11 +25,11 @@ Every gstack skill follows the same adaptation process:
 |--------|-------|-------------|
 | **Trigger** | Developer types `/review` in Claude Code | `pull_request: [opened, synchronize]` |
 | **Input** | `git diff origin/<base>` run by agent | Diff provided by checkout + `git diff` on runner |
-| **Checklist** | Reads from `~/.claude/skills/review/checklist.md` | Reads from `.gstack-actions/skills/review/checklist.md` |
+| **Checklist** | Reads from `~/.claude/skills/review/checklist.md` | Reads from `.github-gstack-intelligence/skills/review/checklist.md` |
 | **Output** | Displayed in Claude Code terminal | Posted as PR comment via `gh pr comment` |
 | **Fix-First** | Auto-fixes + AskUserQuestion for ASK items | Auto-fixes committed; ASK items posted as comment requesting reply |
 | **Greptile integration** | Fetches Greptile comments via `gh api` | Same — `gh api` available on runner |
-| **State** | `gstack-review-log` writes to local file | Results committed to `.gstack-actions/state/results/review/` |
+| **State** | `gstack-review-log` writes to local file | Results committed to `.github-gstack-intelligence/state/results/review/` |
 
 **Adaptation effort:** Low. The review skill is the most natural fit — the diff IS the input, and the output is structured Markdown that posts perfectly as a PR comment.
 
@@ -40,7 +40,7 @@ Every gstack skill follows the same adaptation process:
 | **Trigger** | Developer types `/cso` | `pull_request: [opened, synchronize]` (with `/review`) or label `security-audit` |
 | **Input** | Full codebase access via Claude Code | Full checkout on runner |
 | **Output** | OWASP Top 10 + STRIDE findings in terminal | Posted as PR comment with severity labels |
-| **State** | None persistent | Results committed to `.gstack-actions/state/results/security/` |
+| **State** | None persistent | Results committed to `.github-gstack-intelligence/state/results/security/` |
 
 **Adaptation effort:** Low. Security audit is read-only analysis — no browser, no user interaction.
 
@@ -63,7 +63,7 @@ Every gstack skill follows the same adaptation process:
 | **Trigger** | Developer types `/benchmark` | `push` to main or `schedule` (nightly) |
 | **Input** | Local benchmark suite | Benchmark suite on runner |
 | **Output** | Comparison against baseline | Posted as issue comment with regression/improvement table |
-| **State** | Local baseline files | Baselines committed to `.gstack-actions/state/benchmarks/` |
+| **State** | Local baseline files | Baselines committed to `.github-gstack-intelligence/state/benchmarks/` |
 
 **Adaptation effort:** Low. Benchmark is fully automated — run suite, compare to committed baseline, report.
 
@@ -74,7 +74,7 @@ Every gstack skill follows the same adaptation process:
 | **Trigger** | Developer types `/retro` | `schedule: cron('0 17 * * 5')` (Friday 5pm) or `workflow_dispatch` |
 | **Input** | Git history for time window | Same — full git history via checkout with `fetch-depth: 0` |
 | **Output** | Retro report in terminal | New issue created with retro report, or posted in a dedicated retro issue |
-| **State** | Retro history in local files | History committed to `.gstack-actions/state/retros/` for trend tracking |
+| **State** | Retro history in local files | History committed to `.github-gstack-intelligence/state/retros/` for trend tracking |
 
 **Adaptation effort:** Low. Retro reads git history — identical on runner. The time window arguments (`/retro 7d`, `/retro 14d`) map to `workflow_dispatch` inputs.
 
@@ -179,7 +179,7 @@ These skills require the GMI conversation pattern: agent posts a comment, user r
 |--------|-------|-------------|
 | **Trigger** | Developer types `/office-hours` | Issue opened with `office-hours` label |
 | **Conversation** | Interactive back-and-forth in Claude Code | Issue comments: user posts, agent replies, user posts again |
-| **Session** | Claude Code session state | `.gstack-actions/state/issues/{N}.json` → `state/sessions/{ts}.jsonl` |
+| **Session** | Claude Code session state | `.github-gstack-intelligence/state/issues/{N}.json` → `state/sessions/{ts}.jsonl` |
 | **Output** | Refined product specification | Accumulated in issue thread; final spec posted as summary comment |
 
 **Adaptation effort:** Low (uses GMI's existing conversation pattern exactly).
