@@ -28,13 +28,36 @@ cleanly. This is safe to repeat at any time.
 
 | File | Source | Type |
 |------|--------|------|
+| **Adapted skill prompts** | | |
 | `review.md` | `review/SKILL.md.tmpl` | Adapted skill prompt |
 | `cso.md` | `cso/SKILL.md.tmpl` | Adapted skill prompt |
-| `references/review-checklist.md` | `review/checklist.md` | Imported reference |
-| `references/review-design-checklist.md` | `review/design-checklist.md` | Imported reference |
-| `references/cso-acknowledgements.md` | `cso/ACKNOWLEDGEMENTS.md` | Imported reference |
+| `ship.md` | `ship/SKILL.md.tmpl` | Adapted skill prompt |
+| `benchmark.md` | `benchmark/SKILL.md.tmpl` | Adapted skill prompt |
+| `retro.md` | `retro/SKILL.md.tmpl` | Adapted skill prompt |
+| `document-release.md` | `document-release/SKILL.md.tmpl` | Adapted skill prompt |
+| `qa.md` | `qa/SKILL.md.tmpl` | Adapted skill prompt |
+| `qa-only.md` | `qa-only/SKILL.md.tmpl` | Adapted skill prompt |
+| `design-review.md` | `design-review/SKILL.md.tmpl` | Adapted skill prompt |
+| `plan-design-review.md` | `plan-design-review/SKILL.md.tmpl` | Adapted skill prompt |
+| `investigate.md` | `investigate/SKILL.md.tmpl` | Adapted skill prompt |
+| `canary.md` | `canary/SKILL.md.tmpl` | Adapted skill prompt |
+| `office-hours.md` | `office-hours/SKILL.md.tmpl` | Adapted skill prompt |
+| `plan-ceo-review.md` | `plan-ceo-review/SKILL.md.tmpl` | Adapted skill prompt |
+| `plan-eng-review.md` | `plan-eng-review/SKILL.md.tmpl` | Adapted skill prompt |
+| `design-consultation.md` | `design-consultation/SKILL.md.tmpl` | Adapted skill prompt |
+| `autoplan.md` | `autoplan/SKILL.md.tmpl` | Adapted skill prompt |
+| **Imported references** | | |
+| `references/gstack-root-skill.md` | `SKILL.md.tmpl` | Adapted root skill template |
 | `references/gstack-architecture.md` | `ARCHITECTURE.md` | Imported reference |
 | `references/gstack-agents.md` | `AGENTS.md` | Imported reference |
+| `references/review-checklist.md` | `review/checklist.md` | Imported reference |
+| `references/review-design-checklist.md` | `review/design-checklist.md` | Imported reference |
+| `references/review-todos-format.md` | `review/TODOS-format.md` | Imported reference |
+| `references/review-greptile-triage.md` | `review/greptile-triage.md` | Imported reference |
+| `references/cso-acknowledgements.md` | `cso/ACKNOWLEDGEMENTS.md` | Imported reference |
+| `references/qa-issue-taxonomy.md` | `qa/references/issue-taxonomy.md` | Imported reference |
+| `references/qa-report-template.md` | `qa/templates/qa-report-template.md` | Imported reference |
+| **Metadata** | | |
 | `source.json` | — | Extraction metadata (not generated) |
 
 ## Adding custom skills
