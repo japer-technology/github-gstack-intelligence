@@ -498,6 +498,35 @@ async function main() {
       console.log(`Persisted ${routeResult.skill} result for PR #${resultNumber}`);
     }
 
+    // ── Persist QA / QA-only / design-review results ────────────────────────────
+    // Write a structured result file for browser-based skills so the agent can
+    // track QA runs over time and downstream skills can reference prior results.
+    if (routeResult && (routeResult.skill === "qa" || routeResult.skill === "qa-only" || routeResult.skill === "design-review")) {
+      const resultSubdir = routeResult.skill === "design-review" ? "design-review" : "qa";
+      const resultDir = resolve(stateDir, "results", resultSubdir);
+      mkdirSync(resultDir, { recursive: true });
+
+      const resultIdentifier = routeResult.context.prNumber ?? routeResult.context.issueNumber ?? targetNumber;
+      const resultFilename = routeResult.context.prNumber
+        ? `pr-${resultIdentifier}.json`
+        : `issue-${resultIdentifier}.json`;
+      const result = {
+        ...(routeResult.context.prNumber
+          ? { prNumber: resultIdentifier }
+          : { issueNumber: resultIdentifier }),
+        skill: routeResult.skill,
+        url: routeResult.context.url ?? null,
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, resultFilename),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted ${routeResult.skill} result for #${resultIdentifier}`);
+    }
+
     // ── Commit and push state changes ───────────────────────────────────────────
     // Stage all changes (session log, mapping JSON, any files the agent edited),
     // commit only if the index is dirty, then push with a retry-on-conflict loop.
