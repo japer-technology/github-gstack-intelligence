@@ -52,6 +52,63 @@ Your repository _is_ the AI workspace. The questions, the results, the code, the
 
 ---
 
+## The GitHubification of GStack
+
+This project is a [Githubification](https://github.com/japer-technology/githubification) of [gstack](https://github.com/garrytan/gstack) — Garry Tan's collection of AI specialist skills for software development. Where gstack runs locally inside Claude Code sessions with a developer in the loop, GitHub GStack Intelligence transforms those skills into GitHub-native workflows that run autonomously on Actions. Of gstack's twenty-five skills, seventeen are adapted for GitHub — the remainder depend on local-only capabilities (persistent browser daemons, interactive terminal sessions) that don't translate to ephemeral Actions runners.
+
+### What is Githubification?
+
+Githubification is the act of converting a repository into **GitHub-as-infrastructure**. Instead of cloning a repo and running the software on your machine, the repo becomes something that runs on GitHub itself. Four GitHub primitives serve four roles:
+
+| GitHub Primitive | Role |
+|---|---|
+| **GitHub Actions** | Compute — the runner that executes the agent |
+| **Git** | Storage and memory — state is committed, versioned, searchable |
+| **GitHub Issues** | User interface — each issue is a conversation or task |
+| **GitHub Secrets** | Credential store — API keys, never hardcoded |
+
+### How Skills Are Adapted
+
+gstack's value is in its skill definitions — the prompt engineering, workflow structure, and quality standards — not in its local execution model. The adaptation maps each skill's workflow to GitHub events and replaces interactive prompts with issue-driven interfaces:
+
+| Local (gstack) | GitHub-Native (this project) |
+|---|---|
+| Developer types `/review` in Claude Code | PR opened → workflow triggers → review skill runs |
+| `AskUserQuestion` pauses for user input | Agent posts a comment and waits for the next `issue_comment` event |
+| Browse daemon on localhost | Playwright launched fresh per workflow run |
+| Results shown in terminal | Results posted as issue/PR comments in Markdown |
+| State in `~/.gstack/sessions/` | State committed to `.github-gstack-intelligence/state/` |
+
+### Available Skills
+
+Seventeen specialist skills are extracted from upstream gstack and adapted for GitHub:
+
+| Skill | What it does |
+|---|---|
+| **review** | Pre-landing PR review with checklist-driven quality gates |
+| **cso** | Security audit using OWASP Top 10 and STRIDE frameworks |
+| **ship** | Full shipping workflow — tests, review, version bump, PR |
+| **benchmark** | Performance regression detection against committed baselines |
+| **retro** | Weekly retrospective from git history |
+| **document-release** | Release notes generation from commit history |
+| **qa** | QA testing with browser automation via Playwright |
+| **qa-only** | Lightweight QA pass without full review |
+| **design-review** | Visual design audit with screenshot analysis |
+| **plan-design-review** | Design review planning and preparation |
+| **investigate** | Debugging and root-cause analysis |
+| **canary** | Canary deployment validation |
+| **office-hours** | Multi-turn conversational support |
+| **plan-ceo-review** | CEO-level product review planning |
+| **plan-eng-review** | Engineering review planning |
+| **design-consultation** | Interactive design consultation |
+| **autoplan** | Automatic implementation planning |
+
+### Upstream Refresh
+
+Skills are automatically extracted from [garrytan/gstack](https://github.com/garrytan/gstack) and adapted for GitHub by the `run-refresh-gstack` workflow dispatch function (triggered via **Actions → github-gstack-intelligence-agent → Run workflow**). The extraction source, commit SHA, and file manifest are tracked in [`skills/source.json`](skills/source.json). Re-running the refresh pulls the latest upstream changes without overwriting any custom configuration.
+
+---
+
 ## How It Works
 
 The entire system runs as a closed loop inside your GitHub repository. When you open an issue (or comment on one), a GitHub Actions workflow launches the AI agent, which reads your message, thinks, responds, and commits its work - all without leaving GitHub.
