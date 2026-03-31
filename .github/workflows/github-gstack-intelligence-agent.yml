@@ -341,6 +341,18 @@ jobs:
             sys.exit(1)
 
           metadata = json.loads(metadata_path.read_text())
+
+          # Validate source metadata.
+          source = metadata.get("source", {})
+          if not source.get("repo"):
+            print("::error::source.json is missing a valid 'source.repo' field.")
+            sys.exit(1)
+          if not source.get("ref"):
+            print("::error::source.json is missing a valid 'source.ref' field.")
+            sys.exit(1)
+          if not source.get("commit"):
+            print("::warning::source.json has no resolved commit SHA — using ref only.")
+
           inputs = metadata.get("inputs", [])
           outputs = metadata.get("outputs", [])
 
@@ -352,8 +364,13 @@ jobs:
             print("::error::Refresh metadata does not list any copied files.")
             sys.exit(1)
 
+          GENERATED_MARKER = "<!-- GSTACK-INTELLIGENCE: GENERATED FILE -->"
+          DO_NOT_TOUCH = "Do not touch"
+
           missing_outputs = []
           unmarked_outputs = []
+          unwarned_outputs = []
+          empty_outputs = []
 
           for relative_path in outputs:
             output_path = root / relative_path
@@ -361,20 +378,37 @@ jobs:
               missing_outputs.append(relative_path)
               continue
 
+            content = output_path.read_text()
+
+            if len(content) < 50:
+              empty_outputs.append(relative_path)
+              continue
+
             if output_path.suffix == ".md":
-              content = output_path.read_text()
-              if "<!-- GSTACK-INTELLIGENCE: GENERATED FILE -->" not in content:
+              if GENERATED_MARKER not in content:
                 unmarked_outputs.append(relative_path)
+              if DO_NOT_TOUCH not in content:
+                unwarned_outputs.append(relative_path)
 
           if missing_outputs:
             print(f"::error::Refresh is missing copied gstack files: {', '.join(missing_outputs)}")
+            sys.exit(1)
+
+          if empty_outputs:
+            print(f"::error::Refreshed gstack files have no meaningful content: {', '.join(empty_outputs)}")
             sys.exit(1)
 
           if unmarked_outputs:
             print(f"::error::Generated gstack files are missing the upgrade warning marker: {', '.join(unmarked_outputs)}")
             sys.exit(1)
 
-          print(f"Validated {len(inputs)} upstream gstack files and {len(outputs)} copied outputs.")
+          if unwarned_outputs:
+            print(f"::error::Generated gstack files are missing the 'Do not touch' warning: {', '.join(unwarned_outputs)}")
+            sys.exit(1)
+
+          print(f"✅ Validated {len(inputs)} upstream gstack files → {len(outputs)} copied outputs.")
+          print(f"   Source: {source.get('repo')} @ {source.get('commit', source.get('ref'))}")
+          print(f"   All outputs exist, have content, the generated marker, and the 'Do not touch' warning.")
           PY
 
       - name: Commit and push refreshed resources
