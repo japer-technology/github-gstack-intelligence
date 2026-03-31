@@ -346,7 +346,7 @@ Create `.github-gstack-intelligence/skills/qa.md`:
 
 Create `.github/workflows/gstack-qa.yml` per [05-workflows.md](05-workflows.md):
 - Triggers on `issue_comment` with `/qa` or `/qa-only` prefix
-- Includes	 Playwright browser installation step
+- Includes Playwright browser installation step
 - Includes screenshot artifact upload
 - Concurrency: `gstack-qa-{issue#}` with `cancel-in-progress: false`
 
