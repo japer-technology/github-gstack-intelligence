@@ -305,17 +305,19 @@ async function main() {
                 const reviewPath = resolve(minimumIntelligenceDir, "skills", `${reviewSkill}.md`);
                 if (existsSync(reviewPath)) {
                   const reviewContent = readFileSync(reviewPath, "utf-8");
-                  const sectionTitle = reviewSkill
-                    .replace("plan-", "")
-                    .replace(/-/g, " ")
-                    .replace(/\b\w/g, c => c.toUpperCase());
+                  const SKILL_TITLES: Record<string, string> = {
+                    "plan-ceo-review": "CEO Review",
+                    "plan-design-review": "Design Review",
+                    "plan-eng-review": "Engineering Review",
+                  };
+                  const sectionTitle = SKILL_TITLES[reviewSkill] ?? reviewSkill;
                   reviewSections.push(`## ${sectionTitle}\n${reviewContent}`);
                 } else {
                   console.warn(`Autoplan sub-skill not found: ${reviewPath}`);
                 }
               }
 
-              skillPrompt = `${autoplanPrompt}\n\n---\n\nExecute the following three reviews in sequence:\n\n${reviewSections.join("\n\n")}`;
+              skillPrompt = `${autoplanPrompt}\n\n---\n\nExecute the following ${reviewSections.length} review(s) in sequence:\n\n${reviewSections.join("\n\n")}`;
               console.log(`Autoplan: loaded ${reviewSections.length} review skill(s)`);
             } else {
               skillPrompt = readFileSync(skillPath, "utf-8");
