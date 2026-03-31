@@ -450,9 +450,13 @@ jobs:
     #   • Run on issue comments, BUT skip comments posted by bots (the agent
     #     itself) to avoid infinite loops, AND skip comments on pull requests
     #     (issue_comment fires for both issues and PRs).
+    #   • Reject the github-actions actor to prevent bot-loop escalation.
     if: >-
-      (github.event_name == 'issues')
-      || (github.event_name == 'issue_comment' && !github.event.issue.pull_request && !endsWith(github.event.comment.user.login, '[bot]'))
+      github.actor != 'github-actions'
+      && (
+        (github.event_name == 'issues')
+        || (github.event_name == 'issue_comment' && !github.event.issue.pull_request && !endsWith(github.event.comment.user.login, '[bot]'))
+      )
     steps:
 
       # 1. AUTHORIZATION — verify the actor has write-level (or higher) access
@@ -550,6 +554,10 @@ jobs:
       #    triggering issue/comment, loads the matching conversation session,
       #    calls the configured LLM, posts the reply, and commits state.
       #
+      #    The `--route` flag enables the event router: slash commands, label
+      #    routing, and skill-aware execution. Without it, all events go
+      #    through general conversation.
+      #
       #    All supported LLM provider keys are passed as environment variables.
       #    Only the key for your chosen provider needs to be set as a secret;
       #    the others will simply be empty and are safely ignored.
@@ -564,7 +572,7 @@ jobs:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun .github-gstack-intelligence/lifecycle/agent.ts
+        run: bun .github-gstack-intelligence/lifecycle/agent.ts --route
 
   # ────────────────────────────────────────────────────────────────────────────
   # JOB 3 — run-gitpages

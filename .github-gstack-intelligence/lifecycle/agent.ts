@@ -77,6 +77,7 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { resolve } from "path";
+import { route, loadConfig, AGENT_SIGNATURE, type RouteResult } from "./router";
 
 // ─── Paths and event context ───────────────────────────────────────────────────
 // `import.meta.dir` resolves to `.github-gstack-intelligence/lifecycle/`; stepping up one level
@@ -99,6 +100,12 @@ const MAX_COMMENT_LENGTH = 60000;
 // When the first character of an issue title or comment body is in this set, GMI
 // exits silently so that the designated agent can react instead.
 const RESERVED_PREFIXES = new Set(["`", "~", "@", "#", "$", "%", "^", ":", ";", "|", "=", "/", "\\", "&"]);
+
+// ─── Route mode ────────────────────────────────────────────────────────────────
+// When `--route` is passed, the agent consults router.ts to determine which
+// skill to execute based on the event type, slash commands, and labels.
+// Without `--route`, all events go through general conversation (legacy behavior).
+const isRouteMode = process.argv.includes("--route");
 
 // Parse the full GitHub Actions event payload (contains issue/comment details).
 const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH!, "utf-8"));
@@ -252,16 +259,77 @@ async function main() {
       prompt = `${title}\n\n${body}`;
     }
 
+    // ── Skill routing (--route mode) ────────────────────────────────────────────
+    // When --route is active, consult the router to determine which skill to
+    // execute. If a route matches, load the skill prompt and inject context.
+    // If no route matches, fall through to general conversation.
+    let routeResult: RouteResult | null = null;
+    if (isRouteMode) {
+      try {
+        const config = loadConfig(minimumIntelligenceDir);
+        routeResult = route(event, eventName, config);
+
+        if (routeResult) {
+          // Load the skill prompt file.
+          const skillPath = resolve(minimumIntelligenceDir, "skills", `${routeResult.skill}.md`);
+          if (existsSync(skillPath)) {
+            const skillPrompt = readFileSync(skillPath, "utf-8");
+
+            // Build context lines for the prompt.
+            const contextParts: string[] = [];
+            if (routeResult.context.prNumber) {
+              contextParts.push(`PR: #${routeResult.context.prNumber}`);
+            }
+            if (routeResult.context.issueNumber) {
+              contextParts.push(`Issue: #${routeResult.context.issueNumber}`);
+            }
+            if (routeResult.context.url) {
+              contextParts.push(`URL: ${routeResult.context.url}`);
+            }
+            if (routeResult.context.branch) {
+              contextParts.push(`Branch: ${routeResult.context.branch}`);
+            }
+            const contextStr = contextParts.length > 0
+              ? `\n\nContext:\n${contextParts.join("\n")}`
+              : "";
+
+            // Include the original user message after the skill prompt.
+            const userMessage = eventName === "issue_comment"
+              ? (event.comment?.body ?? "")
+              : `${title}\n\n${body}`;
+
+            prompt = `${skillPrompt}${contextStr}\n\n---\n\nUser message:\n${userMessage}`;
+            console.log(`Skill prompt loaded: ${routeResult.skill} (${skillPath})`);
+          } else {
+            console.warn(`Skill file not found: ${skillPath}, falling back to general conversation`);
+            routeResult = null;
+          }
+        } else if (eventName !== "issues" && eventName !== "issue_comment") {
+          // Non-conversation event with no matching route — exit cleanly.
+          console.log("No route matched for non-conversation event, exiting cleanly");
+          succeeded = true;
+          return;
+        }
+      } catch (e) {
+        console.warn(`Router error: ${e}. Falling back to general conversation.`);
+        routeResult = null;
+      }
+    }
+
     // ── Skip reserved-prefix messages for other AI agents ───────────────────────
     // Certain leading characters signal that this message is intended for another
     // AI agent.  If the issue title (for new issues) or comment body (for comments)
     // starts with any of these characters, exit cleanly without responding so that
     // the designated agent can react instead.
-    const textToCheck = eventName === "issue_comment" ? event.comment.body : title;
-    if (textToCheck && RESERVED_PREFIXES.has(textToCheck[0])) {
-      console.log(`Skipping: first character "${textToCheck[0]}" is a reserved prefix for another agent.`);
-      succeeded = true;
-      return;
+    // When a route matched a slash command, skip this check — the router already
+    // interpreted the `/` prefix as a skill command.
+    if (!routeResult) {
+      const textToCheck = eventName === "issue_comment" ? event.comment.body : title;
+      if (textToCheck && RESERVED_PREFIXES.has(textToCheck[0])) {
+        console.log(`Skipping: first character "${textToCheck[0]}" is a reserved prefix for another agent.`);
+        succeeded = true;
+        return;
+      }
     }
 
     // ── Validate provider API key ────────────────────────────────────────────────
@@ -423,6 +491,9 @@ async function main() {
     if (!pushSucceeded) {
       commentBody += `\n\n---\n⚠️ **Warning:** The agent's session state could not be pushed to the repository. Conversation context may not be preserved for follow-up comments. See the [workflow run logs](https://github.com/${repo}/actions) for details.`;
     }
+    // Append the agent signature as a hidden HTML comment for bot-loop prevention.
+    // The router checks incoming comments for this signature and skips them.
+    commentBody += "\n" + AGENT_SIGNATURE;
     await gh("issue", "comment", String(issueNumber), "--body", commentBody);
 
     // Throw push failure AFTER the comment has been posted so the user always

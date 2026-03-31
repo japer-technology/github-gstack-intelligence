@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "defaults": {
+    "provider": "openai",
+    "model": "gpt-5.4",
+    "maxCommentLength": 60000,
+    "costTier": "standard"
+  },
+  "access": {
+    "allowedPermissions": ["admin", "maintain", "write"],
+    "botLoopPrevention": true,
+    "prefixGating": true,
+    "prefixes": ["/"]
+  },
+  "skills": {
+    "review": { "enabled": true, "trigger": "pull_request" },
+    "cso": { "enabled": true, "trigger": "pull_request", "labelGated": true, "label": "security-audit" },
+    "qa": { "enabled": true, "trigger": "issue_comment" },
+    "investigate": { "enabled": true, "trigger": "issue_label", "label": "investigate" },
+    "office-hours": { "enabled": true, "trigger": "issue_label", "label": "office-hours" },
+    "retro": { "enabled": false, "trigger": "schedule", "schedule": "0 17 * * 5" },
+    "benchmark": { "enabled": false, "trigger": "schedule", "schedule": "0 6 * * *" },
+    "ship": { "enabled": true, "trigger": "issue_comment" },
+    "document-release": { "enabled": true, "trigger": "release" },
+    "canary": { "enabled": false, "trigger": "deployment_status" },
+    "autoplan": { "enabled": true, "trigger": "issue_comment" },
+    "plan-ceo-review": { "enabled": true, "trigger": "issue_comment" },
+    "plan-eng-review": { "enabled": true, "trigger": "issue_comment" },
+    "design-review": { "enabled": true, "trigger": "pull_request", "labelGated": true, "label": "design-review" },
+    "plan-design-review": { "enabled": true, "trigger": "issue_comment" },
+    "design-consultation": { "enabled": true, "trigger": "issue_label", "label": "design-consultation" },
+    "qa-only": { "enabled": true, "trigger": "issue_comment" }
+  }
+}
