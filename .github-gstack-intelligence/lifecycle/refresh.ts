@@ -174,6 +174,17 @@ function replaceAll(content: string, replacements: Array<[string, string]>): str
   );
 }
 
+/**
+ * Replace any remaining {{TOKENS}} with a CI-ADAPTED HTML comment so that
+ * new upstream tokens never break the build. Intended as a final catch-all
+ * after all known replacements have been applied.
+ */
+function replaceRemainingTokens(content: string): string {
+  return content.replace(/\{\{[A-Z][A-Z0-9_]*\}\}/g, (token) =>
+    `<!-- CI-ADAPTED: ${token} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->`,
+  );
+}
+
 function buildGeneratedHeader(skillName: string, sourcePath: string, sourceCommit: string | null): string {
   const sourceMarker = sourceCommit
     ? `\`${sourceCommit.slice(0, 12)}\``
@@ -260,11 +271,7 @@ function adaptReviewSkill(template: string, sourceCommit: string | null): string
   adapted = replaceAll(adapted, LOCAL_PATH_REPLACEMENTS);
 
   // Gracefully replace any remaining upstream tokens so new additions never break the build
-  adapted = adapted.replace(/\{\{[A-Z][A-Z0-9_]*\}\}/g, (token) =>
-    `<!-- CI-ADAPTED: ${token} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->`,
-  );
-
-  return adapted;
+  return replaceRemainingTokens(adapted);
 }
 
 function adaptCsoSkill(template: string, sourceCommit: string | null): string {
@@ -281,11 +288,7 @@ function adaptCsoSkill(template: string, sourceCommit: string | null): string {
   adapted = replaceAll(adapted, LOCAL_PATH_REPLACEMENTS);
 
   // Gracefully replace any remaining upstream tokens so new additions never break the build
-  adapted = adapted.replace(/\{\{[A-Z][A-Z0-9_]*\}\}/g, (token) =>
-    `<!-- CI-ADAPTED: ${token} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->`,
-  );
-
-  return adapted;
+  return replaceRemainingTokens(adapted);
 }
 
 /**
@@ -383,11 +386,7 @@ function adaptGenericSkill(skillName: string, template: string, sourcePath: stri
     ["AskUserQuestion", "GitHub follow-up comment"],
   ]);
 
-  adapted = adapted.replace(/\{\{[A-Z][A-Z0-9_]*\}\}/g, (token) =>
-    `<!-- CI-ADAPTED: ${token} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->`,
-  );
-
-  return adapted;
+  return replaceRemainingTokens(adapted);
 }
 
 async function main() {
