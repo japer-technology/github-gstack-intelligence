@@ -138,4 +138,4 @@ When all seven phases are complete, any GitHub repository gets a **full AI engin
 
 ---
 
-*Plan for [japer-technology/github-gstack-intelligence](https://github.com/japer-technology/github-gstack-intelligence), building on analysis in [`docs/analysis/`](../analysis/).*
+*Plan for [japer-technology/github-gstack-intelligence](https://github.com/japer-technology/github-gstack-intelligence), building on analysis in [`analysis/`](../analysis/).*
