@@ -222,7 +222,7 @@ async function main() {
       title = event.pull_request.title ?? "";
       body = event.pull_request.body ?? "";
     } else {
-      title = event.issue.title;
+      title = event.issue.title ?? "";
       body = event.issue.body ?? "";
       if (body.length >= 65536) {
         body = await gh("issue", "view", String(targetNumber), "--json", "body", "--jq", ".body");
@@ -468,7 +468,7 @@ async function main() {
         }, null, 2) + "\n"
       );
       console.log(`Saved mapping: issue #${targetNumber} -> ${latestSession}`);
-    } else if (!latestSession) {
+    } else if (!latestSession && !isPullRequest) {
       console.log("Warning: no session file found to map");
     }
 
@@ -480,6 +480,9 @@ async function main() {
       const resultDir = resolve(stateDir, "results", resultSubdir);
       mkdirSync(resultDir, { recursive: true });
 
+      // For review/CSO skills routed from PR events, prNumber is always set by
+      // the router. The targetNumber fallback handles the edge case where the
+      // skill is invoked via a slash command on an issue comment.
       const resultNumber = routeResult.context.prNumber ?? targetNumber;
       const result = {
         prNumber: resultNumber,
