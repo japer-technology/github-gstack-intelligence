@@ -174,6 +174,17 @@ function replaceAll(content: string, replacements: Array<[string, string]>): str
   );
 }
 
+/**
+ * Replace any remaining {{TOKENS}} with a CI-ADAPTED HTML comment so that
+ * new upstream tokens never break the build. Intended as a final catch-all
+ * after all known replacements have been applied.
+ */
+function replaceRemainingTokens(content: string): string {
+  return content.replace(/\{\{[A-Z][A-Z0-9_]*\}\}/g, (token) =>
+    `<!-- CI-ADAPTED: ${token} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->`,
+  );
+}
+
 function buildGeneratedHeader(skillName: string, sourcePath: string, sourceCommit: string | null): string {
   const sourceMarker = sourceCommit
     ? `\`${sourceCommit.slice(0, 12)}\``
@@ -225,14 +236,6 @@ function wrapImportedMarkdown(content: string, sourcePath: string, sourceCommit:
   return `${buildImportedDocumentHeader(sourcePath, sourceCommit)}${content}`;
 }
 
-function assertNoTemplateTokens(skillName: string, content: string) {
-  const unresolved = [...content.matchAll(/\{\{[A-Z0-9_-]+\}\}/g)].map((match) => match[0]);
-
-  if (unresolved.length > 0) {
-    throw new Error(`Unresolved template tokens remain in ${skillName}: ${unresolved.join(", ")}`);
-  }
-}
-
 function adaptReviewSkill(template: string, sourceCommit: string | null): string {
   const withoutAskUserQuestion = removeAskUserQuestionFromFrontmatter(template);
   const withDirectReplacements = replaceAll(withoutAskUserQuestion, [
@@ -263,21 +266,29 @@ function adaptReviewSkill(template: string, sourceCommit: string | null): string
     ].join("\n"),
   );
 
-  assertNoTemplateTokens("review", withGreptileNote);
-  return withGreptileNote;
+  // Apply common replacements to catch tokens added upstream after the review-specific ones
+  let adapted = replaceAll(withGreptileNote, COMMON_TOKEN_REPLACEMENTS);
+  adapted = replaceAll(adapted, LOCAL_PATH_REPLACEMENTS);
+
+  // Gracefully replace any remaining upstream tokens so new additions never break the build
+  return replaceRemainingTokens(adapted);
 }
 
 function adaptCsoSkill(template: string, sourceCommit: string | null): string {
   const withoutAskUserQuestion = removeAskUserQuestionFromFrontmatter(template);
-  const adapted = replaceAll(withoutAskUserQuestion, [
+  let adapted = replaceAll(withoutAskUserQuestion, [
     ["{{PREAMBLE}}", buildGeneratedHeader("cso", SOURCE_FILES.csoTemplate, sourceCommit)],
     ["{{CONFIDENCE_CALIBRATION}}", "Use the same confidence-gated reporting thresholds, but publish the final posture report through GitHub comments and repository-local state instead of local CLI interactions."],
     ["AskUserQuestion", "GitHub follow-up comment"],
     ['"Phase 8 can scan your globally installed AI coding agent skills and hooks for malicious patterns. This reads files outside the repo. Want to include this?"', '"Phase 8 can scan globally installed AI coding agent skills and hooks for malicious patterns. Post a GitHub follow-up comment asking for approval before reading files outside the repo."'],
   ]);
 
-  assertNoTemplateTokens("cso", adapted);
-  return adapted;
+  // Apply common replacements to catch tokens added upstream after the cso-specific ones
+  adapted = replaceAll(adapted, COMMON_TOKEN_REPLACEMENTS);
+  adapted = replaceAll(adapted, LOCAL_PATH_REPLACEMENTS);
+
+  // Gracefully replace any remaining upstream tokens so new additions never break the build
+  return replaceRemainingTokens(adapted);
 }
 
 /**
@@ -375,11 +386,7 @@ function adaptGenericSkill(skillName: string, template: string, sourcePath: stri
     ["AskUserQuestion", "GitHub follow-up comment"],
   ]);
 
-  adapted = adapted.replace(/\{\{[A-Z][A-Z0-9_]*\}\}/g, (token) =>
-    `<!-- CI-ADAPTED: ${token} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->`,
-  );
-
-  return adapted;
+  return replaceRemainingTokens(adapted);
 }
 
 async function main() {
