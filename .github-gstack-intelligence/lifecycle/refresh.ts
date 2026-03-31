@@ -375,7 +375,7 @@ function adaptGenericSkill(skillName: string, template: string, sourcePath: stri
     ["AskUserQuestion", "GitHub follow-up comment"],
   ]);
 
-  adapted = adapted.replace(/\{\{[A-Z][A-Z0-9_-]*\}\}/g, (token) =>
+  adapted = adapted.replace(/\{\{[A-Z][A-Z0-9_]*\}\}/g, (token) =>
     `<!-- CI-ADAPTED: ${token} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->`,
   );
 
@@ -389,11 +389,10 @@ async function main() {
 
   console.log(`Refreshing gstack resources from ${sourceRepo} (${sourceMarker})`);
 
-  const fetched: Record<string, string> = {};
-  await Promise.all(
-    Object.entries(SOURCE_FILES).map(async ([key, path]) => {
-      fetched[key] = await fetchText(path);
-    }),
+  const fetched = Object.fromEntries(
+    await Promise.all(
+      Object.entries(SOURCE_FILES).map(async ([key, path]) => [key, await fetchText(path)] as const),
+    ),
   );
 
   ensureDir(skillsDir);
