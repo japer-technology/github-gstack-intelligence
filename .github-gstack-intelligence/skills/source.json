@@ -1,9 +1,9 @@
 {
-  "extractedAt": "2026-03-31T02:35:36.482Z",
+  "extractedAt": "2026-03-31T02:51:21.310Z",
   "source": {
     "repo": "garrytan/gstack",
     "ref": "main",
-    "commit": null
+    "commit": "a1a933614cda44839f8f3f94f3a30fdb864cb134"
   },
   "inputs": [
     "ETHOS.md",
