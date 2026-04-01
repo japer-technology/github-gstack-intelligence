@@ -240,16 +240,20 @@ jobs:
             # purpose, or added new files since the last install.
             # ────────────────────────────────────────────────────────────
 
-            # Remove source repo's session state from the template.
+            # Remove source repo's session state from the template so it is
+            # never copied — the "never" category alone is not enough because
+            # it copies template files when they don't exist locally.
             rm -rf "$EXTRACTED/$TARGET/state"
 
             echo "── Upgrade: processing template files ──"
-            ( cd "$EXTRACTED/$TARGET" && find . -type f ) | sort | while IFS= read -r relpath; do
+            while IFS= read -r relpath; do
               relpath="${relpath#./}"
               SRC="$EXTRACTED/$TARGET/$relpath"
               DST="$TARGET/$relpath"
 
               # ── Classify the file ──
+              # "always" takes precedence: checked first, then "never" only
+              # applies if the file was not already classified as "always".
               CATEGORY="default"
 
               # Always overwrite: framework code that must stay current.
@@ -262,14 +266,16 @@ jobs:
               esac
 
               # Never overwrite: user customisations that must be preserved.
-              case "$relpath" in
-                config.json)          CATEGORY="never" ;;
-                AGENTS.md)            CATEGORY="never" ;;
-                .pi/settings.json)    CATEGORY="never" ;;
-                .pi/APPEND_SYSTEM.md) CATEGORY="never" ;;
-                .pi/BOOTSTRAP.md)     CATEGORY="never" ;;
-                state/*)              CATEGORY="never" ;;
-              esac
+              if [ "$CATEGORY" = "default" ]; then
+                case "$relpath" in
+                  config.json)          CATEGORY="never" ;;
+                  AGENTS.md)            CATEGORY="never" ;;
+                  .pi/settings.json)    CATEGORY="never" ;;
+                  .pi/APPEND_SYSTEM.md) CATEGORY="never" ;;
+                  .pi/BOOTSTRAP.md)     CATEGORY="never" ;;
+                  state/*)              CATEGORY="never" ;;
+                esac
+              fi
 
               # ── Apply the rule ──
               case "$CATEGORY" in
@@ -297,7 +303,7 @@ jobs:
                   fi
                   ;;
               esac
-            done
+            done < <( cd "$EXTRACTED/$TARGET" && find . -type f | sort )
             echo "── Upgrade complete ──"
           else
             # Fresh install.
