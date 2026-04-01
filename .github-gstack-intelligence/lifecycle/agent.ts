@@ -117,6 +117,11 @@ const eventName = process.env.GITHUB_EVENT_NAME!;
 // Whether this event is a pull_request event (PR review, not an issue).
 const isPullRequest = eventName === "pull_request";
 
+// Whether this event is an automated event with no associated issue or PR.
+// These events (schedule, release, deployment_status) don't have a target
+// issue/PR number for comment posting — results are committed to state only.
+const isAutomatedEvent = ["schedule", "release", "deployment_status"].includes(eventName);
+
 // "owner/repo" format — used when calling the GitHub REST API via `gh api`.
 const repo = process.env.GITHUB_REPOSITORY!;
 
@@ -124,11 +129,13 @@ const repo = process.env.GITHUB_REPOSITORY!;
 const defaultBranch = event.repository?.default_branch ?? "main";
 
 // The target number is the issue number for issue events, or the PR number for
-// pull_request events. In GitHub, PRs are also issues, so the number can be used
-// with both issue and PR API endpoints.
+// pull_request events. For automated events (schedule, release, deployment_status),
+// there is no target number — set to 0.
 const targetNumber: number = isPullRequest
   ? event.pull_request.number
-  : event.issue.number;
+  : isAutomatedEvent
+    ? 0
+    : event.issue?.number ?? 0;
 
 // Read the committed `.pi` defaults and pass them explicitly to the runtime.
 // This prevents provider/model drift from host-level config (for example a
@@ -214,6 +221,8 @@ async function main() {
     // ── Read title and body from the event payload ───────────────────────────────
     // For pull_request events, use the PR title and body.
     // For issue events, use the issue title and body from the webhook payload.
+    // For automated events (schedule, release, deployment_status), title/body
+    // are derived from the event context (handled by the router's skill prompt).
     // GitHub truncates string fields at 65 536 characters in webhook payloads, so
     // we fall back to the API only when the body hits that limit.
     let title: string;
@@ -221,9 +230,23 @@ async function main() {
     if (isPullRequest) {
       title = event.pull_request.title ?? "";
       body = event.pull_request.body ?? "";
+    } else if (isAutomatedEvent) {
+      // Automated events don't have an issue/PR — the router builds the prompt
+      // from the event payload. Title/body are placeholders for context lines.
+      if (eventName === "release") {
+        title = `Release: ${event.release?.tag_name ?? "unknown"}`;
+        body = event.release?.body ?? "";
+      } else if (eventName === "deployment_status") {
+        title = `Deployment: ${event.deployment?.environment ?? "unknown"}`;
+        body = `Status: ${event.deployment_status?.state ?? "unknown"}`;
+      } else {
+        // schedule
+        title = `Scheduled run: ${event.schedule ?? "unknown cron"}`;
+        body = "";
+      }
     } else {
-      title = event.issue.title ?? "";
-      body = event.issue.body ?? "";
+      title = event.issue?.title ?? "";
+      body = event.issue?.body ?? "";
       if (body.length >= 65536) {
         body = await gh("issue", "view", String(targetNumber), "--json", "body", "--jq", ".body");
       }
@@ -233,16 +256,16 @@ async function main() {
     // Each issue maps to exactly one `pi` session file via `state/issues/<n>.json`.
     // If a mapping exists AND the referenced session file is still present, we resume
     // the conversation by passing `--session <path>` to `pi`.  Otherwise we start fresh.
-    // For pull_request events, session continuity is not needed — each review is
-    // a one-shot operation that starts fresh.
+    // For pull_request and automated events, session continuity is not needed —
+    // each run is a one-shot operation that starts fresh.
     mkdirSync(issuesDir, { recursive: true });
     mkdirSync(sessionsDir, { recursive: true });
 
     let mode = "new";
     let sessionPath = "";
-    const mappingFile = isPullRequest ? "" : resolve(issuesDir, `${targetNumber}.json`);
+    const mappingFile = (isPullRequest || isAutomatedEvent) ? "" : resolve(issuesDir, `${targetNumber}.json`);
 
-    if (!isPullRequest && existsSync(mappingFile)) {
+    if (!isPullRequest && !isAutomatedEvent && existsSync(mappingFile)) {
       try {
         const mapping = JSON.parse(readFileSync(mappingFile, "utf-8"));
         if (existsSync(mapping.sessionPath)) {
@@ -487,8 +510,9 @@ async function main() {
     // ── Persist issue → session mapping ─────────────────────────────────────────
     // Write (or overwrite) the mapping file so that the next run for this issue
     // can locate the correct session transcript and resume the conversation.
-    // For pull_request events, session mapping is skipped — each review is one-shot.
-    if (latestSession && !isPullRequest) {
+    // For pull_request and automated events, session mapping is skipped — each
+    // run is a one-shot operation.
+    if (latestSession && !isPullRequest && !isAutomatedEvent) {
       writeFileSync(
         mappingFile,
         JSON.stringify({
@@ -498,7 +522,7 @@ async function main() {
         }, null, 2) + "\n"
       );
       console.log(`Saved mapping: issue #${targetNumber} -> ${latestSession}`);
-    } else if (!latestSession && !isPullRequest) {
+    } else if (!latestSession && !isPullRequest && !isAutomatedEvent) {
       console.log("Warning: no session file found to map");
     }
 
@@ -557,6 +581,92 @@ async function main() {
       console.log(`Persisted ${routeResult.skill} result for #${resultIdentifier}`);
     }
 
+    // ── Persist retro results ───────────────────────────────────────────────────
+    // Retro reports are saved as date-stamped JSON in state/results/retro/ so
+    // subsequent retros can compare trends across weeks.
+    if (routeResult && routeResult.skill === "retro") {
+      const resultDir = resolve(stateDir, "results", "retro");
+      mkdirSync(resultDir, { recursive: true });
+
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const result = {
+        skill: "retro",
+        date: dateStr,
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, `${dateStr}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted retro result for ${dateStr}`);
+    }
+
+    // ── Persist benchmark results ───────────────────────────────────────────────
+    // Benchmark results are saved as date-stamped JSON in state/benchmarks/history/
+    // and the baseline file is referenced for comparison.
+    if (routeResult && routeResult.skill === "benchmark") {
+      const historyDir = resolve(stateDir, "benchmarks", "history");
+      mkdirSync(historyDir, { recursive: true });
+
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const result = {
+        skill: "benchmark",
+        date: dateStr,
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(historyDir, `${dateStr}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted benchmark result for ${dateStr}`);
+    }
+
+    // ── Persist canary results ──────────────────────────────────────────────────
+    // Canary monitoring results track deployment health checks over time.
+    if (routeResult && routeResult.skill === "canary") {
+      const resultDir = resolve(stateDir, "results", "canary");
+      mkdirSync(resultDir, { recursive: true });
+
+      const timestamp = new Date().toISOString();
+      const result = {
+        skill: "canary",
+        url: routeResult.context.url ?? null,
+        timestamp,
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, `${timestamp.slice(0, 19).replace(/:/g, "-")}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted canary result`);
+    }
+
+    // ── Persist document-release results ────────────────────────────────────────
+    // Track which releases have been documented by the agent.
+    if (routeResult && routeResult.skill === "document-release") {
+      const resultDir = resolve(stateDir, "results", "releases");
+      mkdirSync(resultDir, { recursive: true });
+
+      const tagName = event.release?.tag_name ?? "unknown";
+      const result = {
+        skill: "document-release",
+        tag: tagName,
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, `${tagName.replace(/[^a-zA-Z0-9._-]/g, "_")}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted document-release result for ${tagName}`);
+    }
+
     // ── Commit and push state changes ───────────────────────────────────────────
     // Stage all changes (session log, mapping JSON, any files the agent edited),
     // commit only if the index is dirty, then push with a retry-on-conflict loop.
@@ -569,7 +679,9 @@ async function main() {
       // exitCode !== 0 means there are staged changes to commit.
       const commitMsg = isPullRequest
         ? `gstack-intelligence: review PR #${targetNumber}`
-        : `gstack-intelligence: work on issue #${targetNumber}`;
+        : isAutomatedEvent
+          ? `gstack-intelligence: ${routeResult?.skill ?? eventName} run`
+          : `gstack-intelligence: work on issue #${targetNumber}`;
       const commitResult = await run(["git", "commit", "-m", commitMsg]);
       if (commitResult.exitCode !== 0) {
         console.error("git commit failed with exit code", commitResult.exitCode);
@@ -594,22 +706,28 @@ async function main() {
     // if the push later fails.  The push failure throw (below) must come AFTER the
     // comment is posted — otherwise the throw would skip the comment entirely and
     // the user would get no reply.
+    // For automated events (schedule, release, deployment_status), there is no
+    // target issue/PR to comment on — results are committed to state only.
     // For pull_request events, post as a PR comment; for issue events, post as an
     // issue comment. Both use the same underlying GitHub API.
-    const trimmedText = agentText.trim();
-    let commentBody = trimmedText.length > 0
-      ? trimmedText.slice(0, MAX_COMMENT_LENGTH)
-      : `✅ The agent ran successfully but did not produce a text response. Check the repository for any file changes that were made.\n\nFor full details, see the [workflow run logs](https://github.com/${repo}/actions).`;
-    if (!pushSucceeded) {
-      commentBody += `\n\n---\n⚠️ **Warning:** The agent's session state could not be pushed to the repository. Conversation context may not be preserved for follow-up comments. See the [workflow run logs](https://github.com/${repo}/actions) for details.`;
-    }
-    // Append the agent signature as a hidden HTML comment for bot-loop prevention.
-    // The router checks incoming comments for this signature and skips them.
-    commentBody += "\n" + AGENT_SIGNATURE;
-    if (isPullRequest) {
-      await gh("pr", "comment", String(targetNumber), "--body", commentBody);
+    if (!isAutomatedEvent) {
+      const trimmedText = agentText.trim();
+      let commentBody = trimmedText.length > 0
+        ? trimmedText.slice(0, MAX_COMMENT_LENGTH)
+        : `✅ The agent ran successfully but did not produce a text response. Check the repository for any file changes that were made.\n\nFor full details, see the [workflow run logs](https://github.com/${repo}/actions).`;
+      if (!pushSucceeded) {
+        commentBody += `\n\n---\n⚠️ **Warning:** The agent's session state could not be pushed to the repository. Conversation context may not be preserved for follow-up comments. See the [workflow run logs](https://github.com/${repo}/actions) for details.`;
+      }
+      // Append the agent signature as a hidden HTML comment for bot-loop prevention.
+      // The router checks incoming comments for this signature and skips them.
+      commentBody += "\n" + AGENT_SIGNATURE;
+      if (isPullRequest) {
+        await gh("pr", "comment", String(targetNumber), "--body", commentBody);
+      } else {
+        await gh("issue", "comment", String(targetNumber), "--body", commentBody);
+      }
     } else {
-      await gh("issue", "comment", String(targetNumber), "--body", commentBody);
+      console.log(`Automated event (${eventName}) — skipping comment posting, results committed to state`);
     }
 
     // Throw push failure AFTER the comment has been posted so the user always
