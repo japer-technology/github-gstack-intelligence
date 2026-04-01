@@ -29,8 +29,8 @@
  *   4. Run the `pi` coding agent binary with the prompt (+ prior session if resuming).
  *      Agent output is streamed through `tee` to provide a live Actions log AND
  *      persist the raw JSONL to `/tmp/agent-raw.jsonl` for post-processing.
- *   5. Extract the assistant's final text reply from the JSONL output using
- *      `tac` (reverse) + `jq` (parse the last `message_end` event).
+ *   5. Extract the assistant's final text reply by parsing the JSONL output
+ *      natively (reverse-iterate to find the last `message_end` event).
  *   6. Persist the issue → session mapping so the next run can resume the conversation.
  *   7. Stage, commit, and push all changes (session log, mapping, repo edits)
  *      back to the default branch with an automatic retry-on-conflict loop.
@@ -71,7 +71,7 @@
  * - Node.js built-in `path` module (resolve)
  * - GitHub CLI (`gh`)             — must be authenticated via GITHUB_TOKEN
  * - `pi` binary                   — installed by `bun install` from package.json
- * - System tools: `tee`, `tac`, `jq`, `git`, `bash`
+ * - System tools: `tee`, `git`, `bash`
  * - Bun runtime                   — for Bun.spawn and top-level await
  */
 
@@ -195,6 +195,61 @@ async function gh(...args: string[]): Promise<string> {
     throw new Error(`gh ${args[0]} failed with exit code ${exitCode}`);
   }
   return stdout;
+}
+
+/**
+ * Extract the most recent assistant text from a JSONL file written by the `pi` agent.
+ *
+ * Reads the file line-by-line, parses each line as JSON (silently skipping any
+ * malformed lines), and iterates in reverse to find the last `message_end` event
+ * where `role === "assistant"` and the content array includes at least one `text`
+ * block.  All text blocks from that event are concatenated and returned.
+ *
+ * Returns an empty string when the file is missing, empty, or contains no
+ * qualifying assistant message — the caller should handle that gracefully.
+ *
+ * @param filePath - Absolute path to the raw JSONL output file.
+ */
+function extractAgentText(filePath: string): string {
+  let rawContent: string;
+  try {
+    rawContent = readFileSync(filePath, "utf-8");
+  } catch {
+    console.warn(`Could not read agent output file: ${filePath}`);
+    return "";
+  }
+
+  const lines = rawContent.split("\n");
+
+  // Walk backwards (most recent events first) to find the last assistant
+  // message_end with text content — mirrors the original `tac | jq` logic.
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (line.length === 0) continue;
+
+    let event: any;
+    try {
+      event = JSON.parse(line);
+    } catch {
+      // Skip non-JSON lines (e.g. log output, partial writes).
+      continue;
+    }
+
+    if (
+      event.type === "message_end" &&
+      event.message?.role === "assistant" &&
+      Array.isArray(event.message?.content)
+    ) {
+      const textParts = event.message.content
+        .filter((block: any) => block.type === "text")
+        .map((block: any) => block.text ?? "");
+      if (textParts.length > 0) {
+        return textParts.join("");
+      }
+    }
+  }
+
+  return "";
 }
 
 
@@ -486,19 +541,14 @@ async function main() {
     }
 
     // ── Extract final assistant text ─────────────────────────────────────────────
-    // The `pi` agent writes newline-delimited JSON events.  We reverse the file
-    // with `tac` so the most recent events appear first in the `jq` array.  We
-    // then search for the most recent `message_end` where the role is `assistant`
-    // AND the content contains at least one `text` block.  This correctly handles
-    // cases where the final event has empty content (e.g., a 400 API error after
-    // a successful tool call) by falling back to an earlier assistant message.
-    const tac = Bun.spawn(["tac", "/tmp/agent-raw.jsonl"], { stdout: "pipe" });
-    const jq = Bun.spawn(
-      ["jq", "-r", "-s", '[ .[] | select(.type == "message_end" and .message.role == "assistant") | select((.message.content // []) | map(select(.type == "text")) | length > 0) ] | .[0].message.content[] | select(.type == "text") | .text'],
-      { stdin: tac.stdout, stdout: "pipe" }
-    );
-    const agentText = await new Response(jq.stdout).text();
-    await jq.exited;
+    // Parse the JSONL output natively instead of piping through `tac | jq`, which
+    // is fragile and emits confusing errors to the CI log when the JSONL contains
+    // non-JSON lines, partial writes, or is empty.  We iterate in reverse to find
+    // the most recent `message_end` where the role is `assistant` AND the content
+    // contains at least one `text` block.  This correctly handles cases where the
+    // final event has empty content (e.g., a 400 API error after a successful tool
+    // call) by falling back to an earlier assistant message.
+    const agentText = extractAgentText("/tmp/agent-raw.jsonl");
 
     // ── Determine latest session file ────────────────────────────────────────────
     // After the agent run, the newest `.jsonl` file in the sessions directory is
