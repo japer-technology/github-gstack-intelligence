@@ -200,11 +200,15 @@ jobs:
             fi
           fi
 
-      # 3. Download the template repository as a zip, extract it, and either
-      #    install fresh or upgrade the existing agent folder.
+      # 3. Download the template repository as a zip, extract it, and apply
+      #    install or upgrade rules.
       #    On fresh install: copies the agent folder and initialises defaults.
-      #    On upgrade: preserves user files (AGENTS.md, .pi/, state/), replaces
-      #    framework files, and restores the backups.
+      #    On upgrade: walks the template file-by-file using three categories:
+      #      ALWAYS overwrite  — framework code (lifecycle/, skills/, etc.)
+      #      NEVER overwrite   — user-customisable files (config, state, etc.)
+      #      DEFAULT           — copy only if the file is new locally
+      #    This ensures user additions and modifications are never lost, even
+      #    for files outside the explicit preserve list.
       - name: Download and install from template
         if: steps.check-folder.outputs.action != 'skip'
         run: |
@@ -227,23 +231,74 @@ jobs:
           rm -rf "$EXTRACTED/$TARGET/public-fabric"
 
           if [ "$ACTION" = "upgrade" ]; then
-            # Back up user-customised files before replacing framework files.
-            BACKUP="/tmp/mi-backup"
-            mkdir -p "$BACKUP"
-            if [ -f "$TARGET/AGENTS.md" ]; then cp "$TARGET/AGENTS.md" "$BACKUP/AGENTS.md"; fi
-            if [ -d "$TARGET/.pi" ];       then cp -R "$TARGET/.pi" "$BACKUP/.pi"; fi
-            if [ -d "$TARGET/state" ];     then cp -R "$TARGET/state" "$BACKUP/state"; fi
+            # ── File-by-file upgrade ────────────────────────────────────
+            #
+            # Instead of deleting everything and restoring backups, we walk
+            # through the template file-by-file and apply upgrade rules.
+            # Files that exist locally but are NOT in the ALWAYS-overwrite
+            # list are left untouched — the user may have modified them on
+            # purpose, or added new files since the last install.
+            # ────────────────────────────────────────────────────────────
 
-            rm -rf "$TARGET"
-            cp -R "$EXTRACTED/$TARGET" "$TARGET"
+            # Remove source repo's session state from the template.
+            rm -rf "$EXTRACTED/$TARGET/state"
 
-            # Remove the source repo's session state.
-            rm -rf "$TARGET/state"
+            echo "── Upgrade: processing template files ──"
+            ( cd "$EXTRACTED/$TARGET" && find . -type f ) | sort | while IFS= read -r relpath; do
+              relpath="${relpath#./}"
+              SRC="$EXTRACTED/$TARGET/$relpath"
+              DST="$TARGET/$relpath"
 
-            # Restore user-customised files from backup.
-            if [ -f "$BACKUP/AGENTS.md" ]; then cp "$BACKUP/AGENTS.md" "$TARGET/AGENTS.md"; fi
-            if [ -d "$BACKUP/.pi" ];       then cp -R "$BACKUP/.pi" "$TARGET/.pi"; fi
-            if [ -d "$BACKUP/state" ];     then cp -R "$BACKUP/state" "$TARGET/state"; fi
+              # ── Classify the file ──
+              CATEGORY="default"
+
+              # Always overwrite: framework code that must stay current.
+              case "$relpath" in
+                lifecycle/*)    CATEGORY="always" ;;
+                skills/*)       CATEGORY="always" ;;
+                package.json)   CATEGORY="always" ;;
+                bun.lock)       CATEGORY="always" ;;
+                VERSION)        CATEGORY="always" ;;
+              esac
+
+              # Never overwrite: user customisations that must be preserved.
+              case "$relpath" in
+                config.json)          CATEGORY="never" ;;
+                AGENTS.md)            CATEGORY="never" ;;
+                .pi/settings.json)    CATEGORY="never" ;;
+                .pi/APPEND_SYSTEM.md) CATEGORY="never" ;;
+                .pi/BOOTSTRAP.md)     CATEGORY="never" ;;
+                state/*)              CATEGORY="never" ;;
+              esac
+
+              # ── Apply the rule ──
+              case "$CATEGORY" in
+                always)
+                  mkdir -p "$(dirname "$DST")"
+                  cp "$SRC" "$DST"
+                  echo "  ↻ overwrite  $relpath"
+                  ;;
+                never)
+                  if [ -f "$DST" ]; then
+                    echo "  ✓ preserve   $relpath"
+                  else
+                    mkdir -p "$(dirname "$DST")"
+                    cp "$SRC" "$DST"
+                    echo "  + new        $relpath (default from template)"
+                  fi
+                  ;;
+                default)
+                  if [ -f "$DST" ]; then
+                    echo "  · skip       $relpath (exists locally — may be customised)"
+                  else
+                    mkdir -p "$(dirname "$DST")"
+                    cp "$SRC" "$DST"
+                    echo "  + new        $relpath"
+                  fi
+                  ;;
+              esac
+            done
+            echo "── Upgrade complete ──"
           else
             # Fresh install.
             cp -R "$EXTRACTED/$TARGET" "$TARGET"
