@@ -1,0 +1,11 @@
+name: "💬 Office Hours"
+description: "Discuss a product idea with the AI agent"
+labels: ["office-hours"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: "What's your idea?"
+      description: "Describe what you want to build or improve"
+    validations:
+      required: true

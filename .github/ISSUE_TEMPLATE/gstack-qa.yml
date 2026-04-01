@@ -1,0 +1,20 @@
+name: "🧪 QA Testing"
+description: "Request QA testing of a URL"
+labels: ["gstack-qa"]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: "URL to test"
+      placeholder: "https://staging.example.com"
+    validations:
+      required: true
+  - type: dropdown
+    id: tier
+    attributes:
+      label: "QA Tier"
+      options:
+        - Quick (critical + high only)
+        - Standard (+ medium)
+        - Exhaustive (+ cosmetic)
+      default: 1

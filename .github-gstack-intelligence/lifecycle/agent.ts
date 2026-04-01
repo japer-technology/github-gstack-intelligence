@@ -291,7 +291,37 @@ async function main() {
           // Load the skill prompt file.
           const skillPath = resolve(minimumIntelligenceDir, "skills", `${routeResult.skill}.md`);
           if (existsSync(skillPath)) {
-            const skillPrompt = readFileSync(skillPath, "utf-8");
+            let skillPrompt: string;
+
+            if (routeResult.skill === "autoplan") {
+              // /autoplan chains three review skills into a single combined prompt.
+              // Load each review skill and concatenate them so the agent executes
+              // all three reviews in one invocation (Approach A from the plan).
+              const autoplanPrompt = readFileSync(skillPath, "utf-8");
+              const reviewSkills = ["plan-ceo-review", "plan-design-review", "plan-eng-review"] as const;
+              const reviewSections: string[] = [];
+
+              for (const reviewSkill of reviewSkills) {
+                const reviewPath = resolve(minimumIntelligenceDir, "skills", `${reviewSkill}.md`);
+                if (existsSync(reviewPath)) {
+                  const reviewContent = readFileSync(reviewPath, "utf-8");
+                  const SKILL_TITLES: Record<string, string> = {
+                    "plan-ceo-review": "CEO Review",
+                    "plan-design-review": "Design Review",
+                    "plan-eng-review": "Engineering Review",
+                  };
+                  const sectionTitle = SKILL_TITLES[reviewSkill] ?? reviewSkill;
+                  reviewSections.push(`## ${sectionTitle}\n${reviewContent}`);
+                } else {
+                  console.warn(`Autoplan sub-skill not found: ${reviewPath}`);
+                }
+              }
+
+              skillPrompt = `${autoplanPrompt}\n\n---\n\nExecute the following ${reviewSections.length} review(s) in sequence:\n\n${reviewSections.join("\n\n")}`;
+              console.log(`Autoplan: loaded ${reviewSections.length} review skill(s)`);
+            } else {
+              skillPrompt = readFileSync(skillPath, "utf-8");
+            }
 
             // Build context lines for the prompt.
             const contextParts: string[] = [];

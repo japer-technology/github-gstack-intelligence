@@ -232,8 +232,11 @@ export function route(
     const command = parseSlashCommand(commentBody);
 
     if (command) {
+      // /autoplan is a one-shot pipeline — no session continuity needed.
+      const sessionMode = command.skill === "autoplan" ? "none" : "new";
+
       return buildRoute(command.skill, config, {
-        sessionMode: "new",
+        sessionMode,
         context: {
           issueNumber,
           url: command.url,
