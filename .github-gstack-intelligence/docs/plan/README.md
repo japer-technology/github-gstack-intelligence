@@ -6,9 +6,9 @@
 
 ## Context
 
-[GitHub GStack Intelligence](https://github.com/japer-technology/github-gstack-intelligence) has already completed the foundation: a working self-installer, a resource extraction pipeline (`run-refresh-gstack`), an agent that handles issue-based conversations, and seventeen CI-adapted skill prompts extracted from [garrytan/gstack](https://github.com/garrytan/gstack).
+[GitHub GStack Intelligence](https://github.com/japer-technology/github-gstack-intelligence) has completed its foundation and core activation phases: a working self-installer, a resource extraction pipeline (`run-refresh-gstack`), an event router (`router.ts`), a Playwright browser helper (`browser.ts`), seventeen CI-adapted skill prompts extracted from [garrytan/gstack](https://github.com/garrytan/gstack), and a configuration layer (`config.json`) controlling all skill activation.
 
-What remains is activating those skills — connecting GitHub events to the right skill prompts, extending the workflow to listen for PRs, schedules, releases, and deployments, and building the routing, browser, and cost-control layers that make the full skill system operational.
+**Phases 1–5 are complete.** The system can route GitHub events to skills, parse slash commands, handle PR reviews, run browser-based QA, support multi-turn conversations, and respond to schedules, releases, and deployments. What remains is Phase 6 (cost controls) and Phase 7 (distribution).
 
 This plan is a **step-by-step implementation guide** organized into seven phases. Each phase builds on the previous one and has clear exit criteria.
 
@@ -16,15 +16,15 @@ This plan is a **step-by-step implementation guide** organized into seven phases
 
 ## The Steps
 
-| # | Phase | What It Delivers | Document |
-|---|-------|------------------|----------|
-| 1 | [Foundation](01-FOUNDATION.md) | `config.json`, `router.ts`, slash-command parser, bot-loop prevention | The brain and configuration layer |
-| 2 | [PR Review & Security](02-REVIEW-SECURITY.md) | `/review` and `/cso` skills active on every PR | Highest-value, lowest-effort unlock |
-| 3 | [Browser & QA](03-BROWSER-QA.md) | `browser.ts`, Playwright setup, `/qa`, `/qa-only`, `/design-review` | Browser-based testing skills |
-| 4 | [Conversations](04-CONVERSATIONS.md) | `/office-hours`, `/plan-ceo-review`, `/plan-eng-review`, `/design-consultation`, `/autoplan` | Multi-turn conversation skills |
-| 5 | [Scheduled & Event-Driven](05-SCHEDULED-EVENTS.md) | `/retro`, `/benchmark`, `/document-release`, `/canary`, `/ship` | Automated periodic and event-triggered skills |
-| 6 | [Cost Controls](06-COST-CONTROLS.md) | Model tiering, rate limiting, diff-based filtering, label gating | Cost management and safety |
-| 7 | [Distribution](07-DISTRIBUTION.md) | Installer improvements, documentation, marketplace listing | Make it available to any repo |
+| # | Phase | What It Delivers | Document | Status |
+|---|-------|------------------|----------|--------|
+| 1 | [Foundation](01-FOUNDATION.md) | `config.json`, `router.ts`, slash-command parser, bot-loop prevention | The brain and configuration layer | ✅ Complete |
+| 2 | [PR Review & Security](02-REVIEW-SECURITY.md) | `/review` and `/cso` skills active on every PR | Highest-value, lowest-effort unlock | ✅ Complete |
+| 3 | [Browser & QA](03-BROWSER-QA.md) | `browser.ts`, Playwright setup, `/qa`, `/qa-only`, `/design-review` | Browser-based testing skills | ✅ Complete |
+| 4 | [Conversations](04-CONVERSATIONS.md) | `/office-hours`, `/plan-ceo-review`, `/plan-eng-review`, `/design-consultation`, `/autoplan` | Multi-turn conversation skills | ✅ Complete |
+| 5 | [Scheduled & Event-Driven](05-SCHEDULED-EVENTS.md) | `/retro`, `/benchmark`, `/document-release`, `/canary`, `/ship` | Automated periodic and event-triggered skills | ✅ Complete |
+| 6 | [Cost Controls](06-COST-CONTROLS.md) | Model tiering, rate limiting, diff-based filtering, label gating | Cost management and safety | 🔲 Not started |
+| 7 | [Distribution](07-DISTRIBUTION.md) | Installer improvements, documentation, marketplace listing | Make it available to any repo | 🔲 Not started |
 
 Supporting document: [**Current Status**](CURRENT-STATUS.md) — a snapshot of what exists today vs. what needs to be built.
 
