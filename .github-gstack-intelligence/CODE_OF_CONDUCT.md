@@ -24,7 +24,6 @@ This Code of Conduct applies to all project spaces: issues, pull requests, discu
 - Trolling, insulting or derogatory comments, and personal or political attacks.
 - Publishing others' private information without explicit permission.
 - Using the project's AI capabilities to cause harm to individuals, communities, or the public interest.
-- Any conduct that would violate the [Four Laws of AI](docs/the-four-laws-of-ai.md).
 
 ---
 
