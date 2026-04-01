@@ -41,7 +41,7 @@ name: github-gstack-intelligence-agent
 
 # ──────────────────────────────────────────────────────────────────────────────
 # TRIGGERS
-# The workflow listens for four distinct GitHub events. Each event activates
+# The workflow listens for several distinct GitHub events. Each event activates
 # a different job (see the `if:` guards on each job below).
 # ──────────────────────────────────────────────────────────────────────────────
 on:
@@ -81,6 +81,20 @@ on:
         options:
           - run-install
           - run-refresh-gstack
+
+  # 6. Scheduled triggers for automated skills:
+  #    • Friday 5pm UTC → /retro (weekly retrospective)
+  #    • Daily 6am UTC  → /benchmark (daily benchmark run, if enabled)
+  schedule:
+    - cron: '0 17 * * 5'
+    - cron: '0 6 * * *'
+
+  # 7. A release is published → /document-release skill updates documentation.
+  release:
+    types: [published]
+
+  # 8. A deployment succeeds → /canary skill runs post-deployment monitoring.
+  deployment_status:
 
 # ──────────────────────────────────────────────────────────────────────────────
 # PERMISSIONS
@@ -434,12 +448,16 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   # JOB 2 — run-agent
   #
-  # Purpose : The core AI agent. Reads the issue (or comment, or PR), loads
-  #           the conversation session from git, sends it to the configured
-  #           LLM, and posts the response back as a comment.  For PRs, the
-  #           /review or /cso skill is invoked and findings appear as PR comments.
-  # Trigger : issues.opened, issue_comment.created, OR pull_request.opened/synchronize.
-  # Security: Only collaborators with write/maintain/admin access can trigger.
+  # Purpose : The core AI agent. Reads the issue (or comment, PR, schedule,
+  #           release, or deployment event), loads the conversation session
+  #           from git, sends it to the configured LLM, and posts the response
+  #           back as a comment. For PRs, the /review or /cso skill is invoked
+  #           and findings appear as PR comments. For scheduled events, skills
+  #           like /retro and /benchmark run automatically.
+  # Trigger : issues.opened, issue_comment.created, pull_request.opened/synchronize,
+  #           schedule, release.published, OR deployment_status (success).
+  # Security: Only collaborators with write/maintain/admin access can trigger
+  #           (schedule/release/deployment events bypass actor checks).
   # ────────────────────────────────────────────────────────────────────────────
   run-agent:
     runs-on: ubuntu-latest
@@ -447,11 +465,18 @@ jobs:
     # Concurrency: one agent run per target (issue or PR) at a time.
     # For issues: the second comment waits for the first to finish (cancel-in-progress: false).
     # For PRs: a new push cancels the previous review (cancel-in-progress via expression).
+    # For schedule/release/deployment_status: one run per event type at a time.
     concurrency:
       group: >-
         github-gstack-intelligence-${{ github.repository }}-${{
           github.event_name == 'pull_request'
             && format('pr-{0}', github.event.pull_request.number)
+            || github.event_name == 'schedule'
+            && format('schedule-{0}', github.event.schedule)
+            || github.event_name == 'release'
+            && format('release-{0}', github.event.release.tag_name)
+            || github.event_name == 'deployment_status'
+            && format('deploy-{0}', github.event.deployment.id)
             || format('issue-{0}', github.event.issue.number)
         }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -462,13 +487,22 @@ jobs:
     #     itself) to avoid infinite loops, AND skip comments on pull requests
     #     (issue_comment fires for both issues and PRs).
     #   • Run on pull_request events (opened, synchronize), skipping bot-authored PRs.
-    #   • Reject the github-actions actor to prevent bot-loop escalation.
+    #   • Run on schedule events (no actor check — runs as github-actions).
+    #   • Run on release events (published).
+    #   • Run on deployment_status events (only successful deployments).
+    #   • Reject the github-actions actor for non-scheduled/release/deployment events
+    #     to prevent bot-loop escalation.
     if: >-
-      github.actor != 'github-actions'
-      && (
-        (github.event_name == 'issues')
-        || (github.event_name == 'issue_comment' && !github.event.issue.pull_request && !endsWith(github.event.comment.user.login, '[bot]'))
-        || (github.event_name == 'pull_request' && !endsWith(github.event.pull_request.user.login, '[bot]'))
+      (github.event_name == 'schedule')
+      || (github.event_name == 'release')
+      || (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
+      || (
+        github.actor != 'github-actions'
+        && (
+          (github.event_name == 'issues')
+          || (github.event_name == 'issue_comment' && !github.event.issue.pull_request && !endsWith(github.event.comment.user.login, '[bot]'))
+          || (github.event_name == 'pull_request' && !endsWith(github.event.pull_request.user.login, '[bot]'))
+        )
       )
     steps:
 
@@ -482,6 +516,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Schedule, release, and deployment_status events have no human actor —
+          # the workflow runs as github-actions. Skip authorization for these.
+          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "release" || "${{ github.event_name }}" == "deployment_status" ]]; then
+            echo "::notice::${{ github.event_name }} trigger — no actor authorization needed"
+            exit 0
+          fi
+
           # Query the GitHub API for the actor's permission level on this repo.
           PERM=$(gh api "repos/${{ github.repository }}/collaborators/${{ github.actor }}/permission" --jq '.permission' 2>/dev/null || echo "none")
           echo "Actor: ${{ github.actor }}, Permission: $PERM"

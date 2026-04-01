@@ -481,4 +481,202 @@ describe("route", () => {
     expect(result).not.toBeNull();
     expect(result!.sessionMode).toBe("new");
   });
+
+  // ── Scheduled & Event-Driven skill routing (Phase 5) ────────────────────
+
+  // schedule → retro (enabled)
+  test("routes schedule event to retro when enabled", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, retro: { enabled: true, trigger: "schedule", schedule: "0 17 * * 5" } },
+    };
+    const event = { schedule: "0 17 * * 5" };
+    const result = route(event, "schedule", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("retro");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("none");
+  });
+
+  // schedule → benchmark (enabled)
+  test("routes schedule event to benchmark when enabled", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, benchmark: { enabled: true, trigger: "schedule", schedule: "0 6 * * *" } },
+    };
+    const event = { schedule: "0 6 * * *" };
+    const result = route(event, "schedule", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("benchmark");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("none");
+  });
+
+  // schedule → no match for unknown cron
+  test("returns null for schedule with unmatched cron pattern", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, retro: { enabled: true, trigger: "schedule", schedule: "0 17 * * 5" } },
+    };
+    const event = { schedule: "0 0 * * *" };
+    const result = route(event, "schedule", enabledConfig);
+    expect(result).toBeNull();
+  });
+
+  // deployment_status → canary (enabled, success)
+  test("routes deployment_status success to canary when enabled", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, canary: { enabled: true, trigger: "deployment_status" } },
+    };
+    const event = {
+      deployment_status: { state: "success" },
+      deployment: { environment_url: "https://canary.example.com" },
+    };
+    const result = route(event, "deployment_status", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("canary");
+    expect(result!.needsBrowser).toBe(true);
+    expect(result!.context.url).toBe("https://canary.example.com");
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  // deployment_status → canary uses target_url fallback
+  test("routes deployment_status with target_url fallback", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, canary: { enabled: true, trigger: "deployment_status" } },
+    };
+    const event = {
+      deployment_status: { state: "success", target_url: "https://fallback.example.com" },
+      deployment: {},
+    };
+    const result = route(event, "deployment_status", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("canary");
+    expect(result!.context.url).toBe("https://fallback.example.com");
+  });
+
+  // deployment_status → skip non-success
+  test("returns null for deployment_status with non-success state", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, canary: { enabled: true, trigger: "deployment_status" } },
+    };
+    const event = {
+      deployment_status: { state: "failure" },
+      deployment: { environment_url: "https://canary.example.com" },
+    };
+    const result = route(event, "deployment_status", enabledConfig);
+    expect(result).toBeNull();
+  });
+
+  // release → document-release (with context)
+  test("routes release event to document-release with sessionMode new", () => {
+    const event = { release: { tag_name: "v2.0.0", body: "Release notes" } };
+    const result = route(event, "release", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("document-release");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  // release → disabled document-release
+  test("returns null for release event when document-release is disabled", () => {
+    const disabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, "document-release": { enabled: false, trigger: "release" } },
+    };
+    const event = { release: { tag_name: "v1.0.0" } };
+    const result = route(event, "release", disabledConfig);
+    expect(result).toBeNull();
+  });
+
+  // /ship slash command routing
+  test("routes /ship with issueNumber context", () => {
+    const event = {
+      comment: { body: "/ship" },
+      issue: { number: 99 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("ship");
+    expect(result!.context.issueNumber).toBe(99);
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  // /canary slash command via issue_comment
+  test("routes /canary slash command with URL from issue comment", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, canary: { enabled: true, trigger: "deployment_status" } },
+    };
+    const event = {
+      comment: { body: "/canary https://staging.example.com" },
+      issue: { number: 42 },
+    };
+    const result = route(event, "issue_comment", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("canary");
+    expect(result!.needsBrowser).toBe(true);
+    expect(result!.context.url).toBe("https://staging.example.com");
+  });
+
+  // /document-release slash command via issue_comment
+  test("routes /document-release slash command from issue comment", () => {
+    const event = {
+      comment: { body: "/document-release" },
+      issue: { number: 55 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("document-release");
+    expect(result!.context.issueNumber).toBe(55);
+    expect(result!.needsBrowser).toBe(false);
+  });
+
+  // /retro and /benchmark via issue_comment (when enabled)
+  test("routes /retro slash command when enabled", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, retro: { enabled: true, trigger: "schedule", schedule: "0 17 * * 5" } },
+    };
+    const event = {
+      comment: { body: "/retro" },
+      issue: { number: 101 },
+    };
+    const result = route(event, "issue_comment", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("retro");
+    expect(result!.context.issueNumber).toBe(101);
+  });
+
+  test("routes /benchmark slash command when enabled", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, benchmark: { enabled: true, trigger: "schedule", schedule: "0 6 * * *" } },
+    };
+    const event = {
+      comment: { body: "/benchmark" },
+      issue: { number: 102 },
+    };
+    const result = route(event, "issue_comment", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("benchmark");
+    expect(result!.context.issueNumber).toBe(102);
+  });
+
+  // workflow_dispatch → scheduled skills
+  test("routes workflow_dispatch with retro function input", () => {
+    const enabledConfig = {
+      ...testConfig,
+      skills: { ...testConfig.skills, retro: { enabled: true, trigger: "schedule", schedule: "0 17 * * 5" } },
+    };
+    const event = { inputs: { function: "retro" } };
+    const result = route(event, "workflow_dispatch", enabledConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("retro");
+    expect(result!.sessionMode).toBe("new");
+  });
 });
