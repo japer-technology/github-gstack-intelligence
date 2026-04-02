@@ -616,19 +616,34 @@ jobs:
           # Add a 🚀 "rocket" reaction to the comment, issue, or PR as a visual
           # indicator that the agent has started processing. Save the reaction
           # ID so the agent can swap it for 👍 when it finishes.
+          # Use jq for safe JSON construction — handles empty/null values without
+          # producing malformed output.
           if [[ "$EVENT_NAME" == "issue_comment" ]]; then
             REACTION_ID=$(gh api "repos/${REPO}/issues/comments/${COMMENT_ID}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
-            if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
-            echo "{\"reactionId\":${RID_JSON},\"reactionTarget\":\"comment\",\"commentId\":${COMMENT_ID},\"issueNumber\":${ISSUE_NUMBER},\"repo\":\"${REPO}\"}" > /tmp/reaction-state.json
+            jq -n \
+              --arg rid "$REACTION_ID" \
+              --arg cid "$COMMENT_ID" \
+              --arg inum "$ISSUE_NUMBER" \
+              --arg repo "$REPO" \
+              '{reactionId: (if $rid == "" then null else $rid end), reactionTarget: "comment", commentId: ($cid | tonumber), issueNumber: ($inum | tonumber), repo: $repo}' \
+              > /tmp/reaction-state.json
           elif [[ "$EVENT_NAME" == "pull_request" ]]; then
             # PRs are issues in GitHub — use the issues reactions API with the PR number.
             REACTION_ID=$(gh api "repos/${REPO}/issues/${PR_NUMBER}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
-            if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
-            echo "{\"reactionId\":${RID_JSON},\"reactionTarget\":\"issue\",\"commentId\":null,\"issueNumber\":${PR_NUMBER},\"repo\":\"${REPO}\"}" > /tmp/reaction-state.json
+            jq -n \
+              --arg rid "$REACTION_ID" \
+              --arg prnum "$PR_NUMBER" \
+              --arg repo "$REPO" \
+              '{reactionId: (if $rid == "" then null else $rid end), reactionTarget: "issue", commentId: null, issueNumber: ($prnum | tonumber), repo: $repo}' \
+              > /tmp/reaction-state.json
           else
             REACTION_ID=$(gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
-            if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
-            echo "{\"reactionId\":${RID_JSON},\"reactionTarget\":\"issue\",\"commentId\":null,\"issueNumber\":${ISSUE_NUMBER},\"repo\":\"${REPO}\"}" > /tmp/reaction-state.json
+            jq -n \
+              --arg rid "$REACTION_ID" \
+              --arg inum "$ISSUE_NUMBER" \
+              --arg repo "$REPO" \
+              '{reactionId: (if $rid == "" then null else $rid end), reactionTarget: "issue", commentId: null, issueNumber: ($inum | tonumber), repo: $repo}' \
+              > /tmp/reaction-state.json
           fi
 
       # 2. REJECTION FEEDBACK — if authorization failed, add a 👎 reaction so
@@ -720,7 +735,17 @@ jobs:
         run: |
           # Read the playwright-core version from package.json so the CLI
           # downloads the exact Chromium build that matches the library.
-          PW_VERSION=$(cd .github-gstack-intelligence && node -e "console.log(require('./package.json').dependencies['playwright-core'])")
+          PKG=".github-gstack-intelligence/package.json"
+          if [ ! -f "$PKG" ]; then
+            echo "::error::${PKG} not found — cannot determine playwright-core version."
+            exit 1
+          fi
+          PW_VERSION=$(node -e "
+            const deps = require('./${PKG}').dependencies || {};
+            const v = deps['playwright-core'];
+            if (!v) { console.error('playwright-core not found in ${PKG}'); process.exit(1); }
+            console.log(v);
+          ")
           echo "Installing Playwright CLI @ ${PW_VERSION} (matching playwright-core dependency)"
           npx "playwright@${PW_VERSION}" install chromium --with-deps
 
