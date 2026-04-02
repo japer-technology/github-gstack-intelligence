@@ -273,23 +273,23 @@ describe("RT-020: issue_comment routing for all skills", () => {
     needsBrowser: boolean;
     sessionMode: string;
   }> = [
-    { body: "/review", skill: "review", needsBrowser: false, sessionMode: "new" },
-    { body: "/cso", skill: "cso", needsBrowser: false, sessionMode: "new" },
-    { body: "/qa https://example.com", skill: "qa", needsBrowser: true, sessionMode: "new" },
-    { body: "/qa-only https://example.com", skill: "qa-only", needsBrowser: true, sessionMode: "new" },
-    { body: "/investigate", skill: "investigate", needsBrowser: false, sessionMode: "new" },
-    { body: "/ship", skill: "ship", needsBrowser: false, sessionMode: "new" },
-    { body: "/office-hours", skill: "office-hours", needsBrowser: false, sessionMode: "new" },
-    { body: "/plan-ceo-review", skill: "plan-ceo-review", needsBrowser: false, sessionMode: "new" },
-    { body: "/plan-eng-review", skill: "plan-eng-review", needsBrowser: false, sessionMode: "new" },
-    { body: "/plan-design-review", skill: "plan-design-review", needsBrowser: false, sessionMode: "new" },
-    { body: "/design-review", skill: "design-review", needsBrowser: true, sessionMode: "new" },
-    { body: "/design-consultation", skill: "design-consultation", needsBrowser: false, sessionMode: "new" },
+    { body: "/review", skill: "review", needsBrowser: false, sessionMode: "resume" },
+    { body: "/cso", skill: "cso", needsBrowser: false, sessionMode: "resume" },
+    { body: "/qa https://example.com", skill: "qa", needsBrowser: true, sessionMode: "resume" },
+    { body: "/qa-only https://example.com", skill: "qa-only", needsBrowser: true, sessionMode: "resume" },
+    { body: "/investigate", skill: "investigate", needsBrowser: false, sessionMode: "resume" },
+    { body: "/ship", skill: "ship", needsBrowser: false, sessionMode: "resume" },
+    { body: "/office-hours", skill: "office-hours", needsBrowser: false, sessionMode: "resume" },
+    { body: "/plan-ceo-review", skill: "plan-ceo-review", needsBrowser: false, sessionMode: "resume" },
+    { body: "/plan-eng-review", skill: "plan-eng-review", needsBrowser: false, sessionMode: "resume" },
+    { body: "/plan-design-review", skill: "plan-design-review", needsBrowser: false, sessionMode: "resume" },
+    { body: "/design-review", skill: "design-review", needsBrowser: true, sessionMode: "resume" },
+    { body: "/design-consultation", skill: "design-consultation", needsBrowser: false, sessionMode: "resume" },
     { body: "/autoplan", skill: "autoplan", needsBrowser: false, sessionMode: "none" },
-    { body: "/retro", skill: "retro", needsBrowser: false, sessionMode: "new" },
-    { body: "/benchmark", skill: "benchmark", needsBrowser: false, sessionMode: "new" },
-    { body: "/document-release", skill: "document-release", needsBrowser: false, sessionMode: "new" },
-    { body: "/canary https://example.com", skill: "canary", needsBrowser: true, sessionMode: "new" },
+    { body: "/retro", skill: "retro", needsBrowser: false, sessionMode: "resume" },
+    { body: "/benchmark", skill: "benchmark", needsBrowser: false, sessionMode: "resume" },
+    { body: "/document-release", skill: "document-release", needsBrowser: false, sessionMode: "resume" },
+    { body: "/canary https://example.com", skill: "canary", needsBrowser: true, sessionMode: "resume" },
   ];
 
   for (const c of cases) {
@@ -705,13 +705,13 @@ describe("SP-011: autoplan special handling", () => {
     expect(result!.sessionMode).toBe("none");
   });
 
-  test("all other skills have sessionMode=new (via issue_comment)", () => {
+  test("all other skills have sessionMode=resume (via issue_comment)", () => {
     const nonAutoplanSkills = Object.keys(allEnabledConfig.skills).filter(s => s !== "autoplan");
     for (const skill of nonAutoplanSkills) {
       const event = { comment: { body: `/${skill}` }, issue: { number: 1 } };
       const result = route(event, "issue_comment", allEnabledConfig);
       if (result) {
-        expect(result.sessionMode).toBe("new");
+        expect(result.sessionMode).toBe("resume");
       }
     }
   });

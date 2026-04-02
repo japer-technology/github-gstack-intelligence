@@ -430,7 +430,7 @@ describe("route", () => {
     expect(result!.skill).toBe("plan-ceo-review");
     expect(result!.context.issueNumber).toBe(50);
     expect(result!.needsBrowser).toBe(false);
-    expect(result!.sessionMode).toBe("new");
+    expect(result!.sessionMode).toBe("resume");
   });
 
   test("routes /plan-eng-review command from issue comment", () => {
@@ -443,7 +443,7 @@ describe("route", () => {
     expect(result!.skill).toBe("plan-eng-review");
     expect(result!.context.issueNumber).toBe(51);
     expect(result!.needsBrowser).toBe(false);
-    expect(result!.sessionMode).toBe("new");
+    expect(result!.sessionMode).toBe("resume");
   });
 
   test("routes /autoplan command with sessionMode none", () => {
@@ -469,17 +469,17 @@ describe("route", () => {
     expect(result!.skill).toBe("design-consultation");
     expect(result!.context.issueNumber).toBe(70);
     expect(result!.needsBrowser).toBe(false);
-    expect(result!.sessionMode).toBe("new");
+    expect(result!.sessionMode).toBe("resume");
   });
 
-  test("non-autoplan commands still use sessionMode new", () => {
+  test("non-autoplan commands use sessionMode resume for continuity", () => {
     const event = {
       comment: { body: "/plan-ceo-review" },
       issue: { number: 80 },
     };
     const result = route(event, "issue_comment", testConfig);
     expect(result).not.toBeNull();
-    expect(result!.sessionMode).toBe("new");
+    expect(result!.sessionMode).toBe("resume");
   });
 
   // ── Scheduled & Event-Driven skill routing (Phase 5) ────────────────────
@@ -603,7 +603,7 @@ describe("route", () => {
     expect(result!.skill).toBe("ship");
     expect(result!.context.issueNumber).toBe(99);
     expect(result!.needsBrowser).toBe(false);
-    expect(result!.sessionMode).toBe("new");
+    expect(result!.sessionMode).toBe("resume");
   });
 
   // /canary slash command via issue_comment

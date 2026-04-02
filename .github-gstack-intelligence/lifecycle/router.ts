@@ -234,7 +234,9 @@ export function route(
 
     if (command) {
       // /autoplan is a one-shot pipeline — no session continuity needed.
-      const sessionMode = command.skill === "autoplan" ? "none" : "new";
+      // All other slash commands use "resume" so that answers show continuity
+      // with prior interactions on the same issue.
+      const sessionMode = command.skill === "autoplan" ? "none" : "resume";
 
       return buildRoute(command.skill, config, {
         sessionMode,
