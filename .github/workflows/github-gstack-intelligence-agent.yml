@@ -86,8 +86,8 @@ on:
   #    • Friday 5pm UTC → /retro (weekly retrospective)
   #    • Daily 6am UTC  → /benchmark (daily benchmark run, if enabled)
   schedule:
-    - cron: '0 17 * * 5'
-    - cron: '0 6 * * *'
+    - cron: '0 17 * * 5'   # Every Friday at 5 PM UTC → /retro (weekly retrospective).
+    - cron: '0 6 * * *'    # Every day at 6 AM UTC → /benchmark (daily benchmark, if enabled).
 
   # 7. A release is published → /document-release skill updates documentation.
   release:
@@ -126,6 +126,7 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   run-install:
     runs-on: ubuntu-latest
+    timeout-minutes: 10   # Prevent runaway downloads or git operations from burning CI minutes.
     # Only run when triggered manually via the Actions UI.
     # Skip when running inside the template repository itself — the run-install job
     # downloads FROM that repo, so running it there would be self-referential.
@@ -211,10 +212,12 @@ jobs:
       #    for files outside the explicit preserve list.
       - name: Download and install from template
         if: steps.check-folder.outputs.action != 'skip'
+        env:
+          INSTALL_ACTION: ${{ steps.check-folder.outputs.action }}
         run: |
           set -euo pipefail
 
-          ACTION="${{ steps.check-folder.outputs.action }}"
+          ACTION="$INSTALL_ACTION"
           TARGET=".github-gstack-intelligence"
 
           # Download the latest template from the main branch.
@@ -345,14 +348,15 @@ jobs:
       #    If nothing changed (edge case), the step is a harmless no-op.
       - name: Commit and push
         if: steps.check-folder.outputs.action != 'skip'
+        env:
+          INSTALL_ACTION: ${{ steps.check-folder.outputs.action }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add .github-gstack-intelligence/ .gitignore .gitattributes
 
-          ACTION="${{ steps.check-folder.outputs.action }}"
-          if [ "$ACTION" = "upgrade" ]; then
+          if [ "$INSTALL_ACTION" = "upgrade" ]; then
             COMMIT_MSG="chore: upgrade .github-gstack-intelligence from template"
           else
             COMMIT_MSG="chore: install .github-gstack-intelligence from template"
@@ -374,6 +378,7 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   run-refresh-gstack:
     runs-on: ubuntu-latest
+    timeout-minutes: 10   # Prevent hung refresh operations from burning CI minutes.
     if: >-
       github.event_name == 'workflow_dispatch'
       && github.event.inputs.function == 'run-refresh-gstack'
@@ -522,6 +527,7 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   run-agent:
     runs-on: ubuntu-latest
+    timeout-minutes: 30   # LLM calls may take minutes; 30 min cap prevents runaway billing.
 
     # Concurrency: one agent run per target (issue or PR) at a time.
     # For issues: the second comment waits for the first to finish (cancel-in-progress: false).
@@ -551,7 +557,8 @@ jobs:
     #   • Run on schedule events (no actor check — runs as github-actions).
     #   • Run on release events (published).
     #   • Run on deployment_status events (only successful deployments).
-    #   • Reject the github-actions actor for non-scheduled/release/deployment events
+    #   • Reject the github-actions actor (both 'github-actions' and
+    #     'github-actions[bot]') for non-scheduled/release/deployment events
     #     to prevent bot-loop escalation.
     if: >-
       (github.event_name == 'schedule')
@@ -559,6 +566,7 @@ jobs:
       || (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
       || (
         github.actor != 'github-actions'
+        && github.actor != 'github-actions[bot]'
         && (
           (github.event_name == 'issues')
           || (github.event_name == 'issue_comment' && !github.event.issue.pull_request && !endsWith(github.event.comment.user.login, '[bot]'))
@@ -576,55 +584,86 @@ jobs:
         id: authorize
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ── Pass GitHub context through environment variables ──────────
+          # Avoids direct ${{ }} interpolation in shell code, which is an
+          # expression-injection vector when values are attacker-controlled.
+          # These specific values are GitHub-controlled (not user input), but
+          # using env vars is a defence-in-depth best practice.
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          REPO: ${{ github.repository }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           # Schedule, release, and deployment_status events have no human actor —
           # the workflow runs as github-actions. Skip authorization for these.
-          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "release" || "${{ github.event_name }}" == "deployment_status" ]]; then
-            echo "::notice::${{ github.event_name }} trigger — no actor authorization needed"
+          if [[ "$EVENT_NAME" == "schedule" || "$EVENT_NAME" == "release" || "$EVENT_NAME" == "deployment_status" ]]; then
+            echo "::notice::${EVENT_NAME} trigger — no actor authorization needed"
             exit 0
           fi
 
           # Query the GitHub API for the actor's permission level on this repo.
-          PERM=$(gh api "repos/${{ github.repository }}/collaborators/${{ github.actor }}/permission" --jq '.permission' 2>/dev/null || echo "none")
-          echo "Actor: ${{ github.actor }}, Permission: $PERM"
+          PERM=$(gh api "repos/${REPO}/collaborators/${ACTOR}/permission" --jq '.permission' 2>/dev/null || echo "none")
+          echo "Actor: ${ACTOR}, Permission: $PERM"
 
           # Reject anyone below write access.
           if [[ "$PERM" != "admin" && "$PERM" != "maintain" && "$PERM" != "write" ]]; then
-            echo "::error::Unauthorized: ${{ github.actor }} has '$PERM' permission"
+            echo "::error::Unauthorized: ${ACTOR} has '$PERM' permission"
             exit 1
           fi
 
           # Add a 🚀 "rocket" reaction to the comment, issue, or PR as a visual
           # indicator that the agent has started processing. Save the reaction
           # ID so the agent can swap it for 👍 when it finishes.
-          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
-            REACTION_ID=$(gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
-            if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
-            echo '{"reactionId":'"$RID_JSON"',"reactionTarget":"comment","commentId":${{ github.event.comment.id }},"issueNumber":${{ github.event.issue.number }},"repo":"${{ github.repository }}"}' > /tmp/reaction-state.json
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          # Use jq for safe JSON construction — handles empty/null values without
+          # producing malformed output.
+          if [[ "$EVENT_NAME" == "issue_comment" ]]; then
+            REACTION_ID=$(gh api "repos/${REPO}/issues/comments/${COMMENT_ID}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
+            jq -n \
+              --arg rid "$REACTION_ID" \
+              --arg cid "$COMMENT_ID" \
+              --arg inum "$ISSUE_NUMBER" \
+              --arg repo "$REPO" \
+              '{reactionId: (if $rid == "" then null else $rid end), reactionTarget: "comment", commentId: ($cid | tonumber), issueNumber: ($inum | tonumber), repo: $repo}' \
+              > /tmp/reaction-state.json
+          elif [[ "$EVENT_NAME" == "pull_request" ]]; then
             # PRs are issues in GitHub — use the issues reactions API with the PR number.
-            REACTION_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
-            if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
-            echo '{"reactionId":'"$RID_JSON"',"reactionTarget":"issue","commentId":null,"issueNumber":${{ github.event.pull_request.number }},"repo":"${{ github.repository }}"}' > /tmp/reaction-state.json
+            REACTION_ID=$(gh api "repos/${REPO}/issues/${PR_NUMBER}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
+            jq -n \
+              --arg rid "$REACTION_ID" \
+              --arg prnum "$PR_NUMBER" \
+              --arg repo "$REPO" \
+              '{reactionId: (if $rid == "" then null else $rid end), reactionTarget: "issue", commentId: null, issueNumber: ($prnum | tonumber), repo: $repo}' \
+              > /tmp/reaction-state.json
           else
-            REACTION_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
-            if [[ -n "$REACTION_ID" ]]; then RID_JSON="\"$REACTION_ID\""; else RID_JSON="null"; fi
-            echo '{"reactionId":'"$RID_JSON"',"reactionTarget":"issue","commentId":null,"issueNumber":${{ github.event.issue.number }},"repo":"${{ github.repository }}"}' > /tmp/reaction-state.json
+            REACTION_ID=$(gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/reactions" -f content=rocket --jq '.id' 2>/dev/null || echo "")
+            jq -n \
+              --arg rid "$REACTION_ID" \
+              --arg inum "$ISSUE_NUMBER" \
+              --arg repo "$REPO" \
+              '{reactionId: (if $rid == "" then null else $rid end), reactionTarget: "issue", commentId: null, issueNumber: ($inum | tonumber), repo: $repo}' \
+              > /tmp/reaction-state.json
           fi
 
       # 2. REJECTION FEEDBACK — if authorization failed, add a 👎 reaction so
       #    the user gets immediate visual feedback that their request was denied.
       - name: Reject
-        if: ${{ failure() && steps.authorize.outcome == 'failure' }}
+        if: failure() && steps.authorize.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
-            gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" -f content=-1
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/reactions" -f content=-1
+          if [[ "$EVENT_NAME" == "issue_comment" ]]; then
+            gh api "repos/${REPO}/issues/comments/${COMMENT_ID}/reactions" -f content=-1
+          elif [[ "$EVENT_NAME" == "pull_request" ]]; then
+            gh api "repos/${REPO}/issues/${PR_NUMBER}/reactions" -f content=-1
           else
-            gh api "repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/reactions" -f content=-1
+            gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/reactions" -f content=-1
           fi
 
       # 3. CHECKOUT — clone the full repository (fetch-depth: 0) so the agent
@@ -676,6 +715,9 @@ jobs:
       #    a browser-based skill is being invoked (/qa, /qa-only, /design-review,
       #    /canary). Adds ~30s and ~200MB to the runner, so we skip it for all
       #    other skills to keep runs fast.
+      #    IMPORTANT: the playwright version is read from package.json to stay
+      #    in sync with the installed playwright-core dependency. A version
+      #    mismatch would download an incompatible Chromium binary.
       - name: Install Playwright (conditional)
         if: >-
           steps.check-folder.outputs.exists == 'true'
@@ -688,9 +730,24 @@ jobs:
             ))
             || github.event_name == 'deployment_status'
           )
-        run: npx playwright install chromium --with-deps
         env:
           PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+        run: |
+          # Read the playwright-core version from package.json so the CLI
+          # downloads the exact Chromium build that matches the library.
+          PKG=".github-gstack-intelligence/package.json"
+          if [ ! -f "$PKG" ]; then
+            echo "::error::${PKG} not found — cannot determine playwright-core version."
+            exit 1
+          fi
+          PW_VERSION=$(node -e "
+            const deps = require('./${PKG}').dependencies || {};
+            const v = deps['playwright-core'];
+            if (!v) { console.error('playwright-core not found in ${PKG}'); process.exit(1); }
+            console.log(v);
+          ")
+          echo "Installing Playwright CLI @ ${PW_VERSION} (matching playwright-core dependency)"
+          npx "playwright@${PW_VERSION}" install chromium --with-deps
 
       # 9. RUN THE AGENT — execute the core agent script. It reads the
       #    triggering issue/comment, loads the matching conversation session,
@@ -735,6 +792,7 @@ jobs:
     # !cancelled() still respects manual cancellation.
     if: always() && !cancelled()
     runs-on: ubuntu-latest
+    timeout-minutes: 10   # Pages uploads are small; 10 min cap prevents stuck deployments.
 
     # Concurrency: only one Pages deployment at a time across the entire repo.
     concurrency:
@@ -779,13 +837,14 @@ jobs:
         id: enable-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
           # Check if Pages is already active.
-          if gh api "repos/${{ github.repository }}/pages" --silent 2>/dev/null; then
+          if gh api "repos/${REPO}/pages" --silent 2>/dev/null; then
             echo "pages_active=true" >> "$GITHUB_OUTPUT"
             echo "✅ GitHub Pages is already enabled."
           # If not, try to enable it with the "workflow" build type.
-          elif gh api "repos/${{ github.repository }}/pages" \
+          elif gh api "repos/${REPO}/pages" \
             -X POST -f build_type=workflow --silent 2>/dev/null; then
             echo "pages_active=true" >> "$GITHUB_OUTPUT"
             echo "✅ GitHub Pages has been enabled."
