@@ -458,6 +458,22 @@ async function main() {
       }
     }
 
+    // ── Honor the router's sessionMode directive ──────────────────────────────────
+    // The session-resolution block above eagerly sets mode="resume" whenever a
+    // prior mapping exists.  Some skills explicitly opt out of continuity:
+    //   • "none"  — one-shot pipeline (e.g. autoplan): discard any prior session.
+    //   • "new"   — always start a fresh session (e.g. PR review): discard any prior session.
+    //   • "resume" — keep the session that was resolved above (default for slash commands).
+    if (routeResult) {
+      if (routeResult.sessionMode === "none" || routeResult.sessionMode === "new") {
+        if (mode === "resume") {
+          console.log(`Route "${routeResult.skill}" requires sessionMode="${routeResult.sessionMode}", overriding resume → fresh start`);
+        }
+        mode = "new";
+        sessionPath = "";
+      }
+    }
+
     // ── Skip reserved-prefix messages for other AI agents ───────────────────────
     // Certain leading characters signal that this message is intended for another
     // AI agent.  If the issue title (for new issues) or comment body (for comments)
