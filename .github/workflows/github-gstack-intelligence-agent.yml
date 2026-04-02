@@ -598,7 +598,7 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   run-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # LLM calls with high-thinking can take 5-10 min per skill. 30 min cap
+    timeout-minutes: 240  # LLM calls with high-thinking can take 5-10 min per skill. 4 hour cap
                           # prevents runaway billing but may truncate /autoplan (chains 3 skills).
 
     # Concurrency: one agent run per target (issue or PR) at a time.
@@ -868,7 +868,7 @@ jobs:
     # !cancelled() still respects manual cancellation.
     if: always() && !cancelled()
     runs-on: ubuntu-latest
-    timeout-minutes: 10   # Pages uploads are small; 10 min cap prevents stuck deployments.
+    timeout-minutes: 30   # Pages uploads are small; 30 min cap prevents stuck deployments.
 
     # Concurrency: only one Pages deployment at a time across the entire repo.
     concurrency:
