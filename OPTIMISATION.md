@@ -2,12 +2,6 @@
 
 An analysis of how gstack's skills are utilised across frameworks and how this repository can be optimised for maximum value extraction.
 
-**Date:** 2 April 2026
-**Scope:** github-gstack-intelligence v1.0.2 evaluated against gstack upstream design documents
-**Design documents reviewed:** DESIGN_SHOTGUN, DESIGN_TOOLS_V1, SESSION_INTELLIGENCE, SELF_LEARNING_V0, ML_PROMPT_INJECTION_KILLER, CONDUCTOR_SESSION_API, CONDUCTOR_CHROME_SIDEBAR_INTEGRATION, CHROME_VS_CHROMIUM_EXPLORATION
-
----
-
 ## Table of Contents
 
 - [Executive Summary](#executive-summary)
