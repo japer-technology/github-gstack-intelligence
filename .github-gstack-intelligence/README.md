@@ -23,6 +23,12 @@ A repository-local AI framework that plugs into a developer’s existing workflo
 
 Powered by [pi-mono](https://github.com/badlogic/pi-mono), conversation history is committed to git, giving your agent long-term memory across sessions. It can search prior context, edit or summarize past conversations, and all changes are versioned.
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence">
+  </picture>
+</p>
+
 ---
 
 ## Your Data, Your Environment
