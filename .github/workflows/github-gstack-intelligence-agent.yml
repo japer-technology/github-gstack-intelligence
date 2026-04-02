@@ -1,17 +1,26 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  GitHub GStack Intelligence — Agent Workflow (Version 1.0.2)                 ║
+# ║  GitHub GStack Intelligence — Agent Workflow (v1.0.2)                        ║
 # ║                                                                              ║
-# ║  An AI agent that lives inside your GitHub repository. It uses Issues as     ║
-# ║  a conversational UI, Git for persistent memory, and Actions as its only     ║
-# ║  compute layer. No external servers or infrastructure required.              ║
+# ║  A Githubification of garrytan/gstack — Garry Tan's (CEO, Y Combinator)     ║
+# ║  collection of 25 AI engineering skills. This workflow adapts 17 of those    ║
+# ║  skills to run autonomously on GitHub Actions, using Issues as a             ║
+# ║  conversational UI, Git as persistent memory, and Actions as the compute     ║
+# ║  layer. No external servers, databases, or CLI tools required.               ║
 # ║                                                                              ║
-# ║  QUICK START — copy this file into your repo and you're 4 steps away:        ║
+# ║  PROVENANCE:                                                                 ║
+# ║    Skill prompts : garrytan/gstack (upstream, refreshable via dispatch)      ║
+# ║    Agent runtime : pi-mono by Mario Zechner (@mariozechner/pi-coding-agent)  ║
+# ║    Architecture  : japer-technology/githubification methodology              ║
+# ║    Family member : one of 10+ github-*-intelligence insertable AI agents     ║
+# ║                    in the japer-technology ecosystem                          ║
+# ║                                                                              ║
+# ║  QUICK START — copy this file into any repo, four steps to a live agent:     ║
 # ║                                                                              ║
 # ║    1. Copy this file → .github/workflows/ in your repository.                ║
 # ║    2. Add an LLM API key as a repository secret                              ║
 # ║       (Settings → Secrets and variables → Actions).                          ║
 # ║       At minimum, add ONE of:                                                ║
-# ║         • OPENAI_API_KEY          (OpenAI — default provider)                ║
+# ║         • OPENAI_API_KEY          (OpenAI — default, uses GPT-5.4)           ║
 # ║         • ANTHROPIC_API_KEY       (Anthropic Claude)                         ║
 # ║         • GEMINI_API_KEY          (Google Gemini)                            ║
 # ║         • XAI_API_KEY             (xAI Grok)                                 ║
@@ -21,28 +30,60 @@
 # ║    3. Run the workflow manually:                                             ║
 # ║       Actions → github-gstack-intelligence-agent → Run workflow.             ║
 # ║       This installs the agent folder into your repo (or upgrades it).        ║
-# ║    4. Open an issue — the agent reads your message and replies!              ║
+# ║    4. Open an issue — the agent reads your message and replies.              ║
 # ║                                                                              ║
 # ║  HOW IT WORKS:                                                               ║
-# ║    • Every issue is a conversation thread. Comment again to continue.        ║
-# ║    • The agent commits every response to git — full history, full recall.    ║
-# ║    • Only repo collaborators with write access (or higher) can trigger       ║
-# ║      the agent. Unauthorized users are silently rejected.                    ║
+# ║    • Every issue is a persistent conversation. Comment again to continue.    ║
+# ║    • Session transcripts (JSONL) are committed to git — fully auditable.     ║
+# ║    • Only repo collaborators with write/maintain/admin access can trigger    ║
+# ║      the agent. Unauthorized users receive a 👎 reaction — no silent fail.   ║
+# ║    • Pull requests auto-trigger /review. Labels gate /cso and /design-review.║
+# ║    • Scheduled crons run /retro (Fridays) and /benchmark (daily) if enabled. ║
+# ║    • Releases trigger /document-release. Deployments trigger /canary.        ║
 # ║                                                                              ║
-# ║  WHAT THIS WORKFLOW CONTAINS (three jobs):                                   ║
-# ║    run-install   — Self-installer and upgrader (workflow_dispatch only).     ║
-# ║    run-agent     — AI agent that responds to issues and comments.            ║
-# ║    run-gitpages  — Publishes the agent's public-fabric to GitHub Pages.      ║
+# ║  WHAT THIS WORKFLOW CONTAINS (four jobs):                                    ║
+# ║    run-install         — Self-installer/upgrader from template repo.         ║
+# ║    run-refresh-gstack  — Pulls latest skills from garrytan/gstack upstream.  ║
+# ║    run-agent           — Core AI agent: routes events → skills → LLM → Git. ║
+# ║    run-gitpages        — Publishes public-fabric directory to GitHub Pages.  ║
 # ║                                                                              ║
-# ║  Docs: https://github.com/japer-technology/github-gstack-intelligence        ║
+# ║  COST DISCLOSURE:                                                            ║
+# ║    Every agent run consumes LLM API credits. The default model (GPT-5.4     ║
+# ║    with high thinking) costs roughly $0.50–$2.00 per invocation depending    ║
+# ║    on context size. On an active repo (20+ PRs/day, slash commands,          ║
+# ║    scheduled skills), monthly costs can reach $500–$2000+. Cost controls     ║
+# ║    (model tiering, rate limiting, diff-based filtering) are planned but      ║
+# ║    NOT YET IMPLEMENTED as of v1.0.2. Monitor your LLM provider dashboard.   ║
+# ║                                                                              ║
+# ║  DATA DISCLOSURE:                                                            ║
+# ║    The agent sends issue/PR content, code diffs, and repository files to     ║
+# ║    your configured LLM provider's API. All session data is committed to      ║
+# ║    your repo's git history (visible to anyone with repo access). No data     ║
+# ║    is sent to japer-technology or any third party beyond the LLM provider.   ║
+# ║                                                                              ║
+# ║  LIMITATIONS (v1.0.2):                                                       ║
+# ║    • No per-skill model tiering — all skills use the same model/settings.    ║
+# ║    • No rate limiting — concurrent issues each trigger separate LLM calls.   ║
+# ║    • 30-minute timeout per agent run — complex pipelines may be cut short.   ║
+# ║    • Memory (state/memory.log) is append-only with no automatic pruning.     ║
+# ║    • 8 of gstack's 25 skills are not adapted (require local-only features).  ║
+# ║                                                                              ║
+# ║  Source: https://github.com/japer-technology/github-gstack-intelligence      ║
+# ║  Docs  : .github-gstack-intelligence/README.md (installed after step 3)     ║
+# ║  Skills: .github-gstack-intelligence/docs/SKILLS.md                          ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 name: github-gstack-intelligence-agent
 
 # ──────────────────────────────────────────────────────────────────────────────
 # TRIGGERS
-# The workflow listens for several distinct GitHub events. Each event activates
-# a different job (see the `if:` guards on each job below).
+# This workflow listens for eight classes of GitHub event. Each event is routed
+# to a specific skill by router.ts (TypeScript, not YAML conditionals). The
+# `if:` guards on each job filter at the workflow level; fine-grained routing
+# (slash commands, labels, config-driven skill enablement) happens in code.
+#
+# Event flow: GitHub event → workflow trigger → job `if:` guard → router.ts
+#             → skill prompt → pi-coding-agent (LLM) → comment + git commit.
 # ──────────────────────────────────────────────────────────────────────────────
 on:
   # 1. A new issue is opened → the agent reads it and posts an AI response.
@@ -82,12 +123,13 @@ on:
           - run-install
           - run-refresh-gstack
 
-  # 6. Scheduled triggers for automated skills:
-  #    • Friday 5pm UTC → /retro (weekly retrospective)
-  #    • Daily 6am UTC  → /benchmark (daily benchmark run, if enabled)
+  # 6. Scheduled triggers for automated skills.
+  #    IMPORTANT: these skills are DISABLED by default in config.json.
+  #    Enable them explicitly before relying on scheduled output.
+  #    Each cron run consumes one LLM invocation worth of API credits.
   schedule:
-    - cron: '0 17 * * 5'   # Every Friday at 5 PM UTC → /retro (weekly retrospective).
-    - cron: '0 6 * * *'    # Every day at 6 AM UTC → /benchmark (daily benchmark, if enabled).
+    - cron: '0 17 * * 5'   # Every Friday at 5 PM UTC → /retro (weekly retrospective, if enabled).
+    - cron: '0 6 * * *'    # Every day at 6 AM UTC → /benchmark (daily performance check, if enabled).
 
   # 7. A release is published → /document-release skill updates documentation.
   release:
@@ -98,17 +140,18 @@ on:
 
 # ──────────────────────────────────────────────────────────────────────────────
 # PERMISSIONS
-# These are the minimum permissions the workflow needs. GitHub Actions uses
-# a least-privilege model; each permission listed here is required for a
-# specific reason documented below.
+# Least-privilege set. Each permission is required for a specific capability;
+# removing any one will break the corresponding feature. These permissions
+# apply to the GITHUB_TOKEN generated for this workflow run — they do NOT
+# grant access to other repositories or external systems.
 # ──────────────────────────────────────────────────────────────────────────────
 permissions:
-  contents: write        # Commit agent responses, session state, and installed files to the repo.
-  issues: write          # Post AI replies as issue comments and add reaction indicators (🚀 / 👍).
-  pull-requests: write   # Post review findings as PR comments and add reaction indicators.
-  actions: write         # Allow the run-install job to push commits that subsequently trigger workflows.
-  pages: write           # Upload and deploy the agent's public-fabric site to GitHub Pages.
-  id-token: write        # Required by actions/deploy-pages for secure OIDC-based Pages deployment.
+  contents: write        # Read repo files, commit session state, push agent edits and installed files.
+  issues: write          # Post AI replies as issue comments, add/remove reaction indicators (🚀/👍/👎).
+  pull-requests: write   # Post review/CSO/design-review findings as PR comments, add reactions.
+  actions: write         # Required so run-install commits can trigger subsequent workflow runs.
+  pages: write           # Upload and deploy the public-fabric directory to GitHub Pages.
+  id-token: write        # OIDC token for actions/deploy-pages — required by GitHub's Pages deployment.
 
 # ══════════════════════════════════════════════════════════════════════════════
 # JOBS
@@ -118,11 +161,18 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   # JOB 1 — run-install
   #
-  # Purpose : Self-installer and upgrader. Downloads the latest agent folder
-  #           from the template repository and commits it into YOUR repo.
-  #           If the agent is already installed at the latest version, it skips.
-  # Trigger : workflow_dispatch (manual "Run workflow" button only).
-  # Safe    : Re-running is always safe — it installs, upgrades, or skips.
+  # Purpose : Self-installer and upgrader. Downloads the agent folder from the
+  #           template repository (japer-technology/github-gstack-intelligence)
+  #           and commits it into YOUR repo. Compares semver VERSION files to
+  #           decide: install (no folder), upgrade (remote > local), or skip.
+  # Trigger : workflow_dispatch with function=run-install (manual button only).
+  # Safe    : Idempotent. Re-running never damages existing state.
+  # Upgrade : File-by-file with three categories:
+  #             ALWAYS overwrite  — lifecycle code, skills, package.json, VERSION
+  #             NEVER overwrite   — config.json, AGENTS.md, .pi/settings.json,
+  #                                 .pi/APPEND_SYSTEM.md, .pi/BOOTSTRAP.md, state/
+  #             DEFAULT           — copy only if file is missing locally
+  #           User customizations in the NEVER category survive every upgrade.
   # ────────────────────────────────────────────────────────────────────────────
   run-install:
     runs-on: ubuntu-latest
@@ -370,10 +420,19 @@ jobs:
           fi
 
   # ────────────────────────────────────────────────────────────────────────────
-  # JOB 1b — run-refresh-gstack
+  # JOB 2 — run-refresh-gstack
   #
-  # Purpose : Refresh the extracted gstack resources that live inside the
-  #           installed .github-gstack-intelligence folder.
+  # Purpose : Pull the latest skill prompts and reference files from upstream
+  #           garrytan/gstack. This is the supply chain for AI prompts —
+  #           skills are vendored like dependencies, tracked by commit SHA,
+  #           and diffable in git history.
+  # Source  : garrytan/gstack @ main (commit SHA recorded in skills/source.json)
+  # Process : refresh.ts fetches raw files → removes AskUserQuestion (local-only
+  #           interactive prompt) → replaces browse daemon refs with Playwright
+  #           → stamps generated-file marker → writes to skills/ directory.
+  # Verify  : Python validation ensures every output file exists, has content
+  #           ≥50 bytes, contains the generated marker, and the do-not-edit
+  #           warning. Fails the job if any check fails.
   # Trigger : workflow_dispatch with function=run-refresh-gstack.
   # ────────────────────────────────────────────────────────────────────────────
   run-refresh-gstack:
@@ -512,22 +571,35 @@ jobs:
           fi
 
   # ────────────────────────────────────────────────────────────────────────────
-  # JOB 2 — run-agent
+  # JOB 3 — run-agent
   #
-  # Purpose : The core AI agent. Reads the issue (or comment, PR, schedule,
-  #           release, or deployment event), loads the conversation session
-  #           from git, sends it to the configured LLM, and posts the response
-  #           back as a comment. For PRs, the /review or /cso skill is invoked
-  #           and findings appear as PR comments. For scheduled events, skills
-  #           like /retro and /benchmark run automatically.
-  # Trigger : issues.opened, issue_comment.created, pull_request.opened/synchronize,
-  #           schedule, release.published, OR deployment_status (success).
-  # Security: Only collaborators with write/maintain/admin access can trigger
-  #           (schedule/release/deployment events bypass actor checks).
+  # Purpose : The core AI agent. Routes GitHub events to one of 17 specialist
+  #           skills authored by Garry Tan (garrytan/gstack), executes the
+  #           skill via pi-coding-agent (LLM call), posts the response as a
+  #           comment, and commits session state to git.
+  #
+  # Pipeline: Event → router.ts (skill selection) → agent.ts (prompt assembly,
+  #           context injection, session resume) → pi-coding-agent (LLM) →
+  #           JSONL extraction → comment post → git commit+push with retry.
+  #
+  # Skills  : /review (auto on PR), /cso (PR + label), /design-review (PR +
+  #           label), /qa (slash cmd + URL), /qa-only, /investigate (label),
+  #           /office-hours (label), /design-consultation (label), /ship,
+  #           /autoplan (chains CEO→design→eng), /plan-ceo-review,
+  #           /plan-eng-review, /plan-design-review, /retro (cron),
+  #           /benchmark (cron), /document-release (release), /canary (deploy)
+  #
+  # Trigger : issues.opened, issue_comment.created, pull_request, schedule,
+  #           release.published, deployment_status (success only).
+  # Security: Collaborators with write/maintain/admin only. Schedule, release,
+  #           and deployment events bypass actor checks (no human actor).
+  # Cost    : Each run is one LLM invocation. /autoplan chains three.
+  # Timeout : 30 minutes. Complex pipelines or large codebases may hit this.
   # ────────────────────────────────────────────────────────────────────────────
   run-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # LLM calls may take minutes; 30 min cap prevents runaway billing.
+    timeout-minutes: 30   # LLM calls with high-thinking can take 5-10 min per skill. 30 min cap
+                          # prevents runaway billing but may truncate /autoplan (chains 3 skills).
 
     # Concurrency: one agent run per target (issue or PR) at a time.
     # For issues: the second comment waits for the first to finish (cancel-in-progress: false).
@@ -775,14 +847,18 @@ jobs:
         run: bun .github-gstack-intelligence/lifecycle/agent.ts --route
 
   # ────────────────────────────────────────────────────────────────────────────
-  # JOB 3 — run-gitpages
+  # JOB 4 — run-gitpages
   #
   # Purpose : Publish the agent's public-fabric directory as a GitHub Pages
-  #           site. This gives you a live web page powered by the agent's
+  #           site. Provides a live web presence powered by the agent's
   #           public output — no separate hosting needed.
-  # Trigger : push to main (i.e. after the agent commits, or any manual push).
-  # Note    : Pages is automatically enabled on first run. If auto-enable
-  #           fails, a warning guides the user to enable it manually.
+  # Trigger : Runs after all other jobs complete (needs: clause). On push
+  #           events the upstream jobs are skipped, so this starts immediately.
+  # Auto    : Attempts to enable GitHub Pages via API on first run. If the
+  #           API call fails (org policy restrictions), a warning guides the
+  #           user to enable it manually — the job does not fail.
+  # Note    : This job uses always() && !cancelled() so it runs even when
+  #           upstream jobs are skipped (e.g. push events skip run-agent).
   # ────────────────────────────────────────────────────────────────────────────
   run-gitpages:
     # Run after agent/install jobs finish. On push events those jobs are
