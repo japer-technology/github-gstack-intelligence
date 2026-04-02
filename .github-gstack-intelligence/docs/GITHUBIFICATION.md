@@ -1,4 +1,4 @@
-# Brainstorm: GitHub GStack Intelligence
+# Githubification
 
 ## What This Actually Is
 
