@@ -11,6 +11,7 @@ A repository-local AI framework that plugs into a developer’s existing workflo
 3. Go to **[Actions → github-gstack-intelligence-agent → Run workflow]** to install the agent files automatically, subsequent runs perform upgrades.
 4. Open an issue — the agent will reply.
 
+## An AI agent that lives in your GitHub Repo
 
 <p align="center">
   <picture>
@@ -23,8 +24,6 @@ A repository-local AI framework that plugs into a developer’s existing workflo
     <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence">
   </picture>
 </p>
-
-## An AI agent that lives in your GitHub Repo
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![AI](https://img.shields.io/badge/Assisted-Development-2b2bff?logo=openai&logoColor=white) [![github-gstack-intelligence-agent](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml/badge.svg)](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml)
 
