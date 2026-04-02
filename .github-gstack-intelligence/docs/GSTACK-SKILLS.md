@@ -2,6 +2,12 @@
 
 Complete reference for the seventeen skills available in GitHub GStack Intelligence.
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 Each skill is an AI specialist that runs as a GitHub Actions workflow. Skills are triggered by GitHub events (PRs, comments, labels, releases, schedules, deployments) and configured in [`config.json`](../config.json).
 
 ---
