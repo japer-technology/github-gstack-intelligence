@@ -64,7 +64,7 @@
 # ║  LIMITATIONS (v1.0.2):                                                       ║
 # ║    • No per-skill model tiering — all skills use the same model/settings.    ║
 # ║    • No rate limiting — concurrent issues each trigger separate LLM calls.   ║
-# ║    • 30-minute timeout per agent run — complex pipelines may be cut short.   ║
+# ║    • 4-hour timeout per agent run — complex pipelines may be cut short.      ║
 # ║    • Memory (state/memory.log) is append-only with no automatic pruning.     ║
 # ║    • 8 of gstack's 25 skills are not adapted (require local-only features).  ║
 # ║                                                                              ║
