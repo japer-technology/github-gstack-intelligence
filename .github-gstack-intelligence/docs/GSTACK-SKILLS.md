@@ -1,6 +1,6 @@
-# Per-Skill Documentation
+# GStack Skill Documentation
 
-Complete reference for all seventeen skills available in GitHub GStack Intelligence.
+Complete reference for the seventeen skills available in GitHub GStack Intelligence.
 
 Each skill is an AI specialist that runs as a GitHub Actions workflow. Skills are triggered by GitHub events (PRs, comments, labels, releases, schedules, deployments) and configured in [`config.json`](../config.json).
 
