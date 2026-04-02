@@ -412,6 +412,9 @@ async function main() {
             if (routeResult.context.url) {
               contextParts.push(`URL: ${routeResult.context.url}`);
             }
+            if (routeResult.context.args) {
+              contextParts.push(`Args: ${routeResult.context.args}`);
+            }
             if (routeResult.context.branch) {
               contextParts.push(`Branch: ${routeResult.context.branch}`);
             }
@@ -423,9 +426,19 @@ async function main() {
               : "";
 
             // Include the original user message after the skill prompt.
-            const userMessage = eventName === "issue_comment"
-              ? (event.comment?.body ?? "")
-              : `${title}\n\n${body}`;
+            // For issue_comment events, include the issue title and body so
+            // skills have full context about the issue (not just the comment).
+            let userMessage: string;
+            if (eventName === "issue_comment") {
+              const commentBody = event.comment?.body ?? "";
+              if (title || body) {
+                userMessage = `Issue: ${title}\n\n${body}\n\n---\n\nComment:\n${commentBody}`;
+              } else {
+                userMessage = commentBody;
+              }
+            } else {
+              userMessage = `${title}\n\n${body}`;
+            }
 
             prompt = `${skillPrompt}${contextStr}\n\n---\n\nUser message:\n${userMessage}`;
             console.log(`Skill prompt loaded: ${routeResult.skill} (${skillPath})`);

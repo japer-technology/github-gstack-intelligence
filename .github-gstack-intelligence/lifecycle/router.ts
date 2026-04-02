@@ -30,6 +30,7 @@ export interface RouteResult {
     prNumber?: number;
     issueNumber?: number;
     url?: string;            // For /qa, /canary
+    args?: string;           // Non-URL arguments (e.g., /investigate <topic>)
     diffStat?: string;
     branch?: string;
   };
@@ -240,6 +241,7 @@ export function route(
         context: {
           issueNumber,
           url: command.url,
+          args: command.args,
         },
       });
     }
@@ -249,7 +251,7 @@ export function route(
     return null;
   }
 
-  // 4. issues (opened with label) → route to label-mapped skill.
+  // 4. issues (opened with label or slash command in title) → route to skill.
   if (eventName === "issues") {
     const labels: string[] = (event.issue?.labels || []).map(
       (l: any) => l.name,
@@ -267,6 +269,16 @@ export function route(
           context: { issueNumber },
         });
       }
+    }
+
+    // No label match — check if the issue title starts with a slash command.
+    const issueTitle = event.issue?.title ?? "";
+    const command = parseSlashCommand(issueTitle);
+    if (command) {
+      return buildRoute(command.skill, config, {
+        sessionMode: "new",
+        context: { issueNumber, args: command.args },
+      });
     }
 
     // No label-mapped skill — return null for general conversation.

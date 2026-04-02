@@ -679,4 +679,98 @@ describe("route", () => {
     expect(result!.skill).toBe("retro");
     expect(result!.sessionMode).toBe("new");
   });
+
+  // ── Slash command in issue title (issues event) ──────────────────────────
+
+  test("routes issue with /investigate in title to investigate skill", () => {
+    const event = {
+      issue: {
+        number: 200,
+        title: "/investigate The Investigation",
+        labels: [],
+      },
+    };
+    const result = route(event, "issues", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("investigate");
+    expect(result!.context.issueNumber).toBe(200);
+    expect(result!.context.args).toBe("The Investigation");
+    expect(result!.sessionMode).toBe("new");
+  });
+
+  test("routes issue with /qa in title to qa skill", () => {
+    const event = {
+      issue: {
+        number: 201,
+        title: "/qa",
+        labels: [],
+      },
+    };
+    const result = route(event, "issues", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("qa");
+    expect(result!.context.issueNumber).toBe(201);
+  });
+
+  test("label-based routing takes priority over title slash command", () => {
+    const event = {
+      issue: {
+        number: 202,
+        title: "/review",
+        labels: [{ name: "investigate" }],
+      },
+    };
+    const result = route(event, "issues", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("investigate");
+  });
+
+  test("returns null for issue with unknown slash command in title", () => {
+    const event = {
+      issue: {
+        number: 203,
+        title: "/unknown-command",
+        labels: [],
+      },
+    };
+    const result = route(event, "issues", testConfig);
+    expect(result).toBeNull();
+  });
+
+  test("returns null for issue title with disabled skill slash command", () => {
+    const event = {
+      issue: {
+        number: 204,
+        title: "/retro",
+        labels: [],
+      },
+    };
+    const result = route(event, "issues", testConfig);
+    expect(result).toBeNull();
+  });
+
+  // ── Args passed through in issue_comment context ─────────────────────────
+
+  test("passes args through in issue_comment context", () => {
+    const event = {
+      comment: { body: "/investigate some bug description" },
+      issue: { number: 300 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("investigate");
+    expect(result!.context.args).toBe("some bug description");
+    expect(result!.context.issueNumber).toBe(300);
+  });
+
+  test("args are undefined when no args provided in slash command", () => {
+    const event = {
+      comment: { body: "/investigate" },
+      issue: { number: 301 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("investigate");
+    expect(result!.context.args).toBeUndefined();
+  });
 });
