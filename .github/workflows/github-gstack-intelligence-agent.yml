@@ -1,7 +1,7 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
 # ║  GitHub GStack Intelligence — Agent Workflow (v1.0.2)                        ║
 # ║                                                                              ║
-# ║  A Githubification of garrytan/gstack — Garry Tan's (CEO, Y Combinator)     ║
+# ║  A Githubification of garrytan/gstack — Garry Tan's (CEO, Y Combinator)      ║
 # ║  collection of 25 AI engineering skills. This workflow adapts 17 of those    ║
 # ║  skills to run autonomously on GitHub Actions, using Issues as a             ║
 # ║  conversational UI, Git as persistent memory, and Actions as the compute     ║
@@ -12,7 +12,7 @@
 # ║    Agent runtime : pi-mono by Mario Zechner (@mariozechner/pi-coding-agent)  ║
 # ║    Architecture  : japer-technology/githubification methodology              ║
 # ║    Family member : one of 10+ github-*-intelligence insertable AI agents     ║
-# ║                    in the japer-technology ecosystem                          ║
+# ║                    in the japer-technology ecosystem                         ║
 # ║                                                                              ║
 # ║  QUICK START — copy this file into any repo, four steps to a live agent:     ║
 # ║                                                                              ║
@@ -44,16 +44,16 @@
 # ║  WHAT THIS WORKFLOW CONTAINS (four jobs):                                    ║
 # ║    run-install         — Self-installer/upgrader from template repo.         ║
 # ║    run-refresh-gstack  — Pulls latest skills from garrytan/gstack upstream.  ║
-# ║    run-agent           — Core AI agent: routes events → skills → LLM → Git. ║
+# ║    run-agent           — Core AI agent: routes events → skills → LLM → Git.  ║
 # ║    run-gitpages        — Publishes public-fabric directory to GitHub Pages.  ║
 # ║                                                                              ║
 # ║  COST DISCLOSURE:                                                            ║
-# ║    Every agent run consumes LLM API credits. The default model (GPT-5.4     ║
+# ║    Every agent run consumes LLM API credits. The default model (GPT-5.4      ║
 # ║    with high thinking) costs roughly $0.50–$2.00 per invocation depending    ║
 # ║    on context size. On an active repo (20+ PRs/day, slash commands,          ║
 # ║    scheduled skills), monthly costs can reach $500–$2000+. Cost controls     ║
 # ║    (model tiering, rate limiting, diff-based filtering) are planned but      ║
-# ║    NOT YET IMPLEMENTED as of v1.0.2. Monitor your LLM provider dashboard.   ║
+# ║    NOT YET IMPLEMENTED as of v1.0.2. Monitor your LLM provider dashboard.    ║
 # ║                                                                              ║
 # ║  DATA DISCLOSURE:                                                            ║
 # ║    The agent sends issue/PR content, code diffs, and repository files to     ║
@@ -69,7 +69,7 @@
 # ║    • 8 of gstack's 25 skills are not adapted (require local-only features).  ║
 # ║                                                                              ║
 # ║  Source: https://github.com/japer-technology/github-gstack-intelligence      ║
-# ║  Docs  : .github-gstack-intelligence/README.md (installed after step 3)     ║
+# ║  Docs  : .github-gstack-intelligence/README.md (installed after step 3)      ║
 # ║  Skills: .github-gstack-intelligence/docs/SKILLS.md                          ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
