@@ -521,6 +521,8 @@ async function main() {
       piBin,
       "--mode",
       "json",
+      "--tools",
+      "read,bash,edit,write,grep,find,ls",
       "--provider",
       configuredProvider,
       "--model",
