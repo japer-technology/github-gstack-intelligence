@@ -20,6 +20,12 @@ The architecture's central insight is that it introduces no new infrastructure. 
 
 ---
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 ## Provenance: Garry Tan's gstack
 
 To understand why these skills work, it helps to understand where they come from. gstack (`garrytan/gstack`) is Garry Tan's personal AI engineering toolkit — a collection of twenty-five structured skill prompts, an engineering ethos document, and a set of architectural conventions that together define how an AI coding agent should think, review, test, ship, and reflect. Tan is the CEO and President of Y Combinator, the most prolific startup accelerator in history, and before that co-founded Initialized Capital (early investor in Coinbase, Instacart, Flexport, and Cruise), was a partner at YC during its early growth years, and served as a designer and engineer at Palantir.
