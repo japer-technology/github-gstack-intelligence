@@ -244,30 +244,30 @@ For each of these slash commands via issue comment:
 
 | Command | Expected Skill | needsBrowser | sessionMode |
 |---|---|---|---|
-| `/review` | review | false | new |
-| `/cso` | cso | false | new |
-| `/qa https://example.com` | qa | true | new |
-| `/qa-only https://example.com` | qa-only | true | new |
-| `/investigate` | investigate | false | new |
-| `/ship` | ship | false | new |
-| `/office-hours` | office-hours | false | new |
-| `/plan-ceo-review` | plan-ceo-review | false | new |
-| `/plan-eng-review` | plan-eng-review | false | new |
-| `/plan-design-review` | plan-design-review | false | new |
-| `/design-review` | design-review | true | new |
-| `/design-consultation` | design-consultation | false | new |
+| `/review` | review | false | resume |
+| `/cso` | cso | false | resume |
+| `/qa https://example.com` | qa | true | resume |
+| `/qa-only https://example.com` | qa-only | true | resume |
+| `/investigate` | investigate | false | resume |
+| `/ship` | ship | false | resume |
+| `/office-hours` | office-hours | false | resume |
+| `/plan-ceo-review` | plan-ceo-review | false | resume |
+| `/plan-eng-review` | plan-eng-review | false | resume |
+| `/plan-design-review` | plan-design-review | false | resume |
+| `/design-review` | design-review | true | resume |
+| `/design-consultation` | design-consultation | false | resume |
 | `/autoplan` | autoplan | false | **none** |
-| `/retro` | retro (if enabled) | false | new |
-| `/benchmark` | benchmark (if enabled) | false | new |
-| `/document-release` | document-release | false | new |
-| `/canary https://example.com` | canary (if enabled) | true | new |
+| `/retro` | retro (if enabled) | false | resume |
+| `/benchmark` | benchmark (if enabled) | false | resume |
+| `/document-release` | document-release | false | resume |
+| `/canary https://example.com` | canary (if enabled) | true | resume |
 
 ```typescript
 describe("RT-020: issue_comment slash command routing", () => {
   const cases = [
-    { body: "/review", skill: "review", browser: false, session: "new" },
-    { body: "/qa https://x.com", skill: "qa", browser: true, session: "new" },
-    { body: "/ship", skill: "ship", browser: false, session: "new" },
+    { body: "/review", skill: "review", browser: false, session: "resume" },
+    { body: "/qa https://x.com", skill: "qa", browser: true, session: "resume" },
+    { body: "/ship", skill: "ship", browser: false, session: "resume" },
     { body: "/autoplan", skill: "autoplan", browser: false, session: "none" },
     // ... all 17 commands
   ];
@@ -284,7 +284,7 @@ describe("RT-020: issue_comment slash command routing", () => {
 });
 ```
 
-**Critical check:** `/autoplan` must have `sessionMode: "none"` (all others default to `"new"`).
+**Critical check:** `/autoplan` must have `sessionMode: "none"` (all others use `"resume"` for conversation continuity).
 
 ---
 
