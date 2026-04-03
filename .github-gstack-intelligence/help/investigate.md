@@ -1,5 +1,11 @@
 # /investigate — Systematic Debugging
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 Root cause investigation following the Iron Law: **"No fixes without root cause investigation first."** Four-phase methodology that prevents whack-a-mole debugging by requiring evidence before action.
 
 ---
@@ -184,5 +190,11 @@ The debug report is posted as a comment on the originating GitHub issue.
 - [`/review`](review.md) — PR code review (catches issues before they become bugs)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

@@ -1,5 +1,11 @@
 # /design-review — Visual Design Audit
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 Designer's-eye QA that finds visual inconsistency, spacing issues, hierarchy problems, AI slop patterns, and slow interactions on live sites — then fixes them iteratively with atomic commits and before/after screenshots.
 
 ---
@@ -211,5 +217,11 @@ Screenshots are captured at multiple viewports (desktop, tablet, mobile) and sto
 - [`/plan-design-review`](plan-design-review.md) — Design review at the plan stage (before implementation)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

@@ -1,5 +1,11 @@
 # /document-release — Release Documentation
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Post-ship documentation update that ensures all project docs are accurate, up-to-date, and written in a friendly, user-forward voice.
 
 ---
@@ -175,5 +181,11 @@ The PR body is also updated with a `## Documentation` section containing a doc d
 - [`/review`](review.md) — Code review with documentation staleness checks
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

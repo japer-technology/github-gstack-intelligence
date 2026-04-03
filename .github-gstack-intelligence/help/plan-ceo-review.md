@@ -1,5 +1,11 @@
 # /plan-ceo-review — CEO/Founder Plan Review
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > CEO/founder-mode review that rethinks the problem, finds the "10-star product," challenges premises, and expands scope when it creates a better product. Four scope modes. Output is an improved plan — no code changes.
 
 ---
@@ -200,5 +206,11 @@ In [`config.json`](../config.json):
 - [`/office-hours`](office-hours.md) — Run first if the problem isn't clearly defined yet
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

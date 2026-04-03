@@ -1,5 +1,11 @@
 # /qa — QA Testing with Fixes
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 Systematically tests a web application like a real user — clicks everything, fills forms, checks states — finds bugs, then iteratively fixes them in source code with atomic commits and re-verifies. Produces before/after health scores with fix evidence and ship-readiness summary.
 
 ---
@@ -197,5 +203,11 @@ Local report output:
 - [`/design-review`](design-review.md) — Visual design audit with fixes (complementary to QA)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

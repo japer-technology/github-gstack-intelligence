@@ -1,5 +1,11 @@
 # /office-hours — YC Office Hours
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > YC office hours partner mode that ensures problems are understood before solutions are proposed. Two modes: Startup mode (six forcing questions about demand reality) and Builder mode (enthusiastic collaborative brainstorming). Produces a design document — no code changes.
 
 ---
@@ -255,5 +261,11 @@ In [`config.json`](../config.json):
 - [`/autoplan`](autoplan.md) — Full review pipeline (run after you have a plan from office hours)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

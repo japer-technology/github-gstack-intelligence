@@ -1,5 +1,11 @@
 # /qa-only — QA Testing (Report Only)
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 Runs the same systematic QA testing methodology as `/qa` — navigation, forms, interactions, console checks, responsive layout verification — but **never fixes anything**. Report-only mode that captures screenshots and documents issues with severity levels and reproduction steps.
 
 ---
@@ -216,5 +222,11 @@ Report filenames use the domain and date: `qa-report-myapp-com-2026-03-12.md`
 - [`/design-review`](design-review.md) — Visual design audit (complementary — `/qa-only` finds functional bugs, `/design-review` finds visual issues)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

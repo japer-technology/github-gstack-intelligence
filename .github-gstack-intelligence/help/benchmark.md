@@ -1,5 +1,11 @@
 # /benchmark — Performance Regression Detection
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Performance regression detection using browser automation to establish baselines for page load times, Core Web Vitals, and resource sizes.
 
 ---
@@ -241,5 +247,11 @@ Each baseline includes per-page metrics: TTFB, FCP, LCP, DOM interactive/complet
 - [`/qa`](qa.md) — Quality assurance testing with browser automation
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)
