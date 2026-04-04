@@ -573,7 +573,7 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   # JOB 3 — run-agent
   #
-  # Purpose : The core AI agent. Routes GitHub events to one of 17 specialist
+  # Purpose : The core AI agent. Routes GitHub events to one of 26 specialist
   #           skills authored by Garry Tan (garrytan/gstack), executes the
   #           skill via pi-coding-agent (LLM call), posts the response as a
   #           comment, and commits session state to git.

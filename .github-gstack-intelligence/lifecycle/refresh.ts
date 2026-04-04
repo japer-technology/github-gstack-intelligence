@@ -26,6 +26,13 @@ const SOURCE_FILES: Record<string, string> = {
   reviewDesignChecklist: "review/design-checklist.md",
   reviewTodosFormat: "review/TODOS-format.md",
   reviewGreptileTriage: "review/greptile-triage.md",
+  reviewSpecialistApiContract: "review/specialists/api-contract.md",
+  reviewSpecialistDataMigration: "review/specialists/data-migration.md",
+  reviewSpecialistMaintainability: "review/specialists/maintainability.md",
+  reviewSpecialistPerformance: "review/specialists/performance.md",
+  reviewSpecialistRedTeam: "review/specialists/red-team.md",
+  reviewSpecialistSecurity: "review/specialists/security.md",
+  reviewSpecialistTesting: "review/specialists/testing.md",
 
   // CSO skill
   csoTemplate: "cso/SKILL.md.tmpl",
@@ -53,6 +60,25 @@ const SOURCE_FILES: Record<string, string> = {
   planEngReviewTemplate: "plan-eng-review/SKILL.md.tmpl",
   designConsultationTemplate: "design-consultation/SKILL.md.tmpl",
   autoplanTemplate: "autoplan/SKILL.md.tmpl",
+
+  // Additional skills
+  carefulTemplate: "careful/SKILL.md.tmpl",
+  designHtmlTemplate: "design-html/SKILL.md.tmpl",
+  designShotgunTemplate: "design-shotgun/SKILL.md.tmpl",
+  devexReviewTemplate: "devex-review/SKILL.md.tmpl",
+  guardTemplate: "guard/SKILL.md.tmpl",
+  healthTemplate: "health/SKILL.md.tmpl",
+  landAndDeployTemplate: "land-and-deploy/SKILL.md.tmpl",
+  learnTemplate: "learn/SKILL.md.tmpl",
+  planDevexReviewTemplate: "plan-devex-review/SKILL.md.tmpl",
+  planDevexReviewDxHallOfFame: "plan-devex-review/dx-hall-of-fame.md",
+
+  // Additional root-level reference documents
+  designDoc: "DESIGN.md",
+  browserDoc: "BROWSER.md",
+  claudeDoc: "CLAUDE.md",
+  contributingDoc: "CONTRIBUTING.md",
+  todosDoc: "TODOS.md",
 };
 
 function rawUrl(path: string) {
@@ -441,6 +467,34 @@ async function main() {
       path: "skills/references/review-greptile-triage.md",
       content: wrapImportedMarkdown(fetched.reviewGreptileTriage, SOURCE_FILES.reviewGreptileTriage, sourceCommit),
     },
+    {
+      path: "skills/references/review-specialist-api-contract.md",
+      content: wrapImportedMarkdown(fetched.reviewSpecialistApiContract, SOURCE_FILES.reviewSpecialistApiContract, sourceCommit),
+    },
+    {
+      path: "skills/references/review-specialist-data-migration.md",
+      content: wrapImportedMarkdown(fetched.reviewSpecialistDataMigration, SOURCE_FILES.reviewSpecialistDataMigration, sourceCommit),
+    },
+    {
+      path: "skills/references/review-specialist-maintainability.md",
+      content: wrapImportedMarkdown(fetched.reviewSpecialistMaintainability, SOURCE_FILES.reviewSpecialistMaintainability, sourceCommit),
+    },
+    {
+      path: "skills/references/review-specialist-performance.md",
+      content: wrapImportedMarkdown(fetched.reviewSpecialistPerformance, SOURCE_FILES.reviewSpecialistPerformance, sourceCommit),
+    },
+    {
+      path: "skills/references/review-specialist-red-team.md",
+      content: wrapImportedMarkdown(fetched.reviewSpecialistRedTeam, SOURCE_FILES.reviewSpecialistRedTeam, sourceCommit),
+    },
+    {
+      path: "skills/references/review-specialist-security.md",
+      content: wrapImportedMarkdown(fetched.reviewSpecialistSecurity, SOURCE_FILES.reviewSpecialistSecurity, sourceCommit),
+    },
+    {
+      path: "skills/references/review-specialist-testing.md",
+      content: wrapImportedMarkdown(fetched.reviewSpecialistTesting, SOURCE_FILES.reviewSpecialistTesting, sourceCommit),
+    },
 
     // CSO skill + references
     {
@@ -532,6 +586,70 @@ async function main() {
     {
       path: "skills/autoplan.md",
       content: adaptGenericSkill("autoplan", fetched.autoplanTemplate, SOURCE_FILES.autoplanTemplate, sourceCommit),
+    },
+
+    // Additional skills
+    {
+      path: "skills/careful.md",
+      content: adaptGenericSkill("careful", fetched.carefulTemplate, SOURCE_FILES.carefulTemplate, sourceCommit),
+    },
+    {
+      path: "skills/design-html.md",
+      content: adaptGenericSkill("design-html", fetched.designHtmlTemplate, SOURCE_FILES.designHtmlTemplate, sourceCommit),
+    },
+    {
+      path: "skills/design-shotgun.md",
+      content: adaptGenericSkill("design-shotgun", fetched.designShotgunTemplate, SOURCE_FILES.designShotgunTemplate, sourceCommit),
+    },
+    {
+      path: "skills/devex-review.md",
+      content: adaptGenericSkill("devex-review", fetched.devexReviewTemplate, SOURCE_FILES.devexReviewTemplate, sourceCommit),
+    },
+    {
+      path: "skills/guard.md",
+      content: adaptGenericSkill("guard", fetched.guardTemplate, SOURCE_FILES.guardTemplate, sourceCommit),
+    },
+    {
+      path: "skills/health.md",
+      content: adaptGenericSkill("health", fetched.healthTemplate, SOURCE_FILES.healthTemplate, sourceCommit),
+    },
+    {
+      path: "skills/land-and-deploy.md",
+      content: adaptGenericSkill("land-and-deploy", fetched.landAndDeployTemplate, SOURCE_FILES.landAndDeployTemplate, sourceCommit),
+    },
+    {
+      path: "skills/learn.md",
+      content: adaptGenericSkill("learn", fetched.learnTemplate, SOURCE_FILES.learnTemplate, sourceCommit),
+    },
+    {
+      path: "skills/plan-devex-review.md",
+      content: adaptGenericSkill("plan-devex-review", fetched.planDevexReviewTemplate, SOURCE_FILES.planDevexReviewTemplate, sourceCommit),
+    },
+
+    // Additional reference documents
+    {
+      path: "skills/references/devex-dx-hall-of-fame.md",
+      content: wrapImportedMarkdown(fetched.planDevexReviewDxHallOfFame, SOURCE_FILES.planDevexReviewDxHallOfFame, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-design.md",
+      content: wrapImportedMarkdown(fetched.designDoc, SOURCE_FILES.designDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-browser.md",
+      content: wrapImportedMarkdown(fetched.browserDoc, SOURCE_FILES.browserDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-claude.md",
+      content: wrapImportedMarkdown(fetched.claudeDoc, SOURCE_FILES.claudeDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-contributing.md",
+      content: wrapImportedMarkdown(fetched.contributingDoc, SOURCE_FILES.contributingDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-todos.md",
+      content: wrapImportedMarkdown(fetched.todosDoc, SOURCE_FILES.todosDoc, sourceCommit),
     },
   ] as const;
   const outputPaths = managedOutputs.map((output) => output.path);
