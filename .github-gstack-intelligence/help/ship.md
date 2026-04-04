@@ -1,5 +1,11 @@
 # /ship — Automated Ship Workflow
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Fully automated, non-interactive shipping workflow that merges, tests, reviews, versions, and creates a PR — all in one command.
 
 ---
@@ -213,5 +219,11 @@ Pre-landing review results are also saved to `state/results/review/review-log.js
 - [`/retro`](retro.md) — Weekly retrospective that reads ship metrics for trend tracking
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

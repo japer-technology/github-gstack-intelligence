@@ -1,5 +1,11 @@
 # /autoplan — Auto-Review Pipeline
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > One command, fully reviewed plan out. Loads CEO, design, and engineering review skills and runs them sequentially with auto-decisions using 6 decision principles. Surfaces taste decisions at a final approval gate.
 
 ---
@@ -195,5 +201,11 @@ In [`config.json`](../config.json):
 - [`/office-hours`](office-hours.md) — Run before `/autoplan` to establish product direction
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

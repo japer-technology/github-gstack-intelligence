@@ -1,5 +1,11 @@
 # /canary — Post-Deploy Monitoring
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Post-deploy visual monitoring that watches the live app for console errors, performance regressions, and page failures — the safety net between "shipped" and "verified."
 
 ---
@@ -231,5 +237,11 @@ A structured JSONL entry is appended for the review dashboard:
 - [`/qa`](qa.md) — Quality assurance testing with browser automation
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

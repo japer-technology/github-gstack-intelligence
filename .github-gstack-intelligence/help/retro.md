@@ -1,5 +1,11 @@
 # /retro — Weekly Retrospective
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Weekly engineering retrospective analyzing commit history, work patterns, and code quality metrics with team-aware breakdowns, persistent history, and trend tracking.
 
 ---
@@ -248,5 +254,11 @@ When a prior retro exists with the same window size, the skill automatically com
 - [`/ship`](ship.md) — Shipping workflow whose metrics feed into retro analysis
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

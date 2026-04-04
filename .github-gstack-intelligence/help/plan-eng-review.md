@@ -1,5 +1,11 @@
 # /plan-eng-review — Engineering Plan Review
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Engineering manager-mode review that locks in execution architecture, data flow, diagrams, edge cases, test coverage, and performance before any code is written. Walks through issues interactively with opinionated recommendations.
 
 ---
@@ -205,5 +211,11 @@ In [`config.json`](../config.json):
 - [`/office-hours`](office-hours.md) — Run first to establish product direction and constraints
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

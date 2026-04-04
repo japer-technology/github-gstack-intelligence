@@ -1,5 +1,11 @@
 # /cso — Security Audit (Chief Security Officer)
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 Chief Security Officer audit performing secrets archaeology, dependency supply chain analysis, CI/CD pipeline security review, LLM/AI integration security checks, and OWASP Top 10 / STRIDE threat modeling. Produces a Security Posture Report without making code changes.
 
 ---
@@ -179,5 +185,11 @@ Each report includes findings with severity, evidence, and remediation plans. Tr
 - [`/review`](review.md) — PR code review (complementary — `/review` finds code issues, `/cso` finds security issues)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

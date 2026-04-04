@@ -1,5 +1,11 @@
 # /design-consultation — Design System Builder
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Understands your product, researches the landscape, and proposes a complete design system — aesthetic, typography, color palette, layout grid, spacing scale, and motion principles. Creates `DESIGN.md` as your project's design source of truth.
 
 ---
@@ -183,5 +189,11 @@ In [`config.json`](../config.json):
 - [`/autoplan`](autoplan.md) — Full review pipeline that includes design review
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

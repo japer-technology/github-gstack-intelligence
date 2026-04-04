@@ -1,5 +1,11 @@
 # /plan-design-review — Designer Plan Review
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 > Interactive designer's-eye plan review that rates each design dimension 0–10, explains what would make it a 10, then improves the plan. Applies 9 design principles and 14 cognitive patterns of great designers. Does not make code changes.
 
 ---
@@ -207,5 +213,11 @@ In [`config.json`](../config.json):
 - [`/design-consultation`](design-consultation.md) — Full design system builder (run if no `DESIGN.md` exists)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)

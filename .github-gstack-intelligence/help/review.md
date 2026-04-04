@@ -1,5 +1,11 @@
 # /review — PR Code Review
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/yc-ceo.png" alt="GStack Intelligence" width="500">
+  </picture>
+</p>
+
 Structured, checklist-driven pre-landing code review that analyzes PR diffs for SQL injection, LLM trust boundary violations, race conditions, conditional side effects, and other structural issues that tests don't catch.
 
 ---
@@ -195,5 +201,11 @@ The `/ship` skill reads this file to confirm that an engineering review was comp
 - [`/ship`](ship.md) — Automated shipping workflow (reads `/review` results before merging)
 
 ---
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
 
 [← Back to Command Reference](README.md)
