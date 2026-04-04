@@ -70,7 +70,7 @@ The `/qa-only` skill tests a web application like a real user but **never makes 
 
 ### Per-Page Exploration Checklist
 
-For each page visited, the skill runs through 8 systematic checks from the [QA issue taxonomy](../skills/references/qa-issue-taxonomy.md) covering Visual/UI, Functional, UX, Content, Performance, Console/Errors, and Accessibility categories.
+For each page visited, the skill runs through 7 systematic checks from the [QA issue taxonomy](../skills/references/qa-issue-taxonomy.md) covering Visual/UI, Functional, UX, Content, Performance, Console/Errors, and Accessibility categories.
 
 ### Issue Categories and Severities
 
@@ -225,7 +225,7 @@ Report filenames use the domain and date: `qa-report-myapp-com-2026-03-12.md`
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence">
   </picture>
 </p>
 
