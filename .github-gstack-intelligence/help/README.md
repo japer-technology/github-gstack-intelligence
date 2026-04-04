@@ -126,9 +126,29 @@ Skills are gated by repository permissions. Only users with `admin`, `maintain`,
 
 ---
 
+## Deep Guides
+
+These documents explain how to use GStack Intelligence as a **system** — not just individual commands, but a disciplined engineering methodology.
+
+| Guide | What It Covers |
+|---|---|
+| **[The Method](the-method.md)** | The complete methodology for software development excellence — five phases, decision frameworks, anti-patterns, and how to measure engineering quality |
+| **[Workflows](workflows.md)** | Step-by-step recipes for 8 common scenarios — greenfield features, bug fixes, security sprints, design system setup, pre-launch quality blitz, and more |
+| **[Getting Started](getting-started.md)** | Your first day with GStack Intelligence — installation, first commands, configuration, troubleshooting |
+| **[ETHOS](../ETHOS.md)** | The builder principles behind every skill — Boil the Lake, Search Before Building, User Sovereignty |
+
+---
+
 ## Getting Help
 
 - **This file** — Command index and quick reference
+- **Deep guides** — [The Method](the-method.md), [Workflows](workflows.md), [Getting Started](getting-started.md) for comprehensive usage guidance
 - **Individual command pages** — Click any command in the table above for full documentation
 - **Skill prompts** — See [`skills/`](../skills/) for the raw AI instructions behind each skill
 - **Architecture** — See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for how the system works internally
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence" width="120">
+  </picture>
+</p>
