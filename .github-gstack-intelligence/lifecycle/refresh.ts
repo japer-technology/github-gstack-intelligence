@@ -79,6 +79,27 @@ const SOURCE_FILES: Record<string, string> = {
   claudeDoc: "CLAUDE.md",
   contributingDoc: "CONTRIBUTING.md",
   todosDoc: "TODOS.md",
+
+  // Help and documentation
+  readmeDoc: "README.md",
+  changelogDoc: "CHANGELOG.md",
+  skillsGuideDoc: "docs/skills.md",
+
+  // Additional skill templates (local-only skills, stored as reference)
+  browseTemplate: "browse/SKILL.md.tmpl",
+  codexTemplate: "codex/SKILL.md.tmpl",
+  checkpointTemplate: "checkpoint/SKILL.md.tmpl",
+  freezeTemplate: "freeze/SKILL.md.tmpl",
+  unfreezeTemplate: "unfreeze/SKILL.md.tmpl",
+  gstackUpgradeTemplate: "gstack-upgrade/SKILL.md.tmpl",
+
+  // OpenClaw integration documentation
+  openclawDoc: "docs/OPENCLAW.md",
+  addingHostDoc: "docs/ADDING_A_HOST.md",
+  openclawAgentsSection: "openclaw/agents-gstack-section.md",
+  openclawFullClaude: "openclaw/gstack-full-CLAUDE.md",
+  openclawLiteClaude: "openclaw/gstack-lite-CLAUDE.md",
+  openclawPlanClaude: "openclaw/gstack-plan-CLAUDE.md",
 };
 
 function rawUrl(path: string) {
@@ -650,6 +671,72 @@ async function main() {
     {
       path: "skills/references/gstack-todos.md",
       content: wrapImportedMarkdown(fetched.todosDoc, SOURCE_FILES.todosDoc, sourceCommit),
+    },
+
+    // Help and documentation
+    {
+      path: "skills/references/gstack-readme.md",
+      content: wrapImportedMarkdown(fetched.readmeDoc, SOURCE_FILES.readmeDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-changelog.md",
+      content: wrapImportedMarkdown(fetched.changelogDoc, SOURCE_FILES.changelogDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-skills-guide.md",
+      content: wrapImportedMarkdown(fetched.skillsGuideDoc, SOURCE_FILES.skillsGuideDoc, sourceCommit),
+    },
+
+    // Additional skill templates (local-only, stored as reference)
+    {
+      path: "skills/references/gstack-browse-skill.md",
+      content: adaptGenericSkill("browse", fetched.browseTemplate, SOURCE_FILES.browseTemplate, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-codex-skill.md",
+      content: adaptGenericSkill("codex", fetched.codexTemplate, SOURCE_FILES.codexTemplate, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-checkpoint-skill.md",
+      content: adaptGenericSkill("checkpoint", fetched.checkpointTemplate, SOURCE_FILES.checkpointTemplate, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-freeze-skill.md",
+      content: adaptGenericSkill("freeze", fetched.freezeTemplate, SOURCE_FILES.freezeTemplate, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-unfreeze-skill.md",
+      content: adaptGenericSkill("unfreeze", fetched.unfreezeTemplate, SOURCE_FILES.unfreezeTemplate, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-upgrade-skill.md",
+      content: adaptGenericSkill("gstack-upgrade", fetched.gstackUpgradeTemplate, SOURCE_FILES.gstackUpgradeTemplate, sourceCommit),
+    },
+
+    // OpenClaw integration documentation
+    {
+      path: "skills/references/gstack-openclaw.md",
+      content: wrapImportedMarkdown(fetched.openclawDoc, SOURCE_FILES.openclawDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/gstack-adding-host.md",
+      content: wrapImportedMarkdown(fetched.addingHostDoc, SOURCE_FILES.addingHostDoc, sourceCommit),
+    },
+    {
+      path: "skills/references/openclaw-agents-section.md",
+      content: wrapImportedMarkdown(fetched.openclawAgentsSection, SOURCE_FILES.openclawAgentsSection, sourceCommit),
+    },
+    {
+      path: "skills/references/openclaw-full-claude.md",
+      content: wrapImportedMarkdown(fetched.openclawFullClaude, SOURCE_FILES.openclawFullClaude, sourceCommit),
+    },
+    {
+      path: "skills/references/openclaw-lite-claude.md",
+      content: wrapImportedMarkdown(fetched.openclawLiteClaude, SOURCE_FILES.openclawLiteClaude, sourceCommit),
+    },
+    {
+      path: "skills/references/openclaw-plan-claude.md",
+      content: wrapImportedMarkdown(fetched.openclawPlanClaude, SOURCE_FILES.openclawPlanClaude, sourceCommit),
     },
   ] as const;
   const outputPaths = managedOutputs.map((output) => output.path);
