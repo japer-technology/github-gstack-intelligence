@@ -597,7 +597,7 @@ How to know if The Method is working. These are not aspirational targets — the
 
 ## Further Reading
 
-- [Command Reference](README.md) — All 17 commands with detailed specifications
+- [Command Reference](README.md) — All 26 commands with detailed specifications
 - [Workflows Guide](workflows.md) — Step-by-step recipes for common scenarios
 - [Getting Started](getting-started.md) — Your first day with GStack Intelligence
 - [ETHOS](../ETHOS.md) — The builder principles behind every skill

@@ -6,7 +6,7 @@
   </picture>
 </p>
 
-GitHub GStack Intelligence ships seventeen AI skills that run as GitHub Actions workflows. Each skill is an AI specialist triggered by GitHub events — pull requests, issue comments, labels, releases, schedules, and deployments.
+GitHub GStack Intelligence ships twenty-six AI skills that run as GitHub Actions workflows. Each skill is an AI specialist triggered by GitHub events — pull requests, issue comments, labels, releases, schedules, and deployments.
 
 This directory is the single source of truth for command documentation. Click any command below to see the full reference.
 
@@ -23,13 +23,22 @@ This directory is the single source of truth for command documentation. Click an
 | [`/qa-only`](qa-only.md) | QA testing — report only, no code changes | `/qa-only [url]` comment | Yes | ✅ Enabled |
 | [`/design-review`](design-review.md) | Visual design audit with iterative fixes | PR + `design-review` label | Yes | ✅ Enabled |
 | [`/design-consultation`](design-consultation.md) | Full design system builder — typography, color, layout | Issue + `design-consultation` label | No | ✅ Enabled |
+| [`/design-html`](design-html.md) | Design finalization — production-quality HTML/CSS | `/design-html` comment | Yes | ✅ Enabled |
+| [`/design-shotgun`](design-shotgun.md) | Rapid design exploration — multiple variant comparison | `/design-shotgun` comment | Yes | ✅ Enabled |
 | [`/autoplan`](autoplan.md) | One-command CEO + Design + Eng review pipeline | `/autoplan` comment | No | ✅ Enabled |
 | [`/plan-ceo-review`](plan-ceo-review.md) | CEO/founder plan review — scope, strategy, failure modes | `/plan-ceo-review` comment | No | ✅ Enabled |
 | [`/plan-eng-review`](plan-eng-review.md) | Engineering plan review — architecture, data flow, tests | `/plan-eng-review` comment | No | ✅ Enabled |
 | [`/plan-design-review`](plan-design-review.md) | Designer plan review — hierarchy, empty states, accessibility | `/plan-design-review` comment | No | ✅ Enabled |
+| [`/plan-devex-review`](plan-devex-review.md) | Developer experience plan review — DX scoring and personas | `/plan-devex-review` comment | No | ✅ Enabled |
+| [`/devex-review`](devex-review.md) | Live developer experience audit with DX scorecard | `/devex-review` comment | Yes | ✅ Enabled |
 | [`/office-hours`](office-hours.md) | YC office hours — startup forcing questions or builder brainstorm | Issue + `office-hours` label | No | ✅ Enabled |
 | [`/ship`](ship.md) | Automated ship workflow — merge, test, version bump, PR | `/ship` comment | No | ✅ Enabled |
+| [`/land-and-deploy`](land-and-deploy.md) | Land and deploy — merge PR, CI, production verification | `/land-and-deploy` comment | Yes | ✅ Enabled |
 | [`/document-release`](document-release.md) | Post-ship documentation update | Automatic on release | No | ✅ Enabled |
+| [`/careful`](careful.md) | Safety guardrails — warns before destructive commands | `/careful` comment | No | ✅ Enabled |
+| [`/guard`](guard.md) | Full safety — destructive warnings + directory-scoped edits | `/guard` comment | No | ✅ Enabled |
+| [`/health`](health.md) | Code quality dashboard — composite 0–10 score with trends | `/health` comment | No | ✅ Enabled |
+| [`/learn`](learn.md) | Manage project learnings — review, search, prune, export | `/learn` comment | No | ✅ Enabled |
 | [`/retro`](retro.md) | Weekly engineering retrospective with trend tracking | Scheduled (Fridays 5 PM UTC) | No | ❌ Disabled |
 | [`/benchmark`](benchmark.md) | Performance regression detection with Core Web Vitals | Scheduled (daily 6 AM UTC) | No | ❌ Disabled |
 | [`/canary`](canary.md) | Post-deploy monitoring and anomaly detection | Automatic on deployment | Yes | ❌ Disabled |
@@ -54,6 +63,8 @@ This directory is the single source of truth for command documentation. Click an
 | [`/qa-only`](qa-only.md) | Same testing methodology as `/qa` but report-only — captures screenshots and documents issues without making any code changes. |
 | [`/design-review`](design-review.md) | Designer's-eye QA that finds visual inconsistency, spacing issues, hierarchy problems, and AI slop patterns — then fixes them iteratively with before/after screenshots. |
 | [`/design-consultation`](design-consultation.md) | Proposes a complete design system — aesthetic, typography, color palette, layout grid, spacing scale, and motion principles. Creates a `DESIGN.md` as the project's design source of truth. |
+| [`/design-html`](design-html.md) | Design finalization — generates production-quality HTML/CSS from approved mockups, CEO plans, or design review context. Dynamic layouts, real reflow, zero dependencies. |
+| [`/design-shotgun`](design-shotgun.md) | Design exploration — generates multiple AI design variants, opens a comparison board, collects structured feedback, and iterates. Visual brainstorming for any UI feature. |
 
 ### Planning
 
@@ -63,19 +74,36 @@ This directory is the single source of truth for command documentation. Click an
 | [`/plan-ceo-review`](plan-ceo-review.md) | CEO/founder-mode review — rethinks the problem, finds the "10-star product," challenges premises, expands scope when it creates a better product. |
 | [`/plan-eng-review`](plan-eng-review.md) | Engineering manager-mode review — locks in architecture, data flow, diagrams, edge cases, test coverage, and performance before code is written. |
 | [`/plan-design-review`](plan-design-review.md) | Interactive designer's-eye plan review — rates each design dimension 0–10, explains what would make it a 10, then improves the plan. |
+| [`/plan-devex-review`](plan-devex-review.md) | Interactive developer experience plan review — explores personas, benchmarks competitors, designs magical moments, traces friction points. Three modes: DX expansion, polish, triage. |
 | [`/office-hours`](office-hours.md) | YC office hours partner mode — Startup mode (forcing questions) or Builder mode (brainstorming). Produces a design document for downstream planning. |
+
+### Developer Experience
+
+| Command | What it does |
+|---|---|
+| [`/devex-review`](devex-review.md) | Live developer experience audit — navigates docs, tries the getting started flow, times TTHW, screenshots error messages, evaluates CLI help text. Produces a DX scorecard with evidence. |
 
 ### Shipping & Documentation
 
 | Command | What it does |
 |---|---|
 | [`/ship`](ship.md) | Fully automated shipping — detects base branch, merges, runs tests, reviews, bumps VERSION, updates CHANGELOG, commits, pushes, and opens a PR. |
+| [`/land-and-deploy`](land-and-deploy.md) | Land and deploy workflow — merges the PR, waits for CI and deploy, verifies production health via canary checks. Takes over after `/ship` creates the PR. |
 | [`/document-release`](document-release.md) | Post-ship documentation update — ensures README, ARCHITECTURE, CONTRIBUTING, and CHANGELOG are accurate and up-to-date with shipped code. |
+
+### Safety & Guardrails
+
+| Command | What it does |
+|---|---|
+| [`/careful`](careful.md) | Safety guardrails for destructive commands — warns before `rm -rf`, `DROP TABLE`, force-push, `git reset --hard`, and similar operations. Override any warning. |
+| [`/guard`](guard.md) | Full safety mode — combines `/careful` (destructive command warnings) with `/freeze` (directory-scoped edits). Maximum safety for production work. |
 
 ### Operations & Monitoring
 
 | Command | What it does |
 |---|---|
+| [`/health`](health.md) | Code quality dashboard — wraps existing project tools (type checker, linter, test runner), computes a weighted composite 0–10 score, and tracks trends over time. |
+| [`/learn`](learn.md) | Manage project learnings — review, search, prune, and export what the agent has learned across sessions. Surface past patterns and decisions. |
 | [`/retro`](retro.md) | Weekly engineering retrospective — analyzes commit history, work patterns, code quality metrics. Per-person breakdown with praise and growth areas. |
 | [`/benchmark`](benchmark.md) | Performance regression detection — captures real Core Web Vitals data, compares against baselines, and tracks trends over time. |
 | [`/canary`](canary.md) | Post-deploy monitoring — watches the live app for console errors, performance regressions, and page failures with periodic screenshots. |

@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing. This project values transparency, auditability, and human judgment above all else. Every contribution — code, documentation, or discussion — becomes part of the repository's permanent history.
 
-Before contributing, please read [Before You Begin](docs/final-warning.md) and the [Four Laws of AI](docs/the-four-laws-of-ai.md).
+Before contributing, please read the [ETHOS](ETHOS.md) to understand the builder principles behind this project.
 
 ---
 
@@ -66,16 +66,17 @@ See the [README](README.md#project-structure) for a detailed breakdown of every 
 
 - **Documentation** is Markdown. Use tables, clear headings, and concise language consistent with existing files.
 - **Code** is TypeScript, executed with Bun.
-- **Skills** are self-contained Markdown files in `.github-gstack-intelligence/.pi/skills/`.
+- **Skills** are self-contained Markdown files in `.github-gstack-intelligence/skills/`.
+- **Help documentation** for each skill lives in `.github-gstack-intelligence/help/`.
 - **Commit messages** should be short and descriptive. Every commit is permanent and auditable.
 
 ---
 
 ## Security
 
-If you discover a security vulnerability, **do not open a public issue**. Instead, refer to the [Incident Response](docs/incident-response.md) plan and contact the maintainers privately.
+If you discover a security vulnerability, **do not open a public issue**. Contact the maintainers privately through GitHub's [Security Advisory](../../security/advisories) feature.
 
-All contributions are subject to the project's [Security Assessment](docs/security-assessment.md) and [Capabilities Analysis](docs/warning-blast-radius.md). Changes that expand the agent's capabilities or permissions require careful review.
+All contributions are subject to review for security implications. Changes that expand the agent's capabilities or permissions require careful review.
 
 ---
 

@@ -2,7 +2,7 @@
 
 Validates that every GitHub event type is correctly routed to the expected skill
 by `router.ts`. These tests cover the `parseSlashCommand()` function and the
-`route()` function across all 17 skills.
+`route()` function across all 26 skills.
 
 ---
 
@@ -12,7 +12,7 @@ These tests run instantly with no API key. They are the primary routing
 validation and are already implemented in `lifecycle/router.test.ts`. The test
 cases below extend coverage to ensure completeness.
 
-### RT-001: Slash Command Parsing — All 17 Commands
+### RT-001: Slash Command Parsing — All 26 Commands
 
 Run `parseSlashCommand()` for every valid command and assert the correct result.
 
@@ -22,7 +22,7 @@ Run `parseSlashCommand()` for every valid command and assert the correct result.
 import { describe, expect, test } from "bun:test";
 import { parseSlashCommand } from "../../lifecycle/router";
 
-describe("RT-001: All 17 slash commands parse correctly", () => {
+describe("RT-001: All 26 slash commands parse correctly", () => {
   const commands = [
     "review", "cso", "qa", "qa-only", "investigate", "ship",
     "office-hours", "plan-ceo-review", "plan-eng-review",
@@ -40,7 +40,7 @@ describe("RT-001: All 17 slash commands parse correctly", () => {
 });
 ```
 
-**Expected:** All 17 commands produce a `SlashCommand` with the correct `skill`.
+**Expected:** All 26 commands produce a `SlashCommand` with the correct `skill`.
 
 ---
 
@@ -269,7 +269,7 @@ describe("RT-020: issue_comment slash command routing", () => {
     { body: "/qa https://x.com", skill: "qa", browser: true, session: "resume" },
     { body: "/ship", skill: "ship", browser: false, session: "resume" },
     { body: "/autoplan", skill: "autoplan", browser: false, session: "none" },
-    // ... all 17 commands
+    // ... all 26 commands
   ];
 
   for (const c of cases) {

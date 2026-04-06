@@ -12,7 +12,7 @@
 
 ## What is GStack Intelligence?
 
-GStack Intelligence turns any GitHub repository into an AI engineering team. Seventeen specialized AI skills — code review, security audit, QA testing, performance benchmarking, planning, shipping, retrospectives, and more — all triggered by the natural events of software development through a single GitHub Actions workflow file.
+GStack Intelligence turns any GitHub repository into an AI engineering team. Twenty-six specialized AI skills — code review, security audit, QA testing, design systems, developer experience, performance benchmarking, planning, shipping, retrospectives, and more — all triggered by the natural events of software development through a single GitHub Actions workflow file.
 
 No CLI. No desktop app. No subscription. Just GitHub.
 
@@ -241,7 +241,7 @@ Every interaction is traceable. Every decision is auditable. Every result is sto
 
 ## Next Steps
 
-- **[Command Reference](README.md)** — Detailed documentation for all 17 commands
+- **[Command Reference](README.md)** — Detailed documentation for all 26 commands
 - **[The Method](the-method.md)** — The complete methodology for software development excellence
 - **[Workflows](workflows.md)** — Step-by-step recipes for common scenarios
 - **[ETHOS](../ETHOS.md)** — The builder principles behind every skill

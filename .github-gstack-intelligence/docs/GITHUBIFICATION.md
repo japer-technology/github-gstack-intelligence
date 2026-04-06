@@ -2,7 +2,7 @@
 
 ## What This Actually Is
 
-Strip away the branding and you arrive at a precise structural claim: **a single YAML file can convert any GitHub repository into a seventeen-specialist AI engineering team, using only the four primitives GitHub already provides** — Actions for compute, Git for storage, Issues for UI, Secrets for credentials. No servers. No databases. No CLI installations. No SaaS subscriptions.
+Strip away the branding and you arrive at a precise structural claim: **a single YAML file can convert any GitHub repository into a twenty-six-specialist AI engineering team, using only the four primitives GitHub already provides** — Actions for compute, Git for storage, Issues for UI, Secrets for credentials. No servers. No databases. No CLI installations. No SaaS subscriptions.
 
 The claim is real. The implementation backs it up. But what's more interesting than what it *is* today is what it *implies* — about where software engineering infrastructure is going, about what it means to distribute engineering judgment as code, and about the structural advantages that fall out of the specific design decisions made here.
 
@@ -54,7 +54,7 @@ When a Githubification project completes — when the upstream framework has bee
 |---|---|---|
 | **`github-minimum-intelligence`** | pi-mono | The foundational template. Conversational AI agent with session memory, hatching identity, Git-native state. The pattern that all others follow. |
 | **`github-maximum-intelligence`** | pi-mono with enhancements | Extended capabilities beyond the minimum baseline |
-| **`github-gstack-intelligence`** | pi-mono + garrytan/gstack | **This project.** 17 specialist skills from Garry Tan's engineering toolkit |
+| **`github-gstack-intelligence`** | pi-mono + garrytan/gstack | **This project.** 26 specialist skills from Garry Tan's engineering toolkit |
 | **`github-pi-mono-intelligence`** | pi-mono directly | Direct pi-mono integration without additional skill layers |
 | **`github-n8n-intelligence`** | n8n | Workflow automation engine running as GitHub-native infrastructure |
 | **`github-openclaw-intelligence`** | OpenClaw | OpenClaw agent adapted for GitHub |
@@ -92,7 +92,7 @@ And proof-of-concept deployments — live GMI instances running on specific mode
 
 ### What This Means for GStack Intelligence
 
-GitHub GStack Intelligence is not a standalone project. It is one specimen in a genus of insertable AI agents — all sharing the same GitHub-native architecture, all installable by copying a single file, all storing state in Git, all speaking through Issues, all computing on Actions. What makes GStack Intelligence distinct within this family is not the *delivery mechanism* (every sibling shares that) but the *content*: Garry Tan's seventeen specialist skills, his engineering ethos, and the specific judgment they encode.
+GitHub GStack Intelligence is not a standalone project. It is one specimen in a genus of insertable AI agents — all sharing the same GitHub-native architecture, all installable by copying a single file, all storing state in Git, all speaking through Issues, all computing on Actions. What makes GStack Intelligence distinct within this family is not the *delivery mechanism* (every sibling shares that) but the *content*: Garry Tan's twenty-six specialist skills, his engineering ethos, and the specific judgment they encode.
 
 The brainstorm question is not "could this pattern work?" — it already works across ten implementations and five live model deployments. The question is: **what happens when a repository has multiple intelligence agents installed simultaneously**, each bringing different skills, different upstream sources, and different cost profiles? That question defines the frontier.
 

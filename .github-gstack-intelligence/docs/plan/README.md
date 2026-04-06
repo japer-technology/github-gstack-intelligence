@@ -6,7 +6,7 @@
 
 ## Context
 
-[GitHub GStack Intelligence](https://github.com/japer-technology/github-gstack-intelligence) has completed its foundation and core activation phases: a working self-installer, a resource extraction pipeline (`run-refresh-gstack`), an event router (`router.ts`), a Playwright browser helper (`browser.ts`), seventeen CI-adapted skill prompts extracted from [garrytan/gstack](https://github.com/garrytan/gstack), and a configuration layer (`config.json`) controlling all skill activation.
+[GitHub GStack Intelligence](https://github.com/japer-technology/github-gstack-intelligence) has completed its foundation and core activation phases: a working self-installer, a resource extraction pipeline (`run-refresh-gstack`), an event router (`router.ts`), a Playwright browser helper (`browser.ts`), twenty-six CI-adapted skill prompts extracted from [garrytan/gstack](https://github.com/garrytan/gstack), and a configuration layer (`config.json`) controlling all skill activation.
 
 **Phases 1–5 are complete.** The system can route GitHub events to skills, parse slash commands, handle PR reviews, run browser-based QA, support multi-turn conversations, and respond to schedules, releases, and deployments. What remains is Phase 6 (cost controls) and Phase 7 (distribution).
 
@@ -134,7 +134,7 @@ Phases 3 and 4 can proceed **in parallel** after Phase 2. Phase 5 depends on com
 
 ## The Result
 
-When all seven phases are complete, any GitHub repository gets a **full AI engineering team as a GitHub Action** — seventeen specialist skills covering PR review, security audit, QA testing with a real browser, architecture review, weekly retrospectives, release documentation, and more. All triggered by the natural events of software development through a single workflow file. No installation beyond copying one YML file. No CLI. No external services. Just GitHub.
+When all seven phases are complete, any GitHub repository gets a **full AI engineering team as a GitHub Action** — twenty-six specialist skills covering PR review, security audit, QA testing with a real browser, architecture review, weekly retrospectives, release documentation, and more. All triggered by the natural events of software development through a single workflow file. No installation beyond copying one YML file. No CLI. No external services. Just GitHub.
 
 ---
 

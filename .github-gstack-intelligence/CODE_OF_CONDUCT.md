@@ -37,4 +37,4 @@ Maintainers have the right and responsibility to remove, edit, or reject comment
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1, with additions specific to this project's [Four Laws of AI](docs/the-four-laws-of-ai.md) and [Before You Begin](docs/final-warning.md) guide.
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1, with additions specific to this project's [ETHOS](ETHOS.md) and builder principles.
