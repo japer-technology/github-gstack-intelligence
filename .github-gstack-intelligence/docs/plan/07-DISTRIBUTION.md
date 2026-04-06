@@ -66,7 +66,7 @@ Check for `VERSION` file existence. If it exists, this is an upgrade — preserv
 
 **File:** `.github-gstack-intelligence/docs/SKILLS.md`
 
-For each of the seventeen skills, document:
+For each of the twenty-six skills, document:
 - What it does (one paragraph)
 - How to trigger it (event, label, command)
 - Example input and output
@@ -215,7 +215,7 @@ Test the full installation flow on repos with:
 
 - [ ] Installer handles upgrades without overwriting user customizations
 - [ ] Installation guide covers the complete setup flow
-- [ ] Per-skill documentation with examples exists for all 17 skills
+- [ ] Per-skill documentation with examples exists for all 26 skills
 - [ ] Cost estimation guide helps teams budget their usage
 - [ ] Troubleshooting guide covers common issues
 - [ ] Distribution format decision is made and implemented

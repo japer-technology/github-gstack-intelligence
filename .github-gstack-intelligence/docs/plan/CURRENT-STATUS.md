@@ -10,7 +10,7 @@
 |-----------|----------|--------|
 | **Single super workflow** | `.github/workflows/github-gstack-intelligence-agent.yml` (v1.1.2) | ✅ Production — handles `issues`, `issue_comment`, `pull_request`, `push`, `schedule`, `release`, `deployment_status`, `workflow_dispatch` |
 | **Self-installer** (`run-install`) | Inline in workflow YML | ✅ Production — copies agent folder on first `workflow_dispatch`, upgrades on subsequent runs |
-| **Resource extraction** (`run-refresh-gstack`) | `.github-gstack-intelligence/lifecycle/refresh.ts` | ✅ Production — extracts all 17 skills + 4 foundational docs + 7 supplementary references from `garrytan/gstack` |
+| **Resource extraction** (`run-refresh-gstack`) | `.github-gstack-intelligence/lifecycle/refresh.ts` | ✅ Production — extracts all 26 skills + 4 foundational docs + 7 supplementary references from `garrytan/gstack` |
 | **Core agent orchestrator** | `.github-gstack-intelligence/lifecycle/agent.ts` | ✅ Production — runs pi-coding-agent with `--route` mode, manages sessions, posts replies, commits state |
 | **Event router** | `.github-gstack-intelligence/lifecycle/router.ts` | ✅ Production — maps GitHub events → skills, parses slash commands, checks config, bot-loop prevention |
 | **Router unit tests** | `.github-gstack-intelligence/lifecycle/router.test.ts` | ✅ Complete — covers all event types, slash commands, label routing, bot-loop prevention, disabled skills |
@@ -29,7 +29,7 @@
 | **GitHub Pages** | `run-gitpages` job in workflow | ✅ Production — publishes `public-fabric/` |
 | **Verification step** | In workflow YML | ✅ Production — validates all extracted files exist, have content ≥50 bytes, contain generated marker |
 | **Analysis documents** | `.github-gstack-intelligence/docs/analysis/` | ✅ Complete — 2 overview docs + 8 detailed plan docs |
-| **Slash-command parser** | Inside `router.ts` | ✅ Production — parses all 17 commands, validates URL arguments, case-insensitive |
+| **Slash-command parser** | Inside `router.ts` | ✅ Production — parses all 26 commands, validates URL arguments, case-insensitive |
 | **Bot-loop prevention** | `AGENT_SIGNATURE` in `router.ts` + actor check in workflow | ✅ Production — prevents agent-to-agent reply loops |
 | **Skill-specific state directories** | `state/results/` | ✅ Created — `review/`, `security/`, `qa/`, `qa/screenshots/`, `retro/`, `benchmarks/`, `canary/`, `design-review/`, `releases/` |
 | **Benchmark baseline** | `state/benchmarks/baseline.json` + `history/` | ✅ Created — initial structure ready for first benchmark run |

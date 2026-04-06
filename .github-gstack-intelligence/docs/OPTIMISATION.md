@@ -33,7 +33,7 @@ An analysis of how gstack's skills are utilised across frameworks and how this r
 
 ## Executive Summary
 
-GitHub GStack Intelligence takes 17 of gstack's 25 skills and projects them onto GitHub's native infrastructure (Actions, Issues, Git, Secrets). This analysis reveals that the upstream gstack project has evolved significantly beyond what this repository currently captures — shipping four major capability layers (Learnings, Review Army, Session Intelligence, and the Design binary) that have no equivalent in the Githubified version. The gap represents both a risk (divergence from upstream value) and an opportunity (each upstream capability has a natural GitHub-native analogue).
+GitHub GStack Intelligence takes 26 of gstack's 39 skills and projects them onto GitHub's native infrastructure (Actions, Issues, Git, Secrets). This analysis reveals that the upstream gstack project has evolved significantly beyond what this repository currently captures — shipping four major capability layers (Learnings, Review Army, Session Intelligence, and the Design binary) that have no equivalent in the Githubified version. The gap represents both a risk (divergence from upstream value) and an opportunity (each upstream capability has a natural GitHub-native analogue).
 
 The optimisations in this paper are ordered by impact-to-effort ratio. The highest-value changes are:
 
@@ -64,7 +64,7 @@ gstack's skills operate across three distinct frameworks, each with different co
 | **Checkpoints** | `checkpoints/*.md` via `/checkpoint` | Same + cross-workspace handoff | Not implemented |
 | **Cost per invocation** | ~$0.50-$2.00 (user's API key) | Same | Same (repo secret API key) |
 
-**Key insight:** The native Claude Code surface has access to all 25 skills and four persistence layers. Conductor adds multi-workspace orchestration and Chrome sidebar integration. GitHub Actions has the weakest execution surface but the strongest distribution model — one YAML file installs the entire system.
+**Key insight:** The native Claude Code surface has access to all 39 skills and four persistence layers. Conductor adds multi-workspace orchestration and Chrome sidebar integration. GitHub Actions has the weakest execution surface but the strongest distribution model — one YAML file installs the entire system.
 
 ### 1.2 Skill Dependency Graph
 
@@ -89,7 +89,7 @@ Layer 0 (Foundation)    /office-hours → /plan-ceo-review → /plan-eng-review 
                         /document-release  /benchmark  /canary              │
 ```
 
-**Current state in this repo:** All 17 skills operate at Layer 0 — flat, independent, with no cross-skill learning or session intelligence. This means every skill invocation starts from zero knowledge about the repository and its history.
+**Current state in this repo:** All 26 skills operate at Layer 0 — flat, independent, with no cross-skill learning or session intelligence. This means every skill invocation starts from zero knowledge about the repository and its history.
 
 ### 1.3 Framework-Specific Skill Adaptations
 
@@ -109,7 +109,7 @@ Each design document reveals specific patterns for how skills adapt across execu
 
 ### 2.1 Skill Tiering and Model Selection
 
-**Problem:** All 17 skills currently use the same model (GPT-5.4 with high thinking) at the same cost. The SELF_LEARNING_V0 design describes adaptive ceremony levels (FULL, STANDARD, FAST) that match skill complexity to compute cost. This repo applies no such tiering.
+**Problem:** All 26 skills currently use the same model (GPT-5.4 with high thinking) at the same cost. The SELF_LEARNING_V0 design describes adaptive ceremony levels (FULL, STANDARD, FAST) that match skill complexity to compute cost. This repo applies no such tiering.
 
 **Optimisation:** Introduce per-skill model tiers in `config.json`:
 

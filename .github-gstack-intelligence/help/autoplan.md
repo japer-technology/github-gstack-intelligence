@@ -198,6 +198,7 @@ In [`config.json`](../config.json):
 - [`/plan-ceo-review`](plan-ceo-review.md) — Run the CEO review interactively (standalone)
 - [`/plan-eng-review`](plan-eng-review.md) — Run the engineering review interactively (standalone)
 - [`/plan-design-review`](plan-design-review.md) — Run the design review interactively (standalone)
+- [`/plan-devex-review`](plan-devex-review.md) — Run the developer experience review interactively (standalone)
 - [`/office-hours`](office-hours.md) — Run before `/autoplan` to establish product direction
 
 ---

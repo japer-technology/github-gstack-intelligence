@@ -1,6 +1,6 @@
 # GStack Intelligence — Definitive Test Plan
 
-Comprehensive functional tests to validate all 17 skills, routing logic, session
+Comprehensive functional tests to validate all 26 skills, routing logic, session
 management, result persistence, browser integration, and safety guards.
 
 > **Scope:** These tests are designed to run in a **test repository** that has
@@ -26,7 +26,7 @@ management, result persistence, browser integration, and safety guards.
 
 | # | File | What it validates |
 |---|---|---|
-| 01 | [01-ROUTING.md](01-ROUTING.md) | Event → skill routing for all 17 skills |
+| 01 | [01-ROUTING.md](01-ROUTING.md) | Event → skill routing for all 26 skills |
 | 02 | [02-REVIEW-SECURITY.md](02-REVIEW-SECURITY.md) | PR review and CSO security audit end-to-end |
 | 03 | [03-BROWSER-QA.md](03-BROWSER-QA.md) | QA, QA-only, design-review, canary browser skills |
 | 04 | [04-CONVERSATIONS.md](04-CONVERSATIONS.md) | Multi-turn conversation skills and session continuity |
