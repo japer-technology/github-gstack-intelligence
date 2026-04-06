@@ -1,5 +1,5 @@
 /**
- * routing.test.ts — Definitive routing tests for all 17 skills.
+ * routing.test.ts — Definitive routing tests for all 26 skills.
  *
  * Covers: slash command parsing, event routing, browser flag, session mode,
  * disabled skills, bot-loop prevention, and edge cases.
@@ -18,7 +18,7 @@ import type { Config, SkillConfig } from "../../../lifecycle/router";
 
 // ─── Test Helpers ───────────────────────────────────────────────────────────
 
-/** Base test config with all skills enabled for comprehensive testing. */
+/** Base test config with all 26 skills enabled for comprehensive testing. */
 const allEnabledConfig: Config = {
   version: "1.0.0",
   defaults: {
@@ -51,6 +51,15 @@ const allEnabledConfig: Config = {
     benchmark: { enabled: true, trigger: "schedule", schedule: "0 6 * * *" },
     "document-release": { enabled: true, trigger: "release" },
     canary: { enabled: true, trigger: "deployment_status" },
+    careful: { enabled: true, trigger: "issue_comment" },
+    "design-html": { enabled: true, trigger: "issue_comment" },
+    "design-shotgun": { enabled: true, trigger: "issue_comment" },
+    "devex-review": { enabled: true, trigger: "issue_comment" },
+    guard: { enabled: true, trigger: "issue_comment" },
+    health: { enabled: true, trigger: "issue_comment" },
+    "land-and-deploy": { enabled: true, trigger: "issue_comment" },
+    learn: { enabled: true, trigger: "issue_comment" },
+    "plan-devex-review": { enabled: true, trigger: "issue_comment" },
   },
 };
 
@@ -65,14 +74,16 @@ function disableSkill(config: Config, skill: string): Config {
   };
 }
 
-// ─── RT-001: All 17 Slash Commands Parse ────────────────────────────────────
+// ─── RT-001: All 26 Slash Commands Parse ────────────────────────────────────
 
-describe("RT-001: All 17 slash commands parse correctly", () => {
+describe("RT-001: All 26 slash commands parse correctly", () => {
   const commands = [
     "review", "cso", "qa", "qa-only", "investigate", "ship",
     "office-hours", "plan-ceo-review", "plan-eng-review",
     "design-review", "plan-design-review", "design-consultation",
     "autoplan", "retro", "benchmark", "document-release", "canary",
+    "careful", "design-html", "design-shotgun", "devex-review",
+    "guard", "health", "land-and-deploy", "learn", "plan-devex-review",
   ];
 
   for (const cmd of commands) {
@@ -290,6 +301,15 @@ describe("RT-020: issue_comment routing for all skills", () => {
     { body: "/benchmark", skill: "benchmark", needsBrowser: false, sessionMode: "resume" },
     { body: "/document-release", skill: "document-release", needsBrowser: false, sessionMode: "resume" },
     { body: "/canary https://example.com", skill: "canary", needsBrowser: true, sessionMode: "resume" },
+    { body: "/careful", skill: "careful", needsBrowser: false, sessionMode: "resume" },
+    { body: "/design-html", skill: "design-html", needsBrowser: true, sessionMode: "resume" },
+    { body: "/design-shotgun", skill: "design-shotgun", needsBrowser: true, sessionMode: "resume" },
+    { body: "/devex-review", skill: "devex-review", needsBrowser: true, sessionMode: "resume" },
+    { body: "/guard", skill: "guard", needsBrowser: false, sessionMode: "resume" },
+    { body: "/health", skill: "health", needsBrowser: false, sessionMode: "resume" },
+    { body: "/land-and-deploy", skill: "land-and-deploy", needsBrowser: true, sessionMode: "resume" },
+    { body: "/learn", skill: "learn", needsBrowser: false, sessionMode: "resume" },
+    { body: "/plan-devex-review", skill: "plan-devex-review", needsBrowser: false, sessionMode: "resume" },
   ];
 
   for (const c of cases) {
@@ -569,11 +589,15 @@ describe("RT-070: workflow_dispatch routing", () => {
 // ─── RT-080: needsBrowser Flag ──────────────────────────────────────────────
 
 describe("RT-080: needsBrowser classification", () => {
-  const browserSkills = ["qa", "qa-only", "canary", "design-review"];
+  const browserSkills = [
+    "qa", "qa-only", "canary", "design-review",
+    "devex-review", "design-html", "design-shotgun", "land-and-deploy",
+  ];
   const nonBrowserSkills = [
     "review", "cso", "investigate", "ship", "office-hours",
     "plan-ceo-review", "plan-eng-review", "plan-design-review",
     "design-consultation", "autoplan", "retro", "benchmark", "document-release",
+    "careful", "guard", "health", "learn", "plan-devex-review",
   ];
 
   for (const skill of browserSkills) {

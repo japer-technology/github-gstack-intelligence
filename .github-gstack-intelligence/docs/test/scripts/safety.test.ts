@@ -37,9 +37,29 @@ const testConfig: Config = {
     review: { enabled: true, trigger: "pull_request" },
     cso: { enabled: true, trigger: "pull_request", labelGated: true, label: "security-audit" },
     qa: { enabled: true, trigger: "issue_comment" },
+    "qa-only": { enabled: true, trigger: "issue_comment" },
     investigate: { enabled: true, trigger: "issue_label", label: "investigate" },
+    "office-hours": { enabled: true, trigger: "issue_label", label: "office-hours" },
+    "design-consultation": { enabled: true, trigger: "issue_label", label: "design-consultation" },
+    ship: { enabled: true, trigger: "issue_comment" },
+    "design-review": { enabled: true, trigger: "pull_request", labelGated: true, label: "design-review" },
+    "plan-ceo-review": { enabled: true, trigger: "issue_comment" },
+    "plan-eng-review": { enabled: true, trigger: "issue_comment" },
+    "plan-design-review": { enabled: true, trigger: "issue_comment" },
+    autoplan: { enabled: true, trigger: "issue_comment" },
     retro: { enabled: false, trigger: "schedule", schedule: "0 17 * * 5" },
+    benchmark: { enabled: false, trigger: "schedule", schedule: "0 6 * * *" },
+    "document-release": { enabled: true, trigger: "release" },
     canary: { enabled: false, trigger: "deployment_status" },
+    careful: { enabled: true, trigger: "issue_comment" },
+    "design-html": { enabled: true, trigger: "issue_comment" },
+    "design-shotgun": { enabled: true, trigger: "issue_comment" },
+    "devex-review": { enabled: true, trigger: "issue_comment" },
+    guard: { enabled: true, trigger: "issue_comment" },
+    health: { enabled: true, trigger: "issue_comment" },
+    "land-and-deploy": { enabled: true, trigger: "issue_comment" },
+    learn: { enabled: true, trigger: "issue_comment" },
+    "plan-devex-review": { enabled: true, trigger: "issue_comment" },
   },
 };
 
@@ -202,6 +222,8 @@ describe("Skill files exist", () => {
     "office-hours", "plan-ceo-review", "plan-eng-review",
     "design-review", "plan-design-review", "design-consultation",
     "autoplan", "retro", "benchmark", "document-release", "canary",
+    "careful", "design-html", "design-shotgun", "devex-review",
+    "guard", "health", "land-and-deploy", "learn", "plan-devex-review",
   ];
 
   for (const skill of expectedSkills) {
