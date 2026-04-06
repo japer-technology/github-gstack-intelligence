@@ -422,7 +422,23 @@ const LOCAL_PATH_REPLACEMENTS: Array<[string, string]> = [
 function adaptGenericSkill(skillName: string, template: string, sourcePath: string, sourceCommit: string | null): string {
   let adapted = removeAskUserQuestionFromFrontmatter(template);
 
-  adapted = adapted.replaceAll("{{PREAMBLE}}", buildGeneratedHeader(skillName, sourcePath, sourceCommit));
+  const header = buildGeneratedHeader(skillName, sourcePath, sourceCommit);
+  if (adapted.includes("{{PREAMBLE}}")) {
+    adapted = adapted.replaceAll("{{PREAMBLE}}", header);
+  } else {
+    // Upstream template lacks {{PREAMBLE}} — inject the generated header
+    // after the YAML frontmatter closing delimiter.
+    const fmClose = adapted.indexOf("\n---", 1);
+    if (fmClose !== -1) {
+      // Skip past the "\n---" (4 chars) to find the next newline after the closing delimiter.
+      const insertAt = adapted.indexOf("\n", fmClose + 4);
+      adapted = insertAt !== -1
+        ? adapted.slice(0, insertAt) + "\n\n" + header + "\n" + adapted.slice(insertAt)
+        : adapted + "\n\n" + header;
+    } else {
+      adapted = header + "\n" + adapted;
+    }
+  }
 
   adapted = replaceAll(adapted, COMMON_TOKEN_REPLACEMENTS);
 
