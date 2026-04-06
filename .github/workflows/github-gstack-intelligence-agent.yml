@@ -2,7 +2,7 @@
 # ║  GitHub GStack Intelligence — Agent Workflow (v1.0.5)                        ║
 # ║                                                                              ║
 # ║  A Githubification of garrytan/gstack — Garry Tan's (CEO, Y Combinator)      ║
-# ║  collection of 25 AI engineering skills. This workflow adapts 17 of those    ║
+# ║  collection of 39 AI engineering skills. This workflow adapts 26 of those    ║
 # ║  skills to run autonomously on GitHub Actions, using Issues as a             ║
 # ║  conversational UI, Git as persistent memory, and Actions as the compute     ║
 # ║  layer. No external servers, databases, or CLI tools required.               ║
@@ -53,7 +53,7 @@
 # ║    on context size. On an active repo (20+ PRs/day, slash commands,          ║
 # ║    scheduled skills), monthly costs can reach $500–$2000+. Cost controls     ║
 # ║    (model tiering, rate limiting, diff-based filtering) are planned but      ║
-# ║    NOT YET IMPLEMENTED as of v1.0.2. Monitor your LLM provider dashboard.    ║
+# ║    NOT YET IMPLEMENTED as of v1.0.5. Monitor your LLM provider dashboard.    ║
 # ║                                                                              ║
 # ║  DATA DISCLOSURE:                                                            ║
 # ║    The agent sends issue/PR content, code diffs, and repository files to     ║
@@ -61,12 +61,12 @@
 # ║    your repo's git history (visible to anyone with repo access). No data     ║
 # ║    is sent to japer-technology or any third party beyond the LLM provider.   ║
 # ║                                                                              ║
-# ║  LIMITATIONS (v1.0.2):                                                       ║
+# ║  LIMITATIONS (v1.0.5):                                                       ║
 # ║    • No per-skill model tiering — all skills use the same model/settings.    ║
 # ║    • No rate limiting — concurrent issues each trigger separate LLM calls.   ║
 # ║    • 4-hour timeout per agent run — complex pipelines may be cut short.      ║
 # ║    • Memory (state/memory.log) is append-only with no automatic pruning.     ║
-# ║    • 8 of gstack's 25 skills are not adapted (require local-only features).  ║
+# ║    • 13 of gstack's 39 skills are not adapted (require local-only features). ║
 # ║                                                                              ║
 # ║  Source: https://github.com/japer-technology/github-gstack-intelligence      ║
 # ║  Docs  : .github-gstack-intelligence/README.md (installed after step 3)      ║
@@ -601,7 +601,7 @@ jobs:
   run-agent:
     runs-on: ubuntu-latest
     timeout-minutes: 240  # LLM calls with high-thinking can take 5-10 min per skill. 4 hour cap
-                          # prevents runaway billing but may truncate /autoplan (chains 3 skills).
+                          # prevents runaway billing but may truncate /autoplan (chains 4 skills).
 
     # Concurrency: one agent run per target (issue or PR) at a time.
     # For issues: the second comment waits for the first to finish (cancel-in-progress: false).
@@ -798,8 +798,8 @@ jobs:
           steps.check-folder.outputs.exists == 'true'
           && (
             (github.event_name == 'issue_comment' && (
-              startsWith(github.event.comment.body, '/qa ')
-              || startsWith(github.event.comment.body, '/qa-only ')
+              startsWith(github.event.comment.body, '/qa ') || github.event.comment.body == '/qa'
+              || startsWith(github.event.comment.body, '/qa-only ') || github.event.comment.body == '/qa-only'
               || startsWith(github.event.comment.body, '/design-review')
               || startsWith(github.event.comment.body, '/canary')
               || startsWith(github.event.comment.body, '/devex-review')

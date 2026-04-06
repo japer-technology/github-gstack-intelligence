@@ -244,7 +244,7 @@ Each matrix job runs the `/review` skill with a specialist-specific prompt prefi
 
 ### 3.1 Concurrency and Rate Control
 
-**Problem:** As flagged in the workflow header (v1.0.2 limitations), there is no rate limiting. Multiple simultaneous issues each trigger separate LLM calls. On active repositories (20+ PRs/day), this creates uncontrolled cost accumulation.
+**Problem:** As flagged in the workflow header (v1.0.5 limitations), there is no rate limiting. Multiple simultaneous issues each trigger separate LLM calls. On active repositories (20+ PRs/day), this creates uncontrolled cost accumulation.
 
 **Optimisation:**
 - **Job concurrency groups:** GitHub Actions supports `concurrency` at the job level. Group agent runs by issue number to prevent duplicate processing:

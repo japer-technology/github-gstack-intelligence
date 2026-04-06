@@ -3,7 +3,7 @@
  *
  * Maps GitHub webhook events to the appropriate skill based on event type,
  * slash commands, labels, and config.json settings. This is the "brain" that
- * decides which of the 17 extracted skill prompts to invoke for any given event.
+ * decides which of the 26 extracted skill prompts to invoke for any given event.
  *
  * The router is invoked by agent.ts when the `--route` flag is passed.
  * It returns a RouteResult describing which skill to run, or null if no
