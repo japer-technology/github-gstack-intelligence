@@ -70,7 +70,10 @@ export interface SlashCommand {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 // Skills that require a browser (Playwright) for execution.
-const BROWSER_SKILLS = new Set(["qa", "qa-only", "canary", "design-review", "devex-review", "design-html", "design-shotgun", "land-and-deploy"]);
+const BROWSER_SKILLS = new Set([
+  "qa", "qa-only", "canary", "design-review",
+  "devex-review", "design-html", "design-shotgun", "land-and-deploy",
+]);
 
 // All recognised slash commands. Unknown commands are ignored (treated as
 // regular conversation text) rather than producing an error.
