@@ -42,6 +42,15 @@ const testConfig: Config = {
     "plan-design-review": { enabled: true, trigger: "issue_comment" },
     "design-consultation": { enabled: true, trigger: "issue_label", label: "design-consultation" },
     "qa-only": { enabled: true, trigger: "issue_comment" },
+    "careful": { enabled: true, trigger: "issue_comment" },
+    "design-html": { enabled: true, trigger: "issue_comment" },
+    "design-shotgun": { enabled: true, trigger: "issue_comment" },
+    "devex-review": { enabled: true, trigger: "issue_comment" },
+    "guard": { enabled: true, trigger: "issue_comment" },
+    "health": { enabled: true, trigger: "issue_comment" },
+    "land-and-deploy": { enabled: true, trigger: "issue_comment" },
+    "learn": { enabled: true, trigger: "issue_comment" },
+    "plan-devex-review": { enabled: true, trigger: "issue_comment" },
   },
 };
 
@@ -126,6 +135,59 @@ describe("parseSlashCommand", () => {
   test("parses /benchmark", () => {
     const result = parseSlashCommand("/benchmark");
     expect(result).toEqual({ skill: "benchmark" });
+  });
+
+  // ── Additional skills (careful, design-html, design-shotgun, devex-review,
+  //    guard, health, land-and-deploy, learn, plan-devex-review) ─────────────
+
+  test("parses /careful", () => {
+    const result = parseSlashCommand("/careful");
+    expect(result).toEqual({ skill: "careful" });
+  });
+
+  test("parses /design-html", () => {
+    const result = parseSlashCommand("/design-html");
+    expect(result).toEqual({ skill: "design-html" });
+  });
+
+  test("parses /design-shotgun", () => {
+    const result = parseSlashCommand("/design-shotgun");
+    expect(result).toEqual({ skill: "design-shotgun" });
+  });
+
+  test("parses /devex-review", () => {
+    const result = parseSlashCommand("/devex-review");
+    expect(result).toEqual({ skill: "devex-review" });
+  });
+
+  test("parses /guard", () => {
+    const result = parseSlashCommand("/guard");
+    expect(result).toEqual({ skill: "guard" });
+  });
+
+  test("parses /health", () => {
+    const result = parseSlashCommand("/health");
+    expect(result).toEqual({ skill: "health" });
+  });
+
+  test("parses /land-and-deploy", () => {
+    const result = parseSlashCommand("/land-and-deploy");
+    expect(result).toEqual({ skill: "land-and-deploy" });
+  });
+
+  test("parses /learn", () => {
+    const result = parseSlashCommand("/learn");
+    expect(result).toEqual({ skill: "learn" });
+  });
+
+  test("parses /learn with args", () => {
+    const result = parseSlashCommand("/learn always use TypeScript strict mode");
+    expect(result).toEqual({ skill: "learn", args: "always use TypeScript strict mode" });
+  });
+
+  test("parses /plan-devex-review", () => {
+    const result = parseSlashCommand("/plan-devex-review");
+    expect(result).toEqual({ skill: "plan-devex-review" });
   });
 
   test("returns null for plain text", () => {
@@ -678,6 +740,128 @@ describe("route", () => {
     expect(result).not.toBeNull();
     expect(result!.skill).toBe("retro");
     expect(result!.sessionMode).toBe("new");
+  });
+
+  // ── Additional skills routing (newer skills) ────────────────────────────
+
+  test("routes /careful from issue comment", () => {
+    const event = {
+      comment: { body: "/careful" },
+      issue: { number: 110 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("careful");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /design-html from issue comment with browser requirement", () => {
+    const event = {
+      comment: { body: "/design-html" },
+      issue: { number: 111 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("design-html");
+    expect(result!.needsBrowser).toBe(true);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /design-shotgun from issue comment with browser requirement", () => {
+    const event = {
+      comment: { body: "/design-shotgun" },
+      issue: { number: 112 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("design-shotgun");
+    expect(result!.needsBrowser).toBe(true);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /devex-review from issue comment with browser requirement", () => {
+    const event = {
+      comment: { body: "/devex-review" },
+      issue: { number: 113 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("devex-review");
+    expect(result!.needsBrowser).toBe(true);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /guard from issue comment", () => {
+    const event = {
+      comment: { body: "/guard" },
+      issue: { number: 114 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("guard");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /health from issue comment", () => {
+    const event = {
+      comment: { body: "/health" },
+      issue: { number: 115 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("health");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /land-and-deploy from issue comment with browser requirement", () => {
+    const event = {
+      comment: { body: "/land-and-deploy" },
+      issue: { number: 116 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("land-and-deploy");
+    expect(result!.needsBrowser).toBe(true);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /learn from issue comment", () => {
+    const event = {
+      comment: { body: "/learn" },
+      issue: { number: 117 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("learn");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /learn with args from issue comment", () => {
+    const event = {
+      comment: { body: "/learn always use strict mode" },
+      issue: { number: 118 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("learn");
+    expect(result!.context.args).toBe("always use strict mode");
+    expect(result!.sessionMode).toBe("resume");
+  });
+
+  test("routes /plan-devex-review from issue comment", () => {
+    const event = {
+      comment: { body: "/plan-devex-review" },
+      issue: { number: 119 },
+    };
+    const result = route(event, "issue_comment", testConfig);
+    expect(result).not.toBeNull();
+    expect(result!.skill).toBe("plan-devex-review");
+    expect(result!.needsBrowser).toBe(false);
+    expect(result!.sessionMode).toBe("resume");
   });
 
   // ── Slash command in issue title (issues event) ──────────────────────────
