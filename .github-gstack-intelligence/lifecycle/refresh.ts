@@ -397,6 +397,29 @@ const COMMON_TOKEN_REPLACEMENTS: Array<[string, string]> = [
   // Benefits-from and outside tooling
   ["{{BENEFITS_FROM}}", "Check for prior skill outputs in `.github-gstack-intelligence/state/results/` that may provide useful context for this skill execution."],
   ["{{CODEX_PLAN_REVIEW}}", "Multi-model second-opinion review is not available in CI mode. Use the repository's existing review signals (PR reviews, automated checks) as supplementary inputs."],
+
+  // Review coordination
+  ["{{REVIEW_ARMY}}", "In CI mode, a single reviewer handles all categories. If the diff is large (>500 lines) or touches security-sensitive files, note in the output that a second human review is recommended for the affected areas. Do not attempt to spawn parallel reviewers."],
+  ["{{CROSS_REVIEW_DEDUP}}", "Before reporting findings, deduplicate: if the same file:line appears in multiple checklist categories, merge into a single finding with the highest severity. Group related findings (e.g., missing null check + missing test for that path) into one actionable item."],
+
+  // Plan file review report (shared dashboard for review chaining)
+  ["{{PLAN_FILE_REVIEW_REPORT}}", "Display a Review Readiness Dashboard by reading all JSON entries from `.github-gstack-intelligence/state/results/review/review-log.json`. For each prior review, show: skill name, status (clean/issues_open), timestamp, and commit hash. Flag any review whose commit hash differs from the current HEAD as potentially stale. If the review log file does not exist or contains no entries, show an empty dashboard and note that no prior reviews have been recorded yet."],
+
+  // Spec review loop (design doc / plan approval gate)
+  ["{{SPEC_REVIEW_LOOP}}", "Present the completed spec/plan to the user via GitHub follow-up comment with three options: A) Approve — mark as APPROVED and proceed, B) Revise — specify which sections need changes (loop back to revise those sections only), C) Start over — return to the beginning. Do not proceed to the next phase until the user responds. If running in CI without interactive input, mark as PENDING and note that approval is required via a follow-up comment on the issue."],
+
+  // DX framework (developer experience methodology)
+  ["{{DX_FRAMEWORK}}", "DX Framework: Score every developer-facing dimension on a 1-10 scale with evidence. Key dimensions: Getting Started (TTHW — Time To Hello World), API/CLI Ergonomics, Error Messages (actionable, not cryptic), Documentation (complete, accurate, findable), Upgrade Path (non-breaking, guided migration), Dev Environment (reproducible, fast), Community (responsive, welcoming), Measurement (analytics, feedback loops). Use `.github-gstack-intelligence/skills/references/devex-dx-hall-of-fame.md` as the competitive benchmark reference. A score below 7 in any dimension requires a concrete remediation plan in the review output."],
+
+  // Deploy bootstrap (deploy infrastructure detection)
+  ["{{DEPLOY_BOOTSTRAP}}", "Detect deploy infrastructure by scanning the repository for platform indicators: `.fly.toml` (Fly.io), `Procfile` (Heroku), `vercel.json` (Vercel), `netlify.toml` (Netlify), `render.yaml` (Render), `railway.json` (Railway), `.github/workflows/*deploy*.yml` or `*cd*.yml` (GitHub Actions CD), `Dockerfile` + cloud config (container-based). Also check CLAUDE.md and `.github-gstack-intelligence/config.json` for persisted `deploymentUrl` or `platform` settings. If a production URL is detected or configured, verify reachability with `curl -sf <url> -o /dev/null -w '%{http_code}'`. Output detected platform, production URL (if any), deploy workflow (if any), and confidence level."],
+
+  // Codex second opinion (multi-model challenge)
+  ["{{CODEX_SECOND_OPINION}}", "Multi-model second opinion is not available in CI mode. Instead, perform a self-adversarial check: before proceeding, re-examine your premises from the opposite perspective. For each premise, ask: 'What evidence would disprove this?' If you cannot articulate counter-evidence, the premise may be under-examined. Note any premises that survived the adversarial check with reduced confidence."],
+
+  // Design mockup and sketch (visual artifact generation)
+  ["{{DESIGN_MOCKUP}}", "Design mockup generation via local tools is not available in CI mode. If a mockup would be valuable, describe the mockup in detail (layout, components, interactions, responsive behavior) in the GitHub comment so the user can visualize or create it. Reference DESIGN.md if it exists for design system constraints."],
+  ["{{DESIGN_SKETCH}}", "Quick sketch generation via local tools is not available in CI mode. If a sketch would clarify an approach, describe it as a text-based wireframe using ASCII art or a structured layout description in the GitHub comment. Focus on information hierarchy and user flow, not visual polish."],
 ];
 
 /**
