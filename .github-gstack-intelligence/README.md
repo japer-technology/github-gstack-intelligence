@@ -58,7 +58,7 @@ Your repository _is_ the AI workspace. The questions, the results, the code, the
 
 ## The GitHubification of GStack
 
-This project is a [Githubification](https://github.com/japer-technology/githubification) of [gstack](https://github.com/garrytan/gstack) — Garry Tan's collection of AI specialist skills for software development. Where gstack runs locally inside Claude Code sessions with a developer in the loop, GitHub GStack Intelligence transforms those skills into GitHub-native workflows that run autonomously on Actions. Of gstack's twenty-five skills, seventeen are adapted for GitHub — the remainder depend on local-only capabilities (persistent browser daemons, interactive terminal sessions) that don't translate to ephemeral Actions runners.
+This project is a [Githubification](https://github.com/japer-technology/githubification) of [gstack](https://github.com/garrytan/gstack) — Garry Tan's collection of AI specialist skills for software development. Where gstack runs locally inside Claude Code sessions with a developer in the loop, GitHub GStack Intelligence transforms those skills into GitHub-native workflows that run autonomously on Actions. Of gstack's thirty-nine skills, twenty-six are adapted for GitHub — the remainder depend on local-only capabilities (persistent browser daemons, interactive terminal sessions, cookie import, deploy configuration) that don't translate to ephemeral Actions runners.
 
 ### What is Githubification?
 
@@ -85,7 +85,7 @@ gstack's value is in its skill definitions — the prompt engineering, workflow 
 
 ### Available Skills
 
-Seventeen specialist skills are extracted from upstream gstack and adapted for GitHub:
+Twenty-six specialist skills are extracted from upstream gstack and adapted for GitHub:
 
 | Skill | What it does |
 |---|---|
@@ -96,16 +96,25 @@ Seventeen specialist skills are extracted from upstream gstack and adapted for G
 | **retro** | Weekly retrospective from git history |
 | **document-release** | Release notes generation from commit history |
 | **qa** | QA testing with browser automation via Playwright |
-| **qa-only** | Lightweight QA pass without full review |
-| **design-review** | Visual design audit with screenshot analysis |
-| **plan-design-review** | Design review planning and preparation |
-| **investigate** | Debugging and root-cause analysis |
-| **canary** | Canary deployment validation |
-| **office-hours** | Multi-turn conversational support |
-| **plan-ceo-review** | CEO-level product review planning |
-| **plan-eng-review** | Engineering review planning |
-| **design-consultation** | Interactive design consultation |
-| **autoplan** | Automatic implementation planning |
+| **qa-only** | Report-only QA testing — captures issues without code changes |
+| **design-review** | Visual design audit with iterative screenshot-driven fixes |
+| **plan-design-review** | Designer's-eye plan review — rates 7 design dimensions 0–10 |
+| **investigate** | Root-cause debugging with 4-phase methodology and scope lock |
+| **canary** | Post-deploy monitoring and anomaly detection |
+| **office-hours** | YC office hours — startup forcing questions or builder brainstorm |
+| **plan-ceo-review** | CEO/founder plan review — scope, strategy, 10-star vision |
+| **plan-eng-review** | Engineering plan review — architecture, data flow, test coverage |
+| **design-consultation** | Full design system builder — typography, color, layout, spacing |
+| **autoplan** | One-command CEO + Design + Engineering review pipeline |
+| **careful** | Safety guardrails — warns before destructive commands |
+| **design-html** | Design finalization — production-quality HTML/CSS from mockups |
+| **design-shotgun** | Rapid design exploration — generate and compare multiple variants |
+| **devex-review** | Live developer experience audit with DX scorecard |
+| **guard** | Full safety mode — destructive command warnings + directory-scoped edits |
+| **health** | Code quality dashboard — weighted composite 0–10 score with trends |
+| **land-and-deploy** | Land and deploy workflow — merge PR, wait for CI, verify production |
+| **learn** | Manage project learnings — review, search, prune, and export |
+| **plan-devex-review** | Interactive developer experience plan review with DX scoring |
 
 ### Upstream Refresh
 
@@ -235,15 +244,23 @@ This is optional. The agent works without hatching, but it's more fun with a per
     settings.json                                # Default LLM settings template (copied to .pi/settings.json on install)
   lifecycle/
     agent.ts                # Core agent orchestrator
-    refresh.ts              # Refresh-time gstack resource extraction
-  skills/                           # Extracted GitHub-native gstack resources
-    references/                     # Extracted checklists and source references
+    router.ts               # Event → skill routing
+    refresh.ts              # Upstream gstack extraction
+    browser.ts              # Playwright browser utilities
+  skills/                           # Extracted GitHub-native gstack skill prompts (26 skills)
+    references/                     # Shared checklists, templates, and source references (38 files)
     source.json                     # Upstream extraction source metadata
-  docs/                             # Documentation and analysis
-  public-fabric/                    # GitHub Pages static site
+  help/                             # User-facing command documentation (30 files)
+  docs/                             # Technical and architectural documentation
   state/                            # Session history and issue mappings (git-tracked)
+    issues/                         # Issue → session file mappings
+    sessions/                       # Conversation transcripts (JSONL)
+    results/                        # Skill execution results
+    benchmarks/                     # Performance baselines
+  config.json                       # Skill enablement, triggers, and global defaults
   logo.png                          # Agent logo
   AGENTS.md                         # Agent identity file
+  ETHOS.md                          # Builder principles
   VERSION                           # Installed version
   package.json                      # Runtime dependencies
 ```
