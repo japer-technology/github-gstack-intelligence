@@ -798,7 +798,8 @@ jobs:
           steps.check-folder.outputs.exists == 'true'
           && (
             (github.event_name == 'issue_comment' && (
-              startsWith(github.event.comment.body, '/qa')
+              startsWith(github.event.comment.body, '/qa ') || github.event.comment.body == '/qa'
+              || startsWith(github.event.comment.body, '/qa-only ') || github.event.comment.body == '/qa-only'
               || startsWith(github.event.comment.body, '/design-review')
               || startsWith(github.event.comment.body, '/canary')
               || startsWith(github.event.comment.body, '/devex-review')
