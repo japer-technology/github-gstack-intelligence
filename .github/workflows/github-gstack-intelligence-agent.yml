@@ -585,15 +585,17 @@ jobs:
   # Skills  : /review (auto on PR), /cso (PR + label), /design-review (PR +
   #           label), /qa (slash cmd + URL), /qa-only, /investigate (label),
   #           /office-hours (label), /design-consultation (label), /ship,
-  #           /autoplan (chains CEO→design→eng), /plan-ceo-review,
-  #           /plan-eng-review, /plan-design-review, /retro (cron),
-  #           /benchmark (cron), /document-release (release), /canary (deploy)
+  #           /autoplan (chains CEO→design→eng→DX), /plan-ceo-review,
+  #           /plan-eng-review, /plan-design-review, /plan-devex-review,
+  #           /retro (cron), /benchmark (cron), /document-release (release),
+  #           /canary (deploy), /careful, /design-html, /design-shotgun,
+  #           /devex-review, /guard, /health, /land-and-deploy, /learn
   #
   # Trigger : issues.opened, issue_comment.created, pull_request, schedule,
   #           release.published, deployment_status (success only).
   # Security: Collaborators with write/maintain/admin only. Schedule, release,
   #           and deployment events bypass actor checks (no human actor).
-  # Cost    : Each run is one LLM invocation. /autoplan chains three.
+  # Cost    : Each run is one LLM invocation. /autoplan chains four.
   # Timeout : 30 minutes. Complex pipelines or large codebases may hit this.
   # ────────────────────────────────────────────────────────────────────────────
   run-agent:
@@ -785,7 +787,8 @@ jobs:
 
       # 8. PLAYWRIGHT (CONDITIONAL) — install the Chromium browser only when
       #    a browser-based skill is being invoked (/qa, /qa-only, /design-review,
-      #    /canary). Adds ~30s and ~200MB to the runner, so we skip it for all
+      #    /canary, /devex-review, /design-html, /design-shotgun, /land-and-deploy).
+      #    Adds ~30s and ~200MB to the runner, so we skip it for all
       #    other skills to keep runs fast.
       #    IMPORTANT: the playwright version is read from package.json to stay
       #    in sync with the installed playwright-core dependency. A version
@@ -799,6 +802,10 @@ jobs:
               || startsWith(github.event.comment.body, '/qa-only ')
               || startsWith(github.event.comment.body, '/design-review')
               || startsWith(github.event.comment.body, '/canary')
+              || startsWith(github.event.comment.body, '/devex-review')
+              || startsWith(github.event.comment.body, '/design-html')
+              || startsWith(github.event.comment.body, '/design-shotgun')
+              || startsWith(github.event.comment.body, '/land-and-deploy')
             ))
             || github.event_name == 'deployment_status'
           )

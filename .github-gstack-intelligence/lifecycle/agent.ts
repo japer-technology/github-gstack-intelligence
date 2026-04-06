@@ -372,11 +372,11 @@ async function main() {
             let skillPrompt: string;
 
             if (routeResult.skill === "autoplan") {
-              // /autoplan chains three review skills into a single combined prompt.
+              // /autoplan chains four review skills into a single combined prompt.
               // Load each review skill and concatenate them so the agent executes
-              // all three reviews in one invocation (Approach A from the plan).
+              // all four reviews in one invocation (Approach A from the plan).
               const autoplanPrompt = readFileSync(skillPath, "utf-8");
-              const reviewSkills = ["plan-ceo-review", "plan-design-review", "plan-eng-review"] as const;
+              const reviewSkills = ["plan-ceo-review", "plan-design-review", "plan-eng-review", "plan-devex-review"] as const;
               const reviewSections: string[] = [];
 
               for (const reviewSkill of reviewSkills) {
@@ -387,6 +387,7 @@ async function main() {
                     "plan-ceo-review": "CEO Review",
                     "plan-design-review": "Design Review",
                     "plan-eng-review": "Engineering Review",
+                    "plan-devex-review": "DX Review",
                   };
                   const sectionTitle = SKILL_TITLES[reviewSkill] ?? reviewSkill;
                   reviewSections.push(`## ${sectionTitle}\n${reviewContent}`);
@@ -746,6 +747,71 @@ async function main() {
         JSON.stringify(result, null, 2) + "\n"
       );
       console.log(`Persisted document-release result for ${tagName}`);
+    }
+
+    // ── Persist health results ──────────────────────────────────────────────────
+    // Health check results are saved as date-stamped JSON in state/results/health/
+    // so trend tracking across runs is possible.
+    if (routeResult && routeResult.skill === "health") {
+      const resultDir = resolve(stateDir, "results", "health");
+      mkdirSync(resultDir, { recursive: true });
+
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const result = {
+        skill: "health",
+        date: dateStr,
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, `${dateStr}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted health result for ${dateStr}`);
+    }
+
+    // ── Persist devex-review results ────────────────────────────────────────────
+    // Track DX audit results per issue so downstream skills can reference prior audits.
+    if (routeResult && routeResult.skill === "devex-review") {
+      const resultDir = resolve(stateDir, "results", "devex-review");
+      mkdirSync(resultDir, { recursive: true });
+
+      const resultIdentifier = routeResult.context.issueNumber ?? targetNumber;
+      const result = {
+        issueNumber: resultIdentifier,
+        skill: "devex-review",
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, `issue-${resultIdentifier}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted devex-review result for issue #${resultIdentifier}`);
+    }
+
+    // ── Persist autoplan results ────────────────────────────────────────────────
+    // Track autoplan runs per issue so the agent knows a full review gauntlet
+    // has been executed.
+    if (routeResult && routeResult.skill === "autoplan") {
+      const resultDir = resolve(stateDir, "results", "autoplan");
+      mkdirSync(resultDir, { recursive: true });
+
+      const resultIdentifier = routeResult.context.issueNumber ?? targetNumber;
+      const result = {
+        issueNumber: resultIdentifier,
+        skill: "autoplan",
+        timestamp: new Date().toISOString(),
+        status: "completed",
+        commit: process.env.GITHUB_SHA ?? null,
+      };
+      writeFileSync(
+        resolve(resultDir, `issue-${resultIdentifier}.json`),
+        JSON.stringify(result, null, 2) + "\n"
+      );
+      console.log(`Persisted autoplan result for issue #${resultIdentifier}`);
     }
 
     // ── Commit and push state changes ───────────────────────────────────────────

@@ -70,7 +70,7 @@ export interface SlashCommand {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 // Skills that require a browser (Playwright) for execution.
-const BROWSER_SKILLS = new Set(["qa", "qa-only", "canary", "design-review"]);
+const BROWSER_SKILLS = new Set(["qa", "qa-only", "canary", "design-review", "devex-review", "design-html", "design-shotgun", "land-and-deploy"]);
 
 // All recognised slash commands. Unknown commands are ignored (treated as
 // regular conversation text) rather than producing an error.
@@ -79,6 +79,8 @@ const VALID_COMMANDS = new Set([
   "office-hours", "plan-ceo-review", "plan-eng-review",
   "design-review", "plan-design-review", "design-consultation",
   "autoplan", "retro", "benchmark", "document-release", "canary",
+  "careful", "design-html", "design-shotgun", "devex-review",
+  "guard", "health", "land-and-deploy", "learn", "plan-devex-review",
 ]);
 
 // Commands that accept a URL as their first argument.

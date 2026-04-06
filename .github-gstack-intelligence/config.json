@@ -29,6 +29,15 @@
     "design-review": { "enabled": true, "trigger": "pull_request", "labelGated": true, "label": "design-review" },
     "plan-design-review": { "enabled": true, "trigger": "issue_comment" },
     "design-consultation": { "enabled": true, "trigger": "issue_label", "label": "design-consultation" },
-    "qa-only": { "enabled": true, "trigger": "issue_comment" }
+    "qa-only": { "enabled": true, "trigger": "issue_comment" },
+    "careful": { "enabled": true, "trigger": "issue_comment" },
+    "design-html": { "enabled": true, "trigger": "issue_comment" },
+    "design-shotgun": { "enabled": true, "trigger": "issue_comment" },
+    "devex-review": { "enabled": true, "trigger": "issue_comment" },
+    "guard": { "enabled": true, "trigger": "issue_comment" },
+    "health": { "enabled": true, "trigger": "issue_comment" },
+    "land-and-deploy": { "enabled": true, "trigger": "issue_comment" },
+    "learn": { "enabled": true, "trigger": "issue_comment" },
+    "plan-devex-review": { "enabled": true, "trigger": "issue_comment" }
   }
 }
