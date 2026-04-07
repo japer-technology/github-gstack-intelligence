@@ -15,6 +15,9 @@ export default function (pi: ExtensionAPI) {
       "Returns structured metadata about the current GitHub repository: " +
       "name, description, default branch, visibility, topics, and language. " +
       "Use this when you need to understand the repository you are working in.",
+    promptSnippet:
+      "Use the github_repo_context tool to retrieve repository metadata (name, description, " +
+      "default branch, visibility, topics, primary language) instead of constructing gh CLI commands.",
     parameters: Type.Object({}),
     async execute(_toolCallId, _params, _signal) {
       try {

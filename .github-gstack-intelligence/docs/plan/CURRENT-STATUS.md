@@ -19,7 +19,7 @@
 | **Config** | `.github-gstack-intelligence/config.json` | ✅ Production — skill enablement, model defaults, access controls, bot-loop prevention, label gating |
 | **Session continuity** | `state/issues/*.json` → `state/sessions/*.jsonl` | ✅ Production — multi-turn conversations persist across workflow runs |
 | **Push conflict resolution** | In `agent.ts` — 10-retry rebase loop | ✅ Production — concurrent agents don't lose work |
-| **Pi-mono runtime** | `package.json` → `@mariozechner/pi-coding-agent` v0.57.1 | ✅ Production — multi-provider LLM support (OpenAI default, Anthropic, Google, xAI, etc.) |
+| **Pi-mono runtime** | `package.json` → `@mariozechner/pi-coding-agent` v0.65.1 | ✅ Production — multi-provider LLM support (OpenAI default, Anthropic, Google, xAI, etc.) |
 | **Extracted skill prompts** | `.github-gstack-intelligence/skills/*.md` (17 files) | ✅ Extracted and CI-adapted — review, cso, ship, qa, retro, etc. |
 | **Extracted references** | `.github-gstack-intelligence/skills/references/` (10 files) | ✅ Extracted — checklists, taxonomies, templates, foundational docs |
 | **Source tracking** | `.github-gstack-intelligence/skills/source.json` | ✅ Production — tracks upstream commit SHA, file manifest, extraction timestamp |
