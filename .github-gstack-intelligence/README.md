@@ -463,25 +463,3 @@ Requires `OPENROUTER_API_KEY`. Browse available models at [openrouter.ai](https:
 | OpenRouter | `openrouter` | any model on [openrouter.ai](https://openrouter.ai/) | `OPENROUTER_API_KEY` |
 
 > **Tip:** The `pi` agent supports many more providers and models. Run `pi --help` or see the [pi-mono docs](https://github.com/badlogic/pi-mono) for the full list.
-
----
-
-## Security
-
-The workflow only responds to repository **owners, members, and collaborators**. Random users cannot trigger the agent on public repos.
-
-If you plan to use gstack-intelligence for anything private, **make the repo private**. Public repos mean your conversation history is visible to everyone, but get generous GitHub Actions usage.
-
----
-
-## Repo Size
-
-The repo is overwhelmingly dominated by node_modules (~99%). The actual project files (README, LICENSE, config, GitHub workflows, GMI state/lifecycle) are only about ~1 MB.
-
----
-
-<p align="center">
-  <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/logo.png" alt="GStack Intelligence" width="500">
-  </picture>
-</p>
