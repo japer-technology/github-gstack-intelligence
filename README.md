@@ -1,6 +1,6 @@
 ### [GitHub GStack Intelligence](.github-gstack-intelligence/README.md)
 
-Allows any GitHub repository to access _Garry Tam's GStack AI Engineering Team_ using GitHub Actions.
+Allows any GitHub repository to access _Garry Tam's GStack AI Engineering Team_.
 
 <p align="center">
   <picture>
