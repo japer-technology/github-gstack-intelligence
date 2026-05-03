@@ -137,34 +137,7 @@ Maintainers should set clear expectations for contributors about which skills ar
 
 The Code of Conduct embedded in this project explicitly prohibits using the agent's capabilities to cause harm to individuals, communities, or the public interest. This aligns directly with the Community Guidelines' prohibition on harassment, threats, and discriminatory content. The agent's security and QA skills are powerful; they operate on real code with real access to the repository. Developers must not repurpose these skills to conduct unauthorized security scanning, generate exploit code, or produce content designed to harm or deceive users of their software.
 
----
-
-## Part V: Understanding the Appeal and Reinstatement Process
-
-Even well-intentioned automation can trigger GitHub's enforcement mechanisms. An agent that fires on every event in a busy repository may accumulate a volume of API calls or Actions runs that GitHub's automated systems flag as anomalous. Skill output that inadvertently reproduces problematic content from an LLM could trigger content moderation. Understanding GitHub's [Appeal and Reinstatement](https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement) process is therefore a practical necessity for maintainers.
-
-### What Can Happen
-
-GitHub may remove content, restrict repository visibility, suspend an account, or limit Actions access if it determines that policies have been violated. Because the agent's actions are attributable to the account owner, any enforcement action taken in response to agent-generated content or agent-triggered behavior applies to the account holder directly.
-
-### Preparation and Mitigation
-
-The best protection against enforcement is operating transparently within policy boundaries from the start:
-
-1. **Enable only the skills you need.** `config.json` ships with several skills disabled. Start conservatively and expand as you understand the impact of each skill.
-2. **Keep all LLM API keys in GitHub Secrets.** Never hardcode credentials. The project's architecture mandates this; do not deviate from it.
-3. **Review session transcripts periodically.** The `.github-gstack-intelligence/state/` directory contains every prompt and response committed to the repository. Reviewing this directory regularly surfaces unexpected outputs before they become enforcement issues.
-4. **Use private repositories for sensitive work.** The `SECURITY.md` file included in this project states this explicitly: session history on public repositories is visible to everyone. If your work involves proprietary code, security vulnerabilities, or user PII, install the agent in a private repository.
-
-### If Enforcement Occurs
-
-If content or an account is restricted due to agent-generated activity, GitHub's process allows for both reinstatement (where the user agrees to correct the violation going forward) and appeal (where the user disputes that a violation occurred). The appeal window is six months from the enforcement decision. Maintain clear documentation of your agent's configuration and the intent behind each enabled skill — this documentation will be central to any reinstatement or appeal submission.
-
-GitHub's process is human-reviewed: appeals are not decided by automated systems, and if the initial reviewer was the same person who made the enforcement decision, a different staff member independently reviews the appeal. The process is designed to be fair; engage with it directly through the [Appeal and Reinstatement form](https://support.github.com/contact/reinstatement) rather than attempting to work around enforcement through alternative accounts.
-
----
-
-## Part VI: Best Practices for Developers
+## Part V: Best Practices for Developers
 
 ### Installation
 
@@ -206,7 +179,7 @@ GitHub's process is human-reviewed: appeals are not decided by automated systems
 
 ---
 
-## Part VII: What This Project Is Not For
+## Part VI: What This Project Is Not For
 
 GitHub GStack Intelligence is not:
 
