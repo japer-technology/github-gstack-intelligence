@@ -29,11 +29,7 @@ Twenty-six specialists covering PR review, security audit, QA testing with a rea
 
 ---
 
-# The Best Practice Use Within the GitHub Ecosystem
-
----
-
-## Introduction
+### The Best Practice Use Within the GitHub Ecosystem
 
 GitHub GStack Intelligence is a repository-local AI framework that converts any GitHub repository into a twenty-six-specialist engineering team by binding GitHub Actions, Git, Issues, and Secrets into a self-contained automation layer. It adapts Garry Tan's `gstack` skill suite — code review, security auditing, QA testing, performance benchmarking, retrospectives, release documentation, and more — into GitHub-native, event-driven workflows triggered by the normal pulse of software development: pull requests opened, issues created, comments posted, deployments completed, schedules fired.
 
