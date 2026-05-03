@@ -27,7 +27,9 @@ Twenty-six specialists covering PR review, security audit, QA testing with a rea
 3. Go to **[Actions → github-gstack-intelligence-agent → Run workflow]** to install the agent files automatically, subsequent runs perform upgrades.
 4. Open an issue → the agent will reply.
 
-# The Best Practice Use of GitHub GStack Intelligence Within the GitHub Ecosystem
+---
+
+# The Best Practice Use Within the GitHub Ecosystem
 
 ---
 
