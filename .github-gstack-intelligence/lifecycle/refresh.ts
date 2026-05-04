@@ -88,7 +88,6 @@ const SOURCE_FILES: Record<string, string> = {
   // Additional skill templates (local-only skills, stored as reference)
   browseTemplate: "browse/SKILL.md.tmpl",
   codexTemplate: "codex/SKILL.md.tmpl",
-  checkpointTemplate: "checkpoint/SKILL.md.tmpl",
   freezeTemplate: "freeze/SKILL.md.tmpl",
   unfreezeTemplate: "unfreeze/SKILL.md.tmpl",
   gstackUpgradeTemplate: "gstack-upgrade/SKILL.md.tmpl",
@@ -734,10 +733,6 @@ async function main() {
     {
       path: "skills/references/gstack-codex-skill.md",
       content: adaptGenericSkill("codex", fetched.codexTemplate, SOURCE_FILES.codexTemplate, sourceCommit),
-    },
-    {
-      path: "skills/references/gstack-checkpoint-skill.md",
-      content: adaptGenericSkill("checkpoint", fetched.checkpointTemplate, SOURCE_FILES.checkpointTemplate, sourceCommit),
     },
     {
       path: "skills/references/gstack-freeze-skill.md",
