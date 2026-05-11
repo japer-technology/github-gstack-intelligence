@@ -1,6 +1,7 @@
 # GitHub Compliance Brief
 
 > **Audience:** A GitHub AI Agent, Trust & Safety reviewer, or GitHub employee reviewing this repository.
+> 
 > **Purpose:** A fast, accurate orientation to what this repository is, what its automation does, and how it aligns with GitHub's Terms of Service, Acceptable Use Policies, and Community Guidelines — so you can verify compliance quickly without reverse-engineering the codebase.
 >
 > This repository is an MIT-licensed, opt-in, repository-local AI engineering framework. All automation runs inside GitHub Actions under the repository owner's own `GITHUB_TOKEN`, gated to collaborators with write-or-greater permissions, with bot-loop prevention, command-prefix gating, and full audit trails committed to Git. It does not star, follow, fork, mass-comment, scrape, or act outside the repository it is installed in. The README contains a written self-audit against GitHub's policies (Parts II–VI).
