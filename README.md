@@ -14,12 +14,6 @@ Twenty-six specialists covering PR review, security audit, QA testing with a rea
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![AI](https://img.shields.io/badge/Assisted-Development-2b2bff?logo=openai&logoColor=white) [![github-minimum-intelligence-agent](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml/badge.svg)](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml)
 
-<p align="center">
-  <picture>
-    <img src="https://raw.githubusercontent.com/japer-technology/github-gstack-intelligence/main/.github-gstack-intelligence/GSSI.jpg" alt="GStack Intelligence">
-  </picture>
-</p>
-
 ### Installation
 
 1. Copy [`.github/workflows/github-gstack-intelligence-agent.yml`](../.github/workflows/github-gstack-intelligence-agent.yml) into your repo's `.github/workflows/` directory.
