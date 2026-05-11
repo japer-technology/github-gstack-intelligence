@@ -1,4 +1,4 @@
-# Plan: GitHub as Infrastructure for GStack
+# Plan: GitHub as the Runtime for GStack
 
 ### Steps to make GStack Intelligence run as a full GitHub-native AI engineering platform
 

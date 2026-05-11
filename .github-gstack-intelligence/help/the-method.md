@@ -117,7 +117,7 @@ The engineering review evaluates the plan for **implementability and technical s
 - **Performance Analysis** — Where are the potential bottlenecks? What are the latency budgets? What scales and what doesn't?
 - **Failure Path Coverage** — What happens when the database is slow? When the API is down? When the user's network drops? When the payload is 10x expected size?
 
-**What it catches:** Missing error handling. Unacknowledged dependencies. Performance cliffs. Untestable designs. Implicit assumptions about infrastructure.
+**What it catches:** Missing error handling. Unacknowledged dependencies. Performance cliffs. Untestable designs. Implicit assumptions about the runtime environment.
 
 #### `/autoplan` — The Automated Pipeline
 
@@ -179,7 +179,7 @@ For security-sensitive changes, add the `security-audit` label to your PR. This 
 5. API security
 6. Data protection and privacy
 7. Dependency vulnerabilities
-8. Infrastructure security
+8. Deployment security
 9. Logging and monitoring
 10. Error handling and information leakage
 11. Business logic security

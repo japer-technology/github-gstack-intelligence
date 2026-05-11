@@ -359,7 +359,7 @@ const COMMON_TOKEN_REPLACEMENTS: Array<[string, string]> = [
   ["{{REVIEW_DASHBOARD}}", "Check for prior review results in `.github-gstack-intelligence/state/results/` and GitHub PR review status."],
 
   // Test-related
-  ["{{TEST_BOOTSTRAP}}", "Use the repository's existing test infrastructure. If no test framework is detected, note it in the output and continue."],
+  ["{{TEST_BOOTSTRAP}}", "Use the repository's existing test setup. If no test framework is detected, note it in the output and continue."],
   ["{{TEST_FAILURE_TRIAGE}}", "Triage test failures by checking whether they are pre-existing (present on the base branch) or introduced by the current changes. Pre-existing failures should be noted but not block the workflow."],
   ["{{TEST_COVERAGE_AUDIT_SHIP}}", "Use the checked-out repository diff and existing tests to reason about coverage; persist only the final GitHub-native findings."],
   ["{{TEST_COVERAGE_AUDIT_REVIEW}}", "Use the checked-out repository diff and existing tests to reason about coverage; persist only the final GitHub-native findings."],
@@ -410,8 +410,8 @@ const COMMON_TOKEN_REPLACEMENTS: Array<[string, string]> = [
   // DX framework (developer experience methodology)
   ["{{DX_FRAMEWORK}}", "DX Framework: Score every developer-facing dimension on a 1-10 scale with evidence. Key dimensions: Getting Started (TTHW — Time To Hello World), API/CLI Ergonomics, Error Messages (actionable, not cryptic), Documentation (complete, accurate, findable), Upgrade Path (non-breaking, guided migration), Dev Environment (reproducible, fast), Community (responsive, welcoming), Measurement (analytics, feedback loops). Use `.github-gstack-intelligence/skills/references/devex-dx-hall-of-fame.md` as the competitive benchmark reference. A score below 7 in any dimension requires a concrete remediation plan in the review output."],
 
-  // Deploy bootstrap (deploy infrastructure detection)
-  ["{{DEPLOY_BOOTSTRAP}}", "Detect deploy infrastructure by scanning the repository for platform indicators: `.fly.toml` (Fly.io), `Procfile` (Heroku), `vercel.json` (Vercel), `netlify.toml` (Netlify), `render.yaml` (Render), `railway.json` (Railway), `.github/workflows/*deploy*.yml` or `*cd*.yml` (GitHub Actions CD), `Dockerfile` + cloud config (container-based). Also check CLAUDE.md and `.github-gstack-intelligence/config.json` for persisted `deploymentUrl` or `platform` settings. If a production URL is detected or configured, verify reachability with `curl -sf <url> -o /dev/null -w '%{http_code}'`. Output detected platform, production URL (if any), deploy workflow (if any), and confidence level."],
+  // Deploy bootstrap (deploy platform detection)
+  ["{{DEPLOY_BOOTSTRAP}}", "Detect deploy platform by scanning the repository for platform indicators: `.fly.toml` (Fly.io), `Procfile` (Heroku), `vercel.json` (Vercel), `netlify.toml` (Netlify), `render.yaml` (Render), `railway.json` (Railway), `.github/workflows/*deploy*.yml` or `*cd*.yml` (GitHub Actions CD), `Dockerfile` + cloud config (container-based). Also check CLAUDE.md and `.github-gstack-intelligence/config.json` for persisted `deploymentUrl` or `platform` settings. If a production URL is detected or configured, verify reachability with `curl -sf <url> -o /dev/null -w '%{http_code}'`. Output detected platform, production URL (if any), deploy workflow (if any), and confidence level."],
 
   // Codex second opinion (multi-model challenge)
   ["{{CODEX_SECOND_OPINION}}", "Multi-model second opinion is not available in CI mode. Instead, perform a self-adversarial check: before proceeding, re-examine your premises from the opposite perspective. For each premise, ask: 'What evidence would disprove this?' If you cannot articulate counter-evidence, the premise may be under-examined. Note any premises that survived the adversarial check with reduced confidence."],

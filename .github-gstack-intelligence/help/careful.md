@@ -30,7 +30,7 @@ Common build cleanup commands (like `rm -rf node_modules` or `rm -rf dist`) are 
 ## When To Use It
 
 - Working on or near production systems
-- Debugging live infrastructure
+- Debugging live deployments
 - Operating in shared environments
 - Any time you want an extra safety net before destructive operations
 

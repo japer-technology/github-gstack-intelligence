@@ -63,7 +63,7 @@ If the diff introduces a new standalone artifact (CLI binary, library package), 
 Fetches and merges the base branch into the feature branch so tests run against the merged state. Auto-resolves simple conflicts (VERSION, CHANGELOG ordering). Stops on complex conflicts.
 
 ### Step 2.5 — Test Framework Bootstrap
-Detects the repository's existing test infrastructure. If no test framework is found, notes it and continues.
+Detects the repository's existing test framework. If no test framework is found, notes it and continues.
 
 ### Step 3 — Run Tests
 Runs all test suites in parallel on the merged code. Applies **Test Failure Ownership Triage** to distinguish pre-existing failures from regressions introduced by the current branch. Only in-branch failures block the ship.
@@ -98,7 +98,7 @@ Cross-references open TODOs against the shipped diff. Automatically marks comple
 
 ### Step 6 — Bisectable Commits
 Groups changes into logical, independently-valid commits ordered for `git bisect`:
-1. Infrastructure (migrations, config, routes)
+1. Foundation (migrations, config, routes)
 2. Models & services (with their tests)
 3. Controllers & views (with their tests)
 4. VERSION + CHANGELOG + TODOS.md (final commit)

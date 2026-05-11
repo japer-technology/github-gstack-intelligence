@@ -4,7 +4,7 @@
 
 Every engineering team knows which practices they should be doing and aren't. Code review happens, but only when someone has time. Security audits happen quarterly if they happen at all. QA testing is manual and incomplete. Retrospectives are skipped. Release documentation is stale before the ink is dry. The practices that separate resilient codebases from fragile ones all share the same bottleneck: they require people, and people are expensive, busy, and finite.
 
-GitHub GStack Intelligence eliminates the headcount constraint by taking a body of work that already exists — **gstack**, the AI engineering skill suite authored by Garry Tan, CEO of Y Combinator — and projecting it onto GitHub's native infrastructure so that any repository can run it without a local development environment. Tan built gstack as a collection of thirty-nine specialist prompts that run inside Claude Code sessions: code review, security auditing, QA testing, performance benchmarking, planning, shipping, retrospectives, and more. Each skill encodes hard-won engineering judgment — the kind that comes from building Palantir's early engineering culture, co-founding Initialized Capital, leading Y Combinator, and personally advising thousands of startups on what to build and how to ship it. The skills are opinionated by design: they reflect a specific thesis about how software should be built in the age of AI-assisted development.
+GitHub GStack Intelligence eliminates the headcount constraint by taking a body of work that already exists — **gstack**, the AI engineering skill suite authored by Garry Tan, CEO of Y Combinator — and projecting it onto GitHub's native platform so that any repository can run it without a local development environment. Tan built gstack as a collection of thirty-nine specialist prompts that run inside Claude Code sessions: code review, security auditing, QA testing, performance benchmarking, planning, shipping, retrospectives, and more. Each skill encodes hard-won engineering judgment — the kind that comes from building Palantir's early engineering culture, co-founding Initialized Capital, leading Y Combinator, and personally advising thousands of startups on what to build and how to ship it. The skills are opinionated by design: they reflect a specific thesis about how software should be built in the age of AI-assisted development.
 
 But gstack, in its native form, requires a developer sitting at a terminal with Claude Code running. GitHub GStack Intelligence is a different execution surface for the same intellectual property. It takes twenty-six of gstack's thirty-nine skills, adapts them for event-driven execution, and wires them into a single GitHub Actions workflow file. Issues become the conversational UI. Actions runners become the compute layer. Git commits become the persistence layer. Pages becomes the publishing surface. One file copied, one API key added, and the repository gains Garry Tan's engineering organization running on every event — every pull request reviewed, every deployment monitored, every Friday retrospective generated — without a developer needing to be in the loop at all.
 
@@ -16,7 +16,7 @@ A single GitHub Actions workflow file listens for eight classes of GitHub events
 
 The agent orchestrator (`agent.ts`) manages everything around the LLM call. It resolves or creates a per-issue conversation session from Git-committed state, builds a prompt with full context, streams the LLM response, posts the result as an issue or PR comment, and commits the session transcript back to the repository. Because sessions are ordinary files tracked in Git, the agent has full memory of every prior exchange on every issue — across workflow runs, across days, across weeks. A push-conflict retry loop with exponential backoff handles concurrent agents racing to commit.
 
-The architecture's central insight is that it introduces no new infrastructure. The workflow file is the only installation artifact. Authorization gates tied to repository collaborator permissions ensure that on public repositories, only users with write access can consume LLM credits.
+The architecture's central insight is that it introduces no new servers or services. The workflow file is the only installation artifact. Authorization gates tied to repository collaborator permissions ensure that on public repositories, only users with write access can consume LLM credits.
 
 ---
 
@@ -34,7 +34,7 @@ The skills in gstack are not generic LLM wrappers. They encode specific engineer
 
 Every skill file committed into a GitHub GStack Intelligence installation carries a provenance marker: `Source: garrytan/gstack @ <commit-sha>`. A refresh workflow (`run-refresh-gstack`) pulls upstream changes from Tan's repository, validates the extracted files, and commits them — ensuring that as gstack evolves, every installation can stay current. The skills are the intellectual core; GitHub GStack Intelligence is the delivery mechanism.
 
-This is what makes the project distinct from other AI coding agents. It is not a general-purpose chatbot. It is a *specific* engineering philosophy — Tan's — made executable and distributed through GitHub's existing infrastructure. The same skills that run in Tan's own Claude Code sessions run autonomously in any repository that copies the workflow file. The quality of the output is bounded by the quality of the prompts, and the prompts are authored by someone whose career has been dedicated to understanding what separates software that ships from software that doesn't.
+This is what makes the project distinct from other AI coding agents. It is not a general-purpose chatbot. It is a *specific* engineering philosophy — Tan's — made executable and distributed through GitHub's existing platform. The same skills that run in Tan's own Claude Code sessions run autonomously in any repository that copies the workflow file. The quality of the output is bounded by the quality of the prompts, and the prompts are authored by someone whose career has been dedicated to understanding what separates software that ships from software that doesn't.
 
 ---
 
@@ -216,7 +216,7 @@ A parallel skill, `/benchmark`, provides the same longitudinal tracking for perf
 >
 > **@carol (7 commits)**
 > Set up the monitoring dashboard and Grafana integration. First
-> infrastructure contribution — solid start.
+> platform contribution — solid start.
 >
 > **@dave (3 commits)**
 > Documentation updates only this week. No code changes.
@@ -390,7 +390,7 @@ The `/autoplan` skill collapses this entire pipeline into a single command. It r
 > (Principle 4: DRY — reuse existing billing infra).
 > AUTO-DECIDED: Blast radius includes `src/auth/`, `src/billing/`,
 > `src/api/middleware/` — scope expansion approved (Principle 2:
-> boil lakes, < 5 files, no new infrastructure).
+> boil lakes, < 5 files, no new services).
 >
 > **Design Review Phase (UX)**
 >

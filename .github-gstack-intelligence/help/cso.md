@@ -36,7 +36,7 @@ The `/cso` skill is **label-gated** — it only triggers automatically on pull r
 |---|---|---|
 | `/cso` | Daily (default) | Full audit, all phases, 8/10 confidence gate for zero noise |
 | `/cso --comprehensive` | Monthly deep scan | All phases, 2/10 confidence bar — surfaces more findings |
-| `/cso --infra` | Infrastructure only | Phases 0–6, 12–14 |
+| `/cso --infra` | Cloud and deploy only | Phases 0–6, 12–14 |
 | `/cso --code` | Code only | Phases 0–1, 7, 9–11, 12–14 |
 | `/cso --skills` | Skill supply chain | Phases 0, 8, 12–14 |
 | `/cso --diff` | Branch changes only | Combinable with any scope flag |
@@ -63,7 +63,7 @@ The `/cso` skill runs a multi-phase security audit. It does **not** make code ch
 | 2 | Secrets Archaeology | Scans git history for exposed keys, tokens, credentials |
 | 3 | Dependency Supply Chain | Known CVEs, typosquatting, unmaintained packages |
 | 4 | CI/CD Pipeline Security | Workflow permissions, artifact integrity, secret exposure in logs |
-| 5 | Infrastructure Review | Cloud config, network exposure, storage permissions |
+| 5 | Cloud & Network Review | Cloud config, network exposure, storage permissions |
 | 6 | Webhook Security | Inbound webhook validation, signature verification |
 | 7 | LLM/AI Security | Prompt injection, output trust boundaries, data leakage |
 | 8 | Skill Supply Chain | Third-party skill/plugin security review |

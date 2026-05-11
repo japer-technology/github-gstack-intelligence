@@ -45,7 +45,7 @@
 # ║    run-install         — Self-installer/upgrader from template repo.         ║
 # ║    run-refresh-gstack  — Pulls latest skills from garrytan/gstack upstream.  ║
 # ║    run-agent           — Core AI agent: routes events → skills → LLM → Git.  ║
-# ║    run-gitpages        — Publishes public-fabric directory to GitHub Pages.  ║
+# ║    run-gitpages        — Publishes public-site directory to GitHub Pages.    ║
 # ║                                                                              ║
 # ║  COST DISCLOSURE:                                                            ║
 # ║    Every agent run consumes LLM API credits. The default model (GPT-5.4      ║
@@ -101,7 +101,7 @@ on:
     types: [opened, synchronize]
 
   # 4. Code is pushed to main → triggers a GitHub Pages deployment so the
-  #    agent's public-fabric site stays up to date.
+  #    agent's public-site stays up to date.
   #    paths-ignore ensures that editing this workflow file alone does NOT
   #    trigger a redundant Pages deploy.
   push:
@@ -150,7 +150,7 @@ permissions:
   issues: write          # Post AI replies as issue comments, add/remove reaction indicators (🚀/👍/👎).
   pull-requests: write   # Post review/CSO/design-review findings as PR comments, add reactions.
   actions: write         # Required so run-install commits can trigger subsequent workflow runs.
-  pages: write           # Upload and deploy the public-fabric directory to GitHub Pages.
+  pages: write           # Upload and deploy the public-site directory to GitHub Pages.
   id-token: write        # OIDC token for actions/deploy-pages — required by GitHub's Pages deployment.
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -281,7 +281,7 @@ jobs:
           # into the user's repo (heavy dependencies and internal analysis).
           rm -rf "$EXTRACTED/$TARGET/node_modules"
           rm -rf "$EXTRACTED/$TARGET/docs/analysis"
-          rm -rf "$EXTRACTED/$TARGET/public-fabric"
+          rm -rf "$EXTRACTED/$TARGET/public-site"
 
           if [ "$ACTION" = "upgrade" ]; then
             # ── File-by-file upgrade ────────────────────────────────────
@@ -856,7 +856,7 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   # JOB 4 — run-gitpages
   #
-  # Purpose : Publish the agent's public-fabric directory as a GitHub Pages
+  # Purpose : Publish the agent's public-site directory as a GitHub Pages
   #           site. Provides a live web presence powered by the agent's
   #           public output — no separate hosting needed.
   # Trigger : Runs after all other jobs complete (needs: clause). On push
@@ -889,26 +889,26 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # 1. Check out the repo so we can read the public-fabric directory.
+      # 1. Check out the repo so we can read the public-site directory.
       #    ref: main ensures we pick up any commits the agent just pushed.
       - name: Checkout
         uses: actions/checkout@v6
         with:
           ref: main
 
-      # 2. Verify the public-fabric directory exists. If the agent has not
+      # 2. Verify the public-site directory exists. If the agent has not
       #    been installed yet (e.g. on a fresh template repo) there is nothing
       #    to deploy, so we abort early with a clear warning instead of
       #    failing in a later step.
-      - name: Check public-fabric exists
+      - name: Check public-site exists
         id: check-folder
         run: |
-          if [ -d ".github-gstack-intelligence/public-fabric" ]; then
+          if [ -d ".github-gstack-intelligence/public-site" ]; then
             echo "folder_exists=true" >> "$GITHUB_OUTPUT"
-            echo "✅ public-fabric directory found."
+            echo "✅ public-site directory found."
           else
             echo "folder_exists=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Directory .github-gstack-intelligence/public-fabric not found. Skipping Pages deployment. Run the installer first (Actions → Run workflow)."
+            echo "::warning::Directory .github-gstack-intelligence/public-site not found. Skipping Pages deployment. Run the installer first (Actions → Run workflow)."
           fi
 
       # 3. AUTO-ENABLE Pages — attempt to enable GitHub Pages via the API.
@@ -941,12 +941,12 @@ jobs:
         if: steps.check-folder.outputs.folder_exists == 'true' && steps.enable-pages.outputs.pages_active == 'true'
         uses: actions/configure-pages@v5
 
-      # 5. Upload the public-fabric directory as a Pages artifact.
+      # 5. Upload the public-site directory as a Pages artifact.
       - name: Upload artifact
         if: steps.check-folder.outputs.folder_exists == 'true' && steps.enable-pages.outputs.pages_active == 'true'
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.github-gstack-intelligence/public-fabric'
+          path: '.github-gstack-intelligence/public-site'
 
       # 6. Deploy the uploaded artifact to GitHub Pages.
       - name: Deploy to GitHub Pages

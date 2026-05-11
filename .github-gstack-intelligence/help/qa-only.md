@@ -100,7 +100,7 @@ For each page visited, the skill runs through 7 systematic checks from the [QA i
 | Report | ✅ With fix details | ✅ Issues only |
 | Suggests fixes | ✅ | ❌ |
 
-> **No test framework detected?** If the project has no test infrastructure, the report includes: *"No test framework detected. Run `/qa` to bootstrap one and enable regression test generation."*
+> **No test framework detected?** If the project has no test setup, the report includes: *"No test framework detected. Run `/qa` to bootstrap one and enable regression test generation."*
 
 ---
 

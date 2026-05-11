@@ -20,13 +20,13 @@
 1. **Destructive command warnings** — Pauses and asks for confirmation before running `rm -rf`, `DROP TABLE`, `force-push`, `git reset --hard`, `kubectl delete`, and similar operations
 2. **Directory-scoped edits** — Restricts all file edits to a specified directory, blocking writes outside the boundary
 
-This is the highest safety setting available — use it when working on production systems or debugging live infrastructure.
+This is the highest safety setting available — use it when working on production systems or debugging live deployments.
 
 ---
 
 ## When To Use It
 
-- Touching production databases or infrastructure
+- Touching production databases or live deployments
 - Debugging live systems where an accidental edit could cause an outage
 - Working in shared environments with critical data
 - Any time you want maximum protection against accidental damage

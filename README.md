@@ -33,7 +33,7 @@ Twenty-six specialists covering PR review, security audit, QA testing with a rea
 
 GitHub GStack Intelligence is a repository-local AI framework that converts any GitHub repository into a twenty-six-specialist engineering team by binding GitHub Actions, Git, Issues, and Secrets into a self-contained automation layer. It adapts Garry Tan's `gstack` skill suite — code review, security auditing, QA testing, performance benchmarking, retrospectives, release documentation, and more — into GitHub-native, event-driven workflows triggered by the normal pulse of software development: pull requests opened, issues created, comments posted, deployments completed, schedules fired.
 
-Because this project operates at the intersection of AI, automation, and GitHub's core infrastructure primitives, its use carries real responsibilities. This analysis examines those responsibilities through the lens of GitHub's published policies — the [Terms of Service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service), [Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), [Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), and [Appeal and Reinstatement](https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement) procedures — and derives concrete best practices for every developer who installs, extends, or contributes to this project.
+Because this project operates at the intersection of AI, automation, and GitHub's core platform primitives, its use carries real responsibilities. This analysis examines those responsibilities through the lens of GitHub's published policies — the [Terms of Service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service), [Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), [Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), and [Appeal and Reinstatement](https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement) procedures — and derives concrete best practices for every developer who installs, extends, or contributes to this project.
 
 ---
 
@@ -113,7 +113,7 @@ Section 6 of the Acceptable Use Policies prohibits exploiting the service. GitHu
 
 ### Site Access and Safety
 
-The Acceptable Use Policies (Section 5) prohibit using GitHub's infrastructure to attack external services. The `qa` skill uses Playwright to interact with URLs provided by developers. Developers must not configure the QA skill to systematically probe external services they do not own. The skill is designed to test your own deployed preview or staging environment, not to crawl or fuzz third-party websites. Using it to repeatedly hit an external API endpoint could constitute unauthorized access to that service and violates GitHub's policies.
+The Acceptable Use Policies (Section 5) prohibit using GitHub's platform to attack external services. The `qa` skill uses Playwright to interact with URLs provided by developers. Developers must not configure the QA skill to systematically probe external services they do not own. The skill is designed to test your own deployed preview or staging environment, not to crawl or fuzz third-party websites. Using it to repeatedly hit an external API endpoint could constitute unauthorized access to that service and violates GitHub's policies.
 
 ---
 
@@ -192,7 +192,7 @@ GitHub GStack Intelligence is not:
 
 ## Conclusion
 
-GitHub GStack Intelligence is a good-faith, policy-compliant project designed to bring high-quality engineering automation to any repository through GitHub's existing infrastructure. Its architecture — credentials in Secrets, state in Git, access gated by repository permissions, audit trail committed with every action — is built with compliance and transparency as first principles.
+GitHub GStack Intelligence is a good-faith, policy-compliant project designed to bring high-quality engineering automation to any repository through GitHub's existing platform. Its architecture — credentials in Secrets, state in Git, access gated by repository permissions, audit trail committed with every action — is built with compliance and transparency as first principles.
 
 Compliant, beneficial use requires developers to understand that GitHub's Terms and Acceptable Use Policies apply to automated actions exactly as they apply to human actions; that the agent's output is the maintainer's responsibility; that LLM API calls transmit repository content to third parties; and that the agent's power to commit code and trigger deployments must be balanced by human review at key decision points.
 

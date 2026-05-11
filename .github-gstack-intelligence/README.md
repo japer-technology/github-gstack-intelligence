@@ -1,6 +1,6 @@
 # GitHub GStack Intelligence
 
-A repository-local AI framework that plugs into a developer’s existing workflow. Instead of external chat tools, it uses GitHub Issues for conversation, Git for persistent versioned memory, and GitHub Actions for execution. Installed by adding one folder to a repo, it delivers low-infrastructure, auditable, user-owned automation by committing every prompt/response and code change to the codebase.
+A repository-local AI framework that plugs into a developer’s existing workflow. Instead of external chat tools, it uses GitHub Issues for conversation, Git for persistent versioned memory, and GitHub Actions for execution. Installed by adding one folder to a repo, it delivers low-overhead, auditable, user-owned automation by committing every prompt/response and code change to the codebase.
 
 ## Installation
 
@@ -48,7 +48,7 @@ Your repository _is_ the AI workspace. The questions, the results, the code, the
 | Capability | Why it matters |
 |---|---|
 | **Single workflow, any repo** | Add one workflow file, run it once, and the agent installs itself. Nothing to host or maintain. |
-| **Zero infrastructure** | Runs on GitHub Actions with your repo as the only backend. |
+| **Zero servers** | Runs on GitHub Actions with your repo as the only backend. |
 | **Persistent memory** | Conversations are committed to git - the agent remembers everything across sessions. |
 | **Full auditability** | Every interaction is versioned; review or roll back any change the agent made. |
 | **Multi-provider LLM support** | Works with Anthropic, OpenAI, Google Gemini, xAI, DeepSeek, Mistral, Groq, and any OpenRouter model. |
@@ -62,7 +62,7 @@ This project is a [Githubification](https://github.com/japer-technology/githubif
 
 ### What is Githubification?
 
-Githubification is the act of converting a repository into **GitHub-as-infrastructure**. Instead of cloning a repo and running the software on your machine, the repo becomes something that runs on GitHub itself. Four GitHub primitives serve four roles:
+Githubification is the act of converting a repository into **a GitHub-native runtime**. Instead of cloning a repo and running the software on your machine, the repo becomes something that runs on GitHub itself. Four GitHub primitives serve four roles:
 
 | GitHub Primitive | Role |
 |---|---|
@@ -159,7 +159,7 @@ flowchart TD
     style N fill:#504CAF,color:#fff
 ```
 
-A technical framework designed to integrate a repository-local AI agent directly into a developer's existing workflow. Unlike external chat platforms, this system uses GitHub Issues as a conversational interface and leverages Git as a persistent memory bank, ensuring all interactions and code changes are versioned and owned by the user. Operating entirely through GitHub Actions, the tool provides a low-infrastructure solution that can be installed by adding a single folder to any repository. The project emphasizes full auditability and data sovereignty by committing every prompt and response to the codebase, allowing the agent to perform tasks such as editing files and summarizing long-term project history.
+A technical framework designed to integrate a repository-local AI agent directly into a developer's existing workflow. Unlike external chat platforms, this system uses GitHub Issues as a conversational interface and leverages Git as a persistent memory bank, ensuring all interactions and code changes are versioned and owned by the user. Operating entirely through GitHub Actions, the tool provides a low-overhead solution that can be installed by adding a single folder to any repository. The project emphasizes full auditability and data sovereignty by committing every prompt and response to the codebase, allowing the agent to perform tasks such as editing files and summarizing long-term project history.
 ### Key Concepts
 
 | Concept | Description |

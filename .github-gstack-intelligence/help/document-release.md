@@ -38,7 +38,7 @@ The skill is mostly automated — it makes obvious factual updates directly and 
 The `/document-release` skill performs a comprehensive documentation audit across the entire project, cross-referencing every `.md` file against the shipped diff.
 
 ### Step 1 — Pre-flight & Diff Analysis
-Checks the current branch (aborts if on the base branch). Gathers the diff stat, commit log, and changed file list. Discovers all documentation files in the repo. Classifies changes into categories: new features, changed behavior, removed functionality, and infrastructure.
+Checks the current branch (aborts if on the base branch). Gathers the diff stat, commit log, and changed file list. Discovers all documentation files in the repo. Classifies changes into categories: new features, changed behavior, removed functionality, and platform/deployment changes.
 
 ### Step 2 — Per-File Documentation Audit
 Reads each documentation file and cross-references it against the diff using generic heuristics:
