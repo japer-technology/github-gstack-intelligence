@@ -10,7 +10,7 @@ If you discover a security vulnerability, **do not open a public issue.** Instea
 |----------|-------------|
 | [ETHOS](ETHOS.md) | Builder principles including User Sovereignty — AI recommends, humans decide |
 | [CONTRIBUTING](CONTRIBUTING.md) | Contribution guidelines with security review requirements |
-| [The Githubification](docs/GITHUBIFICATION.md) | How the GitHub-as-infrastructure model handles security boundaries |
+| [The Githubification](docs/GITHUBIFICATION.md) | How the GitHub-as-runtime model handles security boundaries |
 
 ## Security Model
 

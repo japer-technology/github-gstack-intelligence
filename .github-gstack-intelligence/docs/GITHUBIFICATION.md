@@ -4,7 +4,7 @@
 
 Strip away the branding and you arrive at a precise structural claim: **a single YAML file can convert any GitHub repository into a twenty-six-specialist AI engineering team, using only the four primitives GitHub already provides** — Actions for compute, Git for storage, Issues for UI, Secrets for credentials. No servers. No databases. No CLI installations. No SaaS subscriptions.
 
-The claim is real. The implementation backs it up. But what's more interesting than what it *is* today is what it *implies* — about where software engineering infrastructure is going, about what it means to distribute engineering judgment as code, and about the structural advantages that fall out of the specific design decisions made here.
+The claim is real. The implementation backs it up. But what's more interesting than what it *is* today is what it *implies* — about where software engineering platforms are going, about what it means to distribute engineering judgment as code, and about the structural advantages that fall out of the specific design decisions made here.
 
 This document is a brainstorm. It is not a roadmap. It explores what could be built, what should be questioned, what is genuinely novel, and what might be wrong.
 
@@ -14,13 +14,13 @@ But first: this repo does not exist in isolation. It is one node in a much large
 
 ## Part 0: The Ecosystem — 68 Repositories, One Thesis
 
-GitHub GStack Intelligence is part of a family of projects under the [japer-technology](https://github.com/japer-technology) organization — 68 public repositories, all organized around a single thesis: **GitHub itself is a general-purpose AI infrastructure platform**, and every useful AI agent or framework can be adapted to run on it natively.
+GitHub GStack Intelligence is part of a family of projects under the [japer-technology](https://github.com/japer-technology) organization — 68 public repositories, all organized around a single thesis: **GitHub itself is a general-purpose AI runtime platform**, and every useful AI agent or framework can be adapted to run on it natively.
 
 The ecosystem has four layers:
 
 ### Layer 1: The Methodology — Githubification
 
-[githubification](https://github.com/japer-technology/githubification) defines the theory. It identifies three types of repositories (AI agents, non-AI software, hybrids) and five adaptation strategies for converting each into GitHub-native infrastructure. The four-primitive model — Actions as compute, Git as storage, Issues as UI, Secrets as credentials — is not ad hoc. It is a documented methodology with classifications, patterns, and exit criteria.
+[githubification](https://github.com/japer-technology/githubification) defines the theory. It identifies three types of repositories (AI agents, non-AI software, hybrids) and five adaptation strategies for converting each into a GitHub-native runtime. The four-primitive model — Actions as compute, Git as storage, Issues as UI, Secrets as credentials — is not ad hoc. It is a documented methodology with classifications, patterns, and exit criteria.
 
 ### Layer 2: The Githubification Pipeline — 25+ Repos Under Conversion
 
@@ -56,7 +56,7 @@ When a Githubification project completes — when the upstream framework has bee
 | **`github-maximum-intelligence`** | pi-mono with enhancements | Extended capabilities beyond the minimum baseline |
 | **`github-gstack-intelligence`** | pi-mono + garrytan/gstack | **This project.** 26 specialist skills from Garry Tan's engineering toolkit |
 | **`github-pi-mono-intelligence`** | pi-mono directly | Direct pi-mono integration without additional skill layers |
-| **`github-n8n-intelligence`** | n8n | Workflow automation engine running as GitHub-native infrastructure |
+| **`github-n8n-intelligence`** | n8n | Workflow automation engine running as a GitHub-native runtime |
 | **`github-openclaw-intelligence`** | OpenClaw | OpenClaw agent adapted for GitHub |
 | **`github-zeroclaw-intelligence`** | ZeroClaw | Zero-dependency Claw agent |
 | **`github-nanoclaw-intelligence`** | NanoClaw | Lightweight Claw variant |
@@ -65,19 +65,18 @@ When a Githubification project completes — when the upstream framework has bee
 
 Every `github-*-intelligence` repo follows the same structural contract: a single workflow file installs the agent, Issues are the UI, Git is the memory, Actions is the compute. They are designed to coexist — multiple intelligence agents can run in the same repository, each responding to its own prefix or namespace.
 
-### Layer 4: The Infrastructure — Supervision, Monitoring, Emergency
+### Layer 4: The Coordination Layer — Supervision, Monitoring, Emergency
 
 Above the individual agents sits a coordination layer:
 
 | Repository | Role |
 |---|---|
-| **`github-intelligence`** | The umbrella — GitHub as AI Infrastructure itself |
+| **`github-intelligence`** | The umbrella — GitHub as an AI runtime itself |
 | **`github-intelligence-dashboard`** | Monitoring dashboard across all intelligence agents |
 | **`github-intelligence-supervisor`** | Supervisor that oversees agent behavior and health |
 | **`github-intelligence-overwatch`** | Cross-repo oversight and coordination |
 | **`github-intelligence-emergency`** | Emergency response and incident handling |
 | **`github-claw`** | Template repository for bootstrapping new Claw-based agents |
-| **`github-fabric`** | Fabric framework for agent composition |
 
 And proof-of-concept deployments — live GMI instances running on specific models, each with a hatched identity:
 
@@ -110,7 +109,7 @@ This is a genuine distribution innovation. The unit of distribution is a workflo
 
 The japer-technology organization has already generalized this pattern across ten-plus intelligence repos. `github-minimum-intelligence` is the base template. `github-gstack-intelligence` adds Garry Tan's skills. `github-n8n-intelligence` adds workflow automation. `github-openclaw-intelligence`, `github-zeroclaw-intelligence`, `github-nanoclaw-intelligence`, `github-moltis-intelligence`, and `github-agenticana-intelligence` each bring a different agent framework to the same delivery model. The five live GMI instances (Banach, Cantor, Cayley, Boral, Abel) prove the pattern works across OpenAI, Anthropic, Google, xAI, and OpenRouter.
 
-**Brainstorm question:** The catalog of YAML files already exists in embryo. What's missing is the *composition* layer: can a user install three intelligence agents into one repo and have them collaborate? The prefix-gating infrastructure (`/` for GStack, `@` for GMI, `!` for a compliance agent) supports namespace separation. But collaboration — one agent reading another's results, one agent delegating to another — requires a protocol that doesn't exist yet.
+**Brainstorm question:** The catalog of YAML files already exists in embryo. What's missing is the *composition* layer: can a user install three intelligence agents into one repo and have them collaborate? The prefix-gating mechanism (`/` for GStack, `@` for GMI, `!` for a compliance agent) supports namespace separation. But collaboration — one agent reading another's results, one agent delegating to another — requires a protocol that doesn't exist yet.
 
 ### 2. Engineering judgment as portable intellectual property
 
@@ -266,7 +265,7 @@ Branch protection is coarse-grained (protect a branch). These skills are fine-gr
 
 ### 17. Multi-agent repositories — the ecosystem's defining question
 
-The `config.json` has a `prefixGating` field with a `/` prefix, and `agent.ts` checks for reserved prefixes (backtick, tilde, `@`). This is infrastructure for multi-agent coexistence. The japer-technology ecosystem already has the agents to fill these slots:
+The `config.json` has a `prefixGating` field with a `/` prefix, and `agent.ts` checks for reserved prefixes (backtick, tilde, `@`). This is the foundation for multi-agent coexistence. The japer-technology ecosystem already has the agents to fill these slots:
 
 - **GitHub GStack Intelligence** responding to `/review`, `/qa`, `/ship` — the engineering specialists
 - **GitHub Minimum Intelligence** responding to general conversation — the base conversational agent
@@ -278,7 +277,7 @@ This is not a theoretical list. These repos exist. Each follows the same structu
 
 The question is no longer *whether* multiple agents can coexist — it's *how they coordinate*. Can GStack Intelligence's `/ship` skill check for a review result produced by a *different* intelligence agent? Can the `github-intelligence-supervisor` repo oversee all agents running across an org's repositories? Can the `github-intelligence-overwatch` repo detect when two agents are working at cross-purposes on the same PR?
 
-The infrastructure repos — `github-intelligence-dashboard`, `github-intelligence-supervisor`, `github-intelligence-overwatch`, `github-intelligence-emergency` — suggest this coordination layer is being built. The dashboard provides visibility. The supervisor provides governance. Overwatch provides cross-repo correlation. Emergency provides incident response.
+The coordination repos — `github-intelligence-dashboard`, `github-intelligence-supervisor`, `github-intelligence-overwatch`, `github-intelligence-emergency` — suggest this coordination layer is being built. The dashboard provides visibility. The supervisor provides governance. Overwatch provides cross-repo correlation. Emergency provides incident response.
 
 **Brainstorm idea:** An inter-agent protocol where skills can declare dependencies on other agents' outputs. The state directory (`.github-*-intelligence/state/`) becomes a shared contract surface — a filesystem-based message bus, versioned in Git, where agents read each other's results. The `github-intelligence-supervisor` enforces the protocol: before `/ship` runs, it checks that `state/results/review/` contains a result from *any* recognized intelligence agent.
 
@@ -350,7 +349,7 @@ If I had to choose five things to build next, in order:
 
 3. **Visual regression testing.** Extend the browser module to capture baseline screenshots on merge to main and compare them on subsequent PRs. This is a natural extension of the existing canary and design-review capabilities.
 
-4. **Multi-source skill refresh.** Generalize `run-refresh-gstack` to pull skills from multiple upstream repositories, each tracked independently in `source.json`. This enables the skill marketplace scenario without building marketplace infrastructure upfront.
+4. **Multi-source skill refresh.** Generalize `run-refresh-gstack` to pull skills from multiple upstream repositories, each tracked independently in `source.json`. This enables the skill marketplace scenario without building a marketplace from scratch.
 
 5. **Self-extending skills.** Enable the `skill-creator` meta-skill to add new skills to the running installation — authoring the prompt, updating `config.json`, and adding routing — all within a single issue conversation. The agent that improves itself.
 
@@ -358,17 +357,17 @@ If I had to choose five things to build next, in order:
 
 ## Closing Thought
 
-The most interesting thing about GitHub GStack Intelligence is not that it puts an AI agent in your repository. Many projects do that. The interesting thing is that it is one member of a family — ten intelligence agents, twenty-five Githubification projects, five live model deployments, four infrastructure services — all built on the same structural thesis: GitHub already provides everything a production AI system needs.
+The most interesting thing about GitHub GStack Intelligence is not that it puts an AI agent in your repository. Many projects do that. The interesting thing is that it is one member of a family — ten intelligence agents, twenty-five Githubification projects, five live model deployments, four coordination services — all built on the same structural thesis: GitHub already provides everything a production AI system needs.
 
 Look at the ecosystem from a distance:
 
 - The **Githubification pipeline** (`githubification-*`) is the intake — forking AutoGPT, OpenHands, LangChain, Codex, n8n, and others, studying each for GitHub-native adaptation.
 - The **intelligence family** (`github-*-intelligence`) is the output — finished, insertable agents that any repository can adopt by copying a single file.
-- The **infrastructure layer** (`github-intelligence-*`) is the governance — dashboard, supervisor, overwatch, emergency — providing visibility and coordination across all agents.
+- The **coordination layer** (`github-intelligence-*`) is the governance — dashboard, supervisor, overwatch, emergency — providing visibility and coordination across all agents.
 - The **live instances** (`gmi-*`) are the proof — Banach, Cantor, Cayley, Boral, Abel — named AI agents running on five different LLM providers, each with a hatched personality, each conversing through Issues, each remembering through Git.
 
-GitHub GStack Intelligence sits at the intersection of the pipeline and the output. It takes Garry Tan's engineering judgment — authored at YC, forged across decades of building and advising — and delivers it through the same single-file installation pattern that every sibling intelligence agent uses. The skills are Tan's. The distribution model is the ecosystem's. The infrastructure they run on was already in every developer's GitHub account.
+GitHub GStack Intelligence sits at the intersection of the pipeline and the output. It takes Garry Tan's engineering judgment — authored at YC, forged across decades of building and advising — and delivers it through the same single-file installation pattern that every sibling intelligence agent uses. The skills are Tan's. The distribution model is the ecosystem's. The platform they run on was already in every developer's GitHub account.
 
 The question this ecosystem poses is not "can AI agents run on GitHub?" That's answered. The question is: **what happens when every repository in an organization has multiple specialized AI agents installed, each bringing different skills from different authors, all coordinated by a supervision layer, all storing state in the same Git history?** That's not an engineering team metaphor anymore. That's an engineering operating system.
 
-Whether that's the future of software development or an elaborate overreach depends on execution. But as a structural idea — sixty-eight repositories, one thesis, zero new infrastructure — it's the most internally consistent vision of AI-assisted engineering currently being built in public.
+Whether that's the future of software development or an elaborate overreach depends on execution. But as a structural idea — sixty-eight repositories, one thesis, zero new servers or services — it's the most internally consistent vision of AI-assisted engineering currently being built in public.

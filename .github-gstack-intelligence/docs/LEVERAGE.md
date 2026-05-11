@@ -1,12 +1,12 @@
 # Leveraging GStack: How Skill Architecture Creates Compound Intelligence
 
-**A technical analysis of how `github-gstack-intelligence` can leverage the upstream [gstack](https://github.com/garrytan/gstack) framework's skill designs, session intelligence, and tooling infrastructure to build a differentiated GitHub-native AI engineering platform.**
+**A technical analysis of how `github-gstack-intelligence` can leverage the upstream [gstack](https://github.com/garrytan/gstack) framework's skill designs, session intelligence, and tooling layer to build a differentiated GitHub-native AI engineering platform.**
 
 ---
 
 ## 1. Executive Summary
 
-The upstream [garrytan/gstack](https://github.com/garrytan/gstack) repository has evolved from a collection of Claude Code skill templates into a comprehensive AI engineering framework with four distinct innovation layers: **visual design generation**, **browser-agent feedback loops**, **ML-based security**, and **self-learning infrastructure**. Each of these layers is documented in dedicated design documents (`docs/designs/**`) and represents a significant engineering investment.
+The upstream [garrytan/gstack](https://github.com/garrytan/gstack) repository has evolved from a collection of Claude Code skill templates into a comprehensive AI engineering framework with four distinct innovation layers: **visual design generation**, **browser-agent feedback loops**, **ML-based security**, and **self-learning capabilities**. Each of these layers is documented in dedicated design documents (`docs/designs/**`) and represents a significant engineering investment.
 
 This paper analyzes how each upstream capability maps to `github-gstack-intelligence`'s GitHub-native architecture — where GitHub Issues are conversations, Git is memory, and GitHub Actions are the runtime — and identifies concrete leverage opportunities that would be impractical to build independently.
 
@@ -51,13 +51,13 @@ This is the architecture that `github-gstack-intelligence` can leverage — not 
 
 ## 3. Design Document Analysis: What Each Design Enables
 
-### 3.1 Self-Learning Infrastructure (SELF_LEARNING_V0.md)
+### 3.1 Self-Learning Layer (SELF_LEARNING_V0.md)
 
 **What it describes:** A 7-release roadmap from basic learnings persistence to fully autonomous feature shipping (`/autoship`). Four state systems — Learnings, Timeline, Checkpoints, Health — each stored as JSONL in a per-project directory.
 
 **Leverage for github-gstack-intelligence:**
 
-The self-learning infrastructure is the single highest-leverage design to adopt. Currently, `github-gstack-intelligence` persists results to `state/results/` as JSON files keyed by PR or issue number. This is equivalent to gstack's Release 1 ("GStack Learns") but without structured typing, confidence scoring, or cross-session injection.
+The self-learning layer is the single highest-leverage design to adopt. Currently, `github-gstack-intelligence` persists results to `state/results/` as JSON files keyed by PR or issue number. This is equivalent to gstack's Release 1 ("GStack Learns") but without structured typing, confidence scoring, or cross-session injection.
 
 | GStack Capability | Current State in This Repo | Leverage Opportunity |
 |---|---|---|
@@ -66,7 +66,7 @@ The self-learning infrastructure is the single highest-leverage design to adopt.
 | **Cross-skill learnings** | Skills operate independently | When `/review` finds a pattern, `/qa` should know about it on the next run |
 | **Timeline events** | Implicit in git history | Explicit `state/timeline.jsonl` with skill, branch, outcome per invocation |
 | **Context recovery** | Session files in `state/sessions/` | On session resume, inject recent learnings and last checkpoint into prompt |
-| **Health scoring** | No composite quality metric | Add `/health` equivalent using repo's existing linter/test infrastructure |
+| **Health scoring** | No composite quality metric | Add `/health` equivalent using the repo's existing linter and test setup |
 | **Adaptive ceremony** (Release 4) | All PRs get same review depth | Scope-aware review depth based on diff size, change class, and trust history |
 
 **Concrete implementation path:**
@@ -76,7 +76,7 @@ The self-learning infrastructure is the single highest-leverage design to adopt.
 3. Add `state/timeline.jsonl` — one line per skill invocation with timestamp, skill, branch, outcome
 4. Use timeline data to power `/retro` with actual cross-session history
 
-**Why this matters:** Every other AI coding tool (Cursor, Windsurf, Copilot) starts fresh per session. GStack's self-learning infrastructure means the 20th review on the same codebase is categorically better than the 1st. This repo already has the persistence layer (Git) — it just needs the structured schema.
+**Why this matters:** Every other AI coding tool (Cursor, Windsurf, Copilot) starts fresh per session. GStack's self-learning layer means the 20th review on the same codebase is categorically better than the 1st. This repo already has the persistence layer (Git) — it just needs the structured schema.
 
 ---
 
@@ -244,7 +244,7 @@ Currently, every PR gets the same review depth. Adaptive ceremony would:
 1. Classify the PR's scope (TINY/SMALL/MEDIUM/LARGE based on diff stats)
 2. Detect change class (docs, tests, config, frontend, backend, migrations, auth, infra)
 3. Apply the appropriate ceremony level
-4. Never fast-track: migrations, auth changes, new API endpoints, infrastructure changes
+4. Never fast-track: migrations, auth changes, new API endpoints, deploy/CI changes
 
 ### 4.3 The /autoship Pipeline (Self-Learning Release 5)
 
@@ -327,13 +327,13 @@ This architectural difference creates unique leverage:
 | Canary runs on user's machine | Canary runs in **CI on every deploy** — automated, consistent, no setup |
 | Design mockups generated locally | Design mockups **committed and linked in PR comments** — part of the review record |
 
-The fundamental leverage is this: gstack builds the **intelligence** — the skills, the learning infrastructure, the review army, the design tools, the security layers. `github-gstack-intelligence` provides the **platform** — persistent storage, event-driven execution, team visibility, and full auditability. Together, they create something neither could build alone: a **self-improving, team-aware AI engineering platform that runs entirely on GitHub**.
+The fundamental leverage is this: gstack builds the **intelligence** — the skills, the learning layer, the review army, the design tools, the security layers. `github-gstack-intelligence` provides the **platform** — persistent storage, event-driven execution, team visibility, and full auditability. Together, they create something neither could build alone: a **self-improving, team-aware AI engineering platform that runs entirely on GitHub**.
 
 ---
 
 ## 7. Conclusion
 
-The gstack design documents reveal a framework that has evolved far beyond individual skill templates. The self-learning infrastructure (Releases 1-7) describes a path from "AI that forgets everything" to "AI that compounds institutional knowledge." The visual design tools close the gap between text descriptions and actual mockups. The ML security layer provides defense-in-depth against prompt injection. The browser-agent feedback loops create structured user interaction patterns.
+The gstack design documents reveal a framework that has evolved far beyond individual skill templates. The self-learning layer (Releases 1-7) describes a path from "AI that forgets everything" to "AI that compounds institutional knowledge." The visual design tools close the gap between text descriptions and actual mockups. The ML security layer provides defense-in-depth against prompt injection. The browser-agent feedback loops create structured user interaction patterns.
 
 For `github-gstack-intelligence`, the leverage opportunity is clear: adopt the **intelligence layer** (learnings, timeline, context recovery, health scoring) from upstream while building on the **platform advantages** (Git persistence, GitHub Actions execution, PR integration, team visibility) that are unique to this repo.
 

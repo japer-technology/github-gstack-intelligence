@@ -188,7 +188,7 @@ No route optimization. No analytics. Just visibility.
 
 ## Recommended Approach
 Approach A: Mobile-first PWA with SSE for location updates.
-Ship in 2 weeks. Cost: $0 infrastructure (Cloudflare Workers + D1).
+Ship in 2 weeks. Cost: $0 hosting (Cloudflare Workers + D1).
 
 ## The Assignment
 Call Sarah. Ask her to use the prototype for one full shift tomorrow.

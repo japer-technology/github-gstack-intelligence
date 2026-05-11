@@ -26,7 +26,7 @@
 | **Agent identity** | `.github-gstack-intelligence/AGENTS.md` | ✅ Present (not yet hatched) |
 | **System prompt** | `.github-gstack-intelligence/.pi/APPEND_SYSTEM.md` | ✅ Configured |
 | **Bootstrap** | `.github-gstack-intelligence/.pi/BOOTSTRAP.md` | ✅ Configured — hatching personality flow |
-| **GitHub Pages** | `run-gitpages` job in workflow | ✅ Production — publishes `public-fabric/` |
+| **GitHub Pages** | `run-gitpages` job in workflow | ✅ Production — publishes `public-site/` |
 | **Verification step** | In workflow YML | ✅ Production — validates all extracted files exist, have content ≥50 bytes, contain generated marker |
 | **Analysis documents** | `.github-gstack-intelligence/docs/analysis/` | ✅ Complete — 2 overview docs + 8 detailed plan docs |
 | **Slash-command parser** | Inside `router.ts` | ✅ Production — parses all 26 commands, validates URL arguments, case-insensitive |

@@ -33,7 +33,7 @@ An analysis of how gstack's skills are utilised across frameworks and how this r
 
 ## Executive Summary
 
-GitHub GStack Intelligence takes 26 of gstack's 39 skills and projects them onto GitHub's native infrastructure (Actions, Issues, Git, Secrets). This analysis reveals that the upstream gstack project has evolved significantly beyond what this repository currently captures — shipping four major capability layers (Learnings, Review Army, Session Intelligence, and the Design binary) that have no equivalent in the Githubified version. The gap represents both a risk (divergence from upstream value) and an opportunity (each upstream capability has a natural GitHub-native analogue).
+GitHub GStack Intelligence takes 26 of gstack's 39 skills and projects them onto GitHub's native primitives (Actions, Issues, Git, Secrets). This analysis reveals that the upstream gstack project has evolved significantly beyond what this repository currently captures — shipping four major capability layers (Learnings, Review Army, Session Intelligence, and the Design binary) that have no equivalent in the Githubified version. The gap represents both a risk (divergence from upstream value) and an opportunity (each upstream capability has a natural GitHub-native analogue).
 
 The optimisations in this paper are ordered by impact-to-effort ratio. The highest-value changes are:
 
@@ -232,7 +232,7 @@ Each matrix job runs the `/review` skill with a specialist-specific prompt prefi
 - Classify change type by file paths (docs/ = docs, migrations/ = migration, src/auth/ = auth, etc.).
 - Look up trust signals from `learnings.jsonl` (consecutive clean reviews for this change class).
 
-**Guard rails:** Never fast-track migrations, auth/permission changes, new API endpoints, or infrastructure changes regardless of trust level.
+**Guard rails:** Never fast-track migrations, auth/permission changes, new API endpoints, or deploy/CI changes regardless of trust level.
 
 **Impact:** Reduces median review time and cost by 50-70% for repositories with a mix of trivial and complex PRs. Concentrates LLM budget on changes that actually need deep analysis.
 
@@ -303,7 +303,7 @@ if (codeFiles.length === 0) {
 
 **Impact:** On typical repositories, 15-25% of PRs are documentation, CI, or dependency updates. Filtering these saves the corresponding LLM costs entirely.
 
-**Effort:** Small. Pure router logic, no infrastructure changes.
+**Effort:** Small. Pure router logic, no platform changes.
 
 ### 3.4 Browser Skill Optimisation
 
@@ -343,7 +343,7 @@ if (codeFiles.length === 0) {
 | L6: Transparent blocking | Show user what was caught | Post a comment explaining the block when injection is detected |
 
 **Defer for now:**
-- L2 (DeBERTa classifier): Requires WASM/ONNX runtime not available in GitHub Actions without significant infrastructure.
+- L2 (DeBERTa classifier): Requires WASM/ONNX runtime not available in GitHub Actions without significant additional setup.
 - L3 (Page content scan): Only relevant for browser skills, lower priority.
 
 **Impact:** Defends against the most common prompt injection vectors (social engineering via issue content). The regex layer alone catches ~60% of known attack patterns. XML framing prevents the most dangerous class of attacks (role confusion).
@@ -465,7 +465,7 @@ Combining impact, effort, and dependency analysis into an implementation sequenc
 
 ## Conclusion
 
-GitHub GStack Intelligence is structurally sound — the single-YAML-file installation model, Git-native state persistence, and event-driven skill routing are correctly architected. The core constraint is that the repo captures a *snapshot* of gstack's capabilities but not the *compounding infrastructure* that makes those capabilities grow more valuable over time.
+GitHub GStack Intelligence is structurally sound — the single-YAML-file installation model, Git-native state persistence, and event-driven skill routing are correctly architected. The core constraint is that the repo captures a *snapshot* of gstack's capabilities but not the *compounding learning layer* that makes those capabilities grow more valuable over time.
 
 The upstream gstack has evolved from a flat collection of skill prompts into a four-layer system: Learnings make every session smarter. The Review Army multiplies coverage. Session Intelligence eliminates context loss. Adaptive Ceremony matches effort to risk. Each layer depends on the ones below it.
 

@@ -28,7 +28,7 @@ Beyond the CLI binary, GMI uses the following pi-mono feature categories:
 
 See [docs/analysis/pi-mono-feature-utilization.md](docs/analysis/pi-mono-feature-utilization.md) for a full audit of used vs. available features.
 
-## Infrastructure Dependencies
+## Platform Dependencies
 
 These are not package dependencies but are required for the system to function:
 
@@ -50,7 +50,7 @@ These are referenced in `.github/workflows/`:
 | [oven-sh/setup-bun@v2](https://github.com/oven-sh/setup-bun) | agent | Installs the Bun runtime in the GitHub Actions environment. |
 | [actions/cache@v5](https://github.com/actions/cache) | agent | Caches `node_modules` keyed on the `bun.lock` hash to speed up dependency installation. |
 | [actions/configure-pages@v5](https://github.com/actions/configure-pages) | agent | Configures GitHub Pages deployment (auto-enables Pages when the repo is used as a template). |
-| [actions/upload-pages-artifact@v4](https://github.com/actions/upload-pages-artifact) | agent | Uploads the static site artifact from `.github-gstack-intelligence/public-fabric/`. |
+| [actions/upload-pages-artifact@v4](https://github.com/actions/upload-pages-artifact) | agent | Uploads the static site artifact from `.github-gstack-intelligence/public-site/`. |
 | [actions/deploy-pages@v4](https://github.com/actions/deploy-pages) | agent | Deploys the uploaded artifact to GitHub Pages. |
 
 ## LLM Provider Dependencies (one required)
@@ -74,7 +74,7 @@ These are pulled in transitively by `@mariozechner/pi-coding-agent`:
 | Package | Description |
 |---------|-------------|
 | `@anthropic-ai/sdk` | Official Anthropic API client for Claude models. |
-| `@aws-sdk/client-bedrock-runtime` | AWS Bedrock client for accessing models via AWS infrastructure. |
+| `@aws-sdk/client-bedrock-runtime` | AWS Bedrock client for accessing models via AWS. |
 | `openai` | Official OpenAI API client. |
 | `@google/genai` | Google's Generative AI SDK for Gemini models. |
 | `fast-xml-parser` | Fast XML parser used by AWS SDK internals. |
