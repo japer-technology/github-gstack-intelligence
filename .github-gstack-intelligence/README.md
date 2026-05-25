@@ -25,7 +25,7 @@ A repository-local AI framework that plugs into a developer’s existing workflo
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![AI](https://img.shields.io/badge/Assisted-Development-2b2bff?logo=openai&logoColor=white) [![github-gstack-intelligence-agent](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml/badge.svg)](https://github.com/japer-technology/github-gstack-intelligence/actions/workflows/github-gstack-intelligence-agent.yml)
 
-Powered by [pi-mono](https://github.com/badlogic/pi-mono), conversation history is committed to git, giving your agent long-term memory across sessions. It can search prior context, edit or summarize past conversations, and all changes are versioned.
+Powered by [pi-mono](https://github.com/earendil-works/pi), conversation history is committed to git, giving your agent long-term memory across sessions. It can search prior context, edit or summarize past conversations, and all changes are versioned.
 
 ---
 
@@ -462,4 +462,4 @@ Requires `OPENROUTER_API_KEY`. Browse available models at [openrouter.ai](https:
 | Groq | `groq` | `deepseek-r1-distill-llama-70b` | `GROQ_API_KEY` |
 | OpenRouter | `openrouter` | any model on [openrouter.ai](https://openrouter.ai/) | `OPENROUTER_API_KEY` |
 
-> **Tip:** The `pi` agent supports many more providers and models. Run `pi --help` or see the [pi-mono docs](https://github.com/badlogic/pi-mono) for the full list.
+> **Tip:** The `pi` agent supports many more providers and models. Run `pi --help` or see the [pi-mono docs](https://github.com/earendil-works/pi) for the full list.

@@ -9,7 +9,7 @@
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [@mariozechner/pi-coding-agent](https://github.com/badlogic/pi-mono) | 0.65.1 | Coding agent CLI with read, bash, edit, and write tools and session management. This is the core AI agent that powers the entire GStack Intelligence system - it processes prompts, interacts with LLM providers, and manages conversation sessions. |
+| [@earendil-works/pi-coding-agent](https://github.com/earendil-works/pi) | 0.75.5 | Coding agent CLI with read, bash, edit, and write tools and session management. This is the core AI agent that powers the entire GStack Intelligence system - it processes prompts, interacts with LLM providers, and manages conversation sessions. |
 
 ### pi-mono Feature Surface
 
@@ -69,7 +69,7 @@ An API key from at least one supported LLM provider is needed:
 
 ## Transitive Dependencies (notable)
 
-These are pulled in transitively by `@mariozechner/pi-coding-agent`:
+These are pulled in transitively by `@earendil-works/pi-coding-agent`:
 
 | Package | Description |
 |---------|-------------|
