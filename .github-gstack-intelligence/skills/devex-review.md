@@ -15,6 +15,10 @@ voice-triggers:
   - "test the developer experience"
   - "try the onboarding"
   - "developer experience test"
+triggers:
+  - live dx audit
+  - test developer experience
+  - measure onboarding time
 allowed-tools:
   - Read
   - Edit
@@ -57,7 +61,7 @@ Not reading about the experience. TESTING it.
 Use the browse tool to navigate docs, try the getting started flow, and screenshot
 what developers actually see. Use bash to try CLI commands. Measure, don't guess.
 
-<!-- CI-ADAPTED: {{DX_FRAMEWORK}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+DX Framework: Score every developer-facing dimension on a 1-10 scale with evidence. Key dimensions: Getting Started (TTHW — Time To Hello World), API/CLI Ergonomics, Error Messages (actionable, not cryptic), Documentation (complete, accurate, findable), Upgrade Path (non-breaking, guided migration), Dev Environment (reproducible, fast), Community (responsive, welcoming), Measurement (analytics, feedback loops). Use `.github-gstack-intelligence/skills/references/devex-dx-hall-of-fame.md` as the competitive benchmark reference. A score below 7 in any dimension requires a concrete remediation plan in the review output.
 
 ## Scope Declaration
 
@@ -225,7 +229,7 @@ Flag any dimension where live score < plan score - 2 (reality fell short of plan
 
 Check for prior review results in `.github-gstack-intelligence/state/results/` and GitHub PR review status.
 
-<!-- CI-ADAPTED: {{PLAN_FILE_REVIEW_REPORT}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+Display a Review Readiness Dashboard by reading all JSON entries from `.github-gstack-intelligence/state/results/review/review-log.json`. For each prior review, show: skill name, status (clean/issues_open), timestamp, and commit hash. Flag any review whose commit hash differs from the current HEAD as potentially stale. If the review log file does not exist or contains no entries, show an empty dashboard and note that no prior reviews have been recorded yet.
 
 Persist durable outcomes in `.github-gstack-intelligence/state/results/` when the lifecycle layer is ready to store them.
 

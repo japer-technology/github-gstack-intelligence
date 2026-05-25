@@ -16,6 +16,11 @@ allowed-tools:
   - Glob
   - Agent
   - WebSearch
+triggers:
+  - review this pr
+  - code review
+  - check my diff
+  - pre-landing review
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->
@@ -51,7 +56,7 @@ You are running the `/review` workflow. Analyze the current branch's diff agains
 
 1. Run `git branch --show-current` to get the current branch.
 2. If on the base branch, output: **"Nothing to review — you're on the base branch or have no changes against it."** and stop.
-3. Run `git fetch origin <base> --quiet && git diff origin/<base> --stat` to check if there's a diff. If no diff, output the same message and stop.
+3. Run `git fetch origin <base> --quiet && DIFF_BASE=$(git merge-base origin/<base> HEAD) && git diff "$DIFF_BASE" --stat` to check if there's a diff. If no diff, output the same message and stop.
 
 ---
 
@@ -80,7 +85,49 @@ Fetch the latest base branch to avoid false positives from stale local state:
 git fetch origin <base> --quiet
 ```
 
-Run `git diff origin/<base>` to get the full diff. This includes both committed and uncommitted changes against the latest base branch.
+Compute the merge base, then diff the working tree against that point:
+
+```bash
+DIFF_BASE=$(git merge-base origin/<base> HEAD)
+git diff "$DIFF_BASE"
+```
+
+This includes both committed and uncommitted changes while excluding commits that landed on the base branch after this branch was created.
+
+## Step 3.4: Workspace-aware queue status (advisory)
+
+Check whether this PR's claimed VERSION still points at a free slot in the queue. Advisory only — never blocks review; just informs the reviewer about landing-order risk.
+
+```bash
+BRANCH_VERSION=$(git show HEAD:VERSION 2>/dev/null | tr -d '\r\n[:space:]' || echo "")
+BASE_BRANCH=$(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)
+BASE_VERSION=$(git show origin/$BASE_BRANCH:VERSION 2>/dev/null | tr -d '\r\n[:space:]' || echo "")
+QUEUE_JSON=$(bun run bin/gstack-next-version \
+  --base "$BASE_BRANCH" \
+  --bump patch \
+  --current-version "$BASE_VERSION" 2>/dev/null || echo '{"offline":true}')
+NEXT_SLOT=$(echo "$QUEUE_JSON" | jq -r '.version // empty')
+CLAIMED_COUNT=$(echo "$QUEUE_JSON" | jq -r '.claimed | length // 0')
+OFFLINE=$(echo "$QUEUE_JSON" | jq -r '.offline // false')
+```
+
+- If `OFFLINE=true`: skip this section (no signal to report).
+- Otherwise, include ONE line in the review output: `Version claimed: v<BRANCH_VERSION>. Queue: <CLAIMED_COUNT> PR(s) ahead. <VERDICT>` where VERDICT is either `Slot free` (if `BRANCH_VERSION >= NEXT_SLOT`) or `⚠ queue moved — rerun /ship to reconcile v<BRANCH_VERSION> → v<NEXT_SLOT>`.
+
+---
+
+## Step 3.5: Slop scan (advisory)
+
+Run a slop scan on changed files to catch AI code quality issues (empty catches,
+redundant `return await`, overcomplicated abstractions):
+
+```bash
+bun run slop:diff origin/<base> 2>/dev/null || true
+```
+
+If findings are reported, include them in the review output as an informational
+diagnostic. Slop findings are advisory, never blocking. If slop:diff is not
+available (e.g., slop-scan not installed), skip this step silently.
 
 ---
 
@@ -108,7 +155,7 @@ Use the same confidence bar, but report through GitHub comments and persisted st
 
 ---
 
-<!-- CI-ADAPTED: {{REVIEW_ARMY}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+In CI mode, a single reviewer handles all categories. If the diff is large (>500 lines) or touches security-sensitive files, note in the output that a second human review is recommended for the affected areas. Do not attempt to spawn parallel reviewers.
 
 ---
 
@@ -116,7 +163,7 @@ Use the same confidence bar, but report through GitHub comments and persisted st
 
 **Every finding gets action — not just critical ones.**
 
-<!-- CI-ADAPTED: {{CROSS_REVIEW_DEDUP}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+Before reporting findings, deduplicate: if the same file:line appears in multiple checklist categories, merge into a single finding with the highest severity. Group related findings (e.g., missing null check + missing test for that path) into one actionable item.
 
 ### Step 5a: Classify each finding
 

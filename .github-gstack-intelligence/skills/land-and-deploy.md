@@ -13,6 +13,10 @@ allowed-tools:
   - Write
   - Glob
 sensitive: true
+triggers:
+  - merge and deploy
+  - land the pr
+  - ship to production
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->
@@ -167,7 +171,7 @@ Let me take a look at your setup."
 
 Run the deploy configuration bootstrap to detect the platform and settings:
 
-<!-- CI-ADAPTED: {{DEPLOY_BOOTSTRAP}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+Detect deploy platform by scanning the repository for platform indicators: `.fly.toml` (Fly.io), `Procfile` (Heroku), `vercel.json` (Vercel), `netlify.toml` (Netlify), `render.yaml` (Render), `railway.json` (Railway), `.github/workflows/*deploy*.yml` or `*cd*.yml` (GitHub Actions CD), `Dockerfile` + cloud config (container-based). Also check CLAUDE.md and `.github-gstack-intelligence/config.json` for persisted `deploymentUrl` or `platform` settings. If a production URL is detected or configured, verify reachability with `curl -sf <url> -o /dev/null -w '%{http_code}'`. Output detected platform, production URL (if any), deploy workflow (if any), and confidence level.
 
 Parse the output and record: the detected platform, production URL, deploy workflow (if any),
 and any persisted config from CLAUDE.md.
@@ -339,6 +343,49 @@ Record the CI wait time for the deploy report.
 If CI passes within the timeout: Tell the user "CI passed after {duration}. Moving to readiness checks." Continue to Step 4.
 If CI fails: **STOP.** "CI failed. Here's what broke: {failures}. This needs to pass before I can merge."
 If timeout (15 min): **STOP.** "CI has been running for over 15 minutes — that's unusual. Check the GitHub Actions tab to see if something is stuck."
+
+---
+
+## Step 3.4: VERSION drift detection (workspace-aware ship)
+
+Before gathering readiness evidence, verify that the VERSION this PR claims is still the next free slot. A sibling workspace may have shipped and landed since `/ship` ran, leaving this PR's VERSION stale.
+
+```bash
+BRANCH_VERSION=$(git show HEAD:VERSION 2>/dev/null | tr -d '\r\n[:space:]' || echo "")
+BASE_BRANCH=$(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)
+BASE_VERSION=$(git show origin/$BASE_BRANCH:VERSION 2>/dev/null | tr -d '\r\n[:space:]' || echo "")
+
+# Imply bump level by comparing branch VERSION to base (crude but good enough for drift detection)
+# We don't need the exact original level — we just need "a level" that passes to the util.
+# If the minor digit advanced, call it minor; patch digit, patch; etc. If base > branch, skip (not ours to land).
+# For simplicity: use "patch" as a conservative default; util handles collision-past regardless of input level.
+QUEUE_JSON=$(bun run bin/gstack-next-version \
+  --base "$BASE_BRANCH" \
+  --bump patch \
+  --current-version "$BASE_VERSION" 2>/dev/null || echo '{"offline":true}')
+NEXT_SLOT=$(echo "$QUEUE_JSON" | jq -r '.version // empty')
+OFFLINE=$(echo "$QUEUE_JSON" | jq -r '.offline // false')
+```
+
+Behavior:
+
+1. If `OFFLINE=true` or the util fails: print `⚠ VERSION drift check unavailable (util offline) — proceeding with PR version v<BRANCH_VERSION>`. Continue to Step 3.5. CI's version-gate job is the backstop.
+
+2. If `BRANCH_VERSION` is already `>=` than `NEXT_SLOT`: no drift (or our PR is ahead of the queue). Continue.
+
+3. If drift is detected (a PR landed ahead of us and `BRANCH_VERSION < NEXT_SLOT`): **STOP** and print exactly:
+   ```
+   ⚠ VERSION drift detected.
+     This PR claims:  v<BRANCH_VERSION>
+     Next free slot:  v<NEXT_SLOT>   (queue moved since last /ship)
+
+   Rerun /ship from the feature branch to reconcile. /ship's ALREADY_BUMPED
+   branch will detect the drift and rewrite VERSION + CHANGELOG header + PR title
+   atomically. Do NOT merge from here — the landed PR would overwrite the other
+   branch's CHANGELOG entry or land with a duplicate version header.
+   ```
+
+   Exit non-zero. Do NOT auto-bump from `/land-and-deploy` — rerunning `/ship` is the clean path (it already handles VERSION + package.json + CHANGELOG header + PR title atomically via Step 12 ALREADY_BUMPED detection).
 
 ---
 
@@ -585,6 +632,49 @@ If direct merge succeeds: record `MERGE_PATH=direct`. Tell the user: "PR merged 
 
 If the merge fails with a permission error: **STOP.** "I don't have permission to merge this PR. You'll need a maintainer to merge it, or check your repo's branch protection rules."
 
+### 4a-postfail: Post-failure PR-state check
+
+**Universal invariant:** after ANY non-zero exit from `gh pr merge`, query authoritative PR state before retrying or stopping. Do NOT retry `gh pr merge`. Related: cli/cli#3442, cli/cli#13380.
+
+```bash
+gh pr view --json state,mergeCommit,mergedAt,mergedBy
+```
+
+**If `state == "MERGED"`:**
+
+The server-side merge succeeded (possibly completed before the local cleanup phase failed, or a concurrent merge landed). Tell the user: "PR is merged on GitHub." (Do NOT say "the merge succeeded" — this handles the concurrent-merge case.)
+
+Capture merge SHA:
+```bash
+gh pr view --json mergeCommit -q .mergeCommit.oid
+```
+
+Worktree cleanup — non-destructive, candidate-based:
+```bash
+git worktree list --porcelain
+```
+Identify candidates: a worktree is stale if (a) it is checked out on the base branch, AND (b) it is not the user's current main working tree, AND (c) `git status --porcelain` inside it is empty (no uncommitted work).
+
+- For each clean candidate: OFFER to remove it. Say: "There's a stale worktree at `<path>` checked out on `<branch>` with no uncommitted work. Remove it?" Remove only if user confirms (`git worktree remove <path> && git worktree prune`).
+- If any candidate has uncommitted work: list the files, tell the user, and STOP worktree cleanup without removing anything.
+- Do NOT use `--force`. Do NOT remove the user's primary working tree.
+
+Record `MERGE_PATH=direct`, then continue to §4a (CI auto-deploy detection).
+
+**If `state == "OPEN"`:**
+
+Check whether auto-merge is enabled:
+```bash
+gh pr view --json autoMergeRequest -q .autoMergeRequest
+```
+
+- If non-null: auto-merge is enabled or merge queue is in use. The open state is expected — proceed to §4a's merge-queue wait path.
+- If null: genuine failure. Surface both errors — the `gh pr merge` stderr AND the current PR open state — then **STOP**.
+
+**If `state == "CLOSED"`:** PR was closed without merging. **STOP.**
+
+**Hard rule: never call `gh pr merge` a second time** after a non-zero exit. Server state is authoritative.
+
 ### 4a: Merge queue detection and messaging
 
 If `MERGE_PATH=auto` and the PR state does not immediately become `MERGED`, the PR is
@@ -634,7 +724,7 @@ Determine what kind of project this is and how to verify the deploy.
 
 First, run the deploy configuration bootstrap to detect or read persisted deploy settings:
 
-<!-- CI-ADAPTED: {{DEPLOY_BOOTSTRAP}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+Detect deploy platform by scanning the repository for platform indicators: `.fly.toml` (Fly.io), `Procfile` (Heroku), `vercel.json` (Vercel), `netlify.toml` (Netlify), `render.yaml` (Render), `railway.json` (Railway), `.github/workflows/*deploy*.yml` or `*cd*.yml` (GitHub Actions CD), `Dockerfile` + cloud config (container-based). Also check CLAUDE.md and `.github-gstack-intelligence/config.json` for persisted `deploymentUrl` or `platform` settings. If a production URL is detected or configured, verify reachability with `curl -sf <url> -o /dev/null -w '%{http_code}'`. Output detected platform, production URL (if any), deploy workflow (if any), and confidence level.
 
 Then run `gstack-diff-scope` to classify the changes:
 

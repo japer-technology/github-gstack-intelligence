@@ -1,5 +1,5 @@
 {
-  "extractedAt": "2026-04-06T02:24:21.003Z",
+  "extractedAt": "2026-05-25T06:48:35.350Z",
   "source": {
     "repo": "garrytan/gstack",
     "ref": "main",
@@ -61,7 +61,6 @@
     "docs/skills.md",
     "browse/SKILL.md.tmpl",
     "codex/SKILL.md.tmpl",
-    "checkpoint/SKILL.md.tmpl",
     "freeze/SKILL.md.tmpl",
     "unfreeze/SKILL.md.tmpl",
     "gstack-upgrade/SKILL.md.tmpl",
@@ -128,7 +127,6 @@
     "skills/references/gstack-skills-guide.md",
     "skills/references/gstack-browse-skill.md",
     "skills/references/gstack-codex-skill.md",
-    "skills/references/gstack-checkpoint-skill.md",
     "skills/references/gstack-freeze-skill.md",
     "skills/references/gstack-unfreeze-skill.md",
     "skills/references/gstack-upgrade-skill.md",

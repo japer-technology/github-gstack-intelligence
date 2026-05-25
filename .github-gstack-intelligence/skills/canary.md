@@ -13,6 +13,10 @@ allowed-tools:
   - Read
   - Write
   - Glob
+triggers:
+  - monitor after deploy
+  - canary check
+  - watch for errors post-deploy
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->

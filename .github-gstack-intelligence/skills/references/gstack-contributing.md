@@ -19,10 +19,12 @@ gstack skills are Markdown files that Claude Code discovers from a `skills/` dir
 That's what dev mode does. It symlinks your repo into the local `.claude/skills/` directory so Claude Code reads skills straight from your checkout.
 
 ```bash
-git clone <repo> && cd gstack
+git clone https://github.com/garrytan/gstack.git && cd gstack
 bun install                    # install dependencies
 bin/dev-setup                  # activate dev mode
 ```
+
+> **Full clone vs shallow.** The README's user-facing install uses `--depth 1` for speed. As a contributor, use a full clone (no `--depth` flag) — you'll need history for `git log`, `git blame`, `git bisect`, and reviewing PRs against earlier versions. If you already have a `--depth 1` clone from following the README, promote it to a full clone with `git fetch --unshallow`.
 
 Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/review`), and see your changes live. When you're done developing:
 
@@ -240,6 +242,25 @@ For template authoring best practices (natural language over bash-isms, dynamic 
 
 To add a browse command, add it to `browse/src/commands.ts`. To add a snapshot flag, add it to `SNAPSHOT_FLAGS` in `browse/src/snapshot.ts`. Then rebuild.
 
+## Jargon list (V1 writing style)
+
+gstack's Writing Style section (injected into every tier-≥2 skill's preamble)
+glosses technical terms on first use per skill invocation. The list of terms
+that qualify for glossing lives at `scripts/jargon-list.json` — ~50 curated
+high-frequency terms (idempotent, race condition, N+1, backpressure, etc.).
+Terms not on the list are assumed plain-English enough.
+
+**Adding or removing a term:** open a PR editing `scripts/jargon-list.json`.
+Run `bun run gen:skill-docs` after the edit — terms are baked into every
+generated SKILL.md at gen time, so changes take effect only after regeneration.
+No runtime loading; no user-side override. The repo list is the source of truth.
+
+Good candidates for addition: high-frequency terms that non-technical users
+encounter in review output without context (common database/concurrency
+terminology, security jargon, frontend framework concepts). Don't add terms
+that only appear in one or two niche skills — the cost-to-value trade isn't
+worth the review overhead.
+
 ## Multi-host development
 
 gstack generates SKILL.md files for 8 hosts from one set of `.tmpl` templates.
@@ -322,6 +343,8 @@ When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It d
 
 **First-time setup:** Put your `ANTHROPIC_API_KEY` in `.env` in the main repo (see `.env.example`). Every Conductor workspace inherits it automatically.
 
+**`GSTACK_*` env prefix (Conductor-injected keys).** Conductor explicitly strips `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` from every workspace's process env. The `.env` copy path doesn't restore them either — the strip happens after env inheritance. Users who want paid evals, `/sync-gbrain` embeddings, or `claude-agent-sdk` calls to work in a Conductor workspace must set `GSTACK_ANTHROPIC_API_KEY` and `GSTACK_OPENAI_API_KEY` in Conductor's workspace env config; Conductor passes those through untouched. On the gstack side, TS entry points import `lib/conductor-env-shim.ts` as a side effect, which promotes `GSTACK_FOO_API_KEY` to `FOO_API_KEY` when the canonical name is empty. If you add a new TS entry point that hits a paid API, add `import "../lib/conductor-env-shim";` to the top of the file. Today the shim is imported from `bin/gstack-gbrain-sync.ts`, `bin/gstack-model-benchmark`, `scripts/preflight-agent-sdk.ts`, and `test/helpers/e2e-helpers.ts`.
+
 ## Things to know
 
 - **SKILL.md files are generated.** Edit the `.tmpl` template, not the `.md`. Run `bun run gen:skill-docs` to regenerate.
@@ -331,6 +354,7 @@ When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It d
 - **Conductor workspaces are independent.** Each workspace is its own git worktree. `bin/dev-setup` runs automatically via `conductor.json`.
 - **`.env` propagates across worktrees.** Set it once in the main repo, all Conductor workspaces get it.
 - **`.claude/skills/` is gitignored.** The symlinks never get committed.
+- **Never write raw `ln -snf` in `setup`.** Every link site in `setup` MUST route through the `_link_or_copy SRC DST` helper near the `IS_WINDOWS` detection. The helper preserves `ln -snf` on Unix and switches to `cp -R` / `cp -f` on Windows without Developer Mode, where plain `ln -snf` produces frozen file copies that don't refresh on `git pull`. `test/setup-windows-fallback.test.ts` enforces this with a static invariant — a single raw `ln` call outside the helper body fails CI.
 
 ## Testing your changes in a real project
 
@@ -377,7 +401,7 @@ to `gstack/...`, so they'll resolve to the global install automatically.
 
 ### Switching prefix mode
 
-If you vendored gstack with one prefix setting and want to switch:
+If you installed gstack with one prefix setting and want to switch:
 
 ```bash
 cd .claude/skills/gstack && ./setup --no-prefix   # switch to /qa, /ship
