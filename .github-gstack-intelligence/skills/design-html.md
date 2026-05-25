@@ -15,6 +15,10 @@ voice-triggers:
   - "build the design"
   - "code the mockup"
   - "make it real"
+triggers:
+  - build the design
+  - code the mockup
+  - make design real
 allowed-tools:
   - Bash
   - Read
@@ -54,6 +58,8 @@ to content, cards size themselves, chat bubbles shrinkwrap, editorial spreads fl
 around obstacles.
 
 Design mockup generation is not available in CI mode. Visual design decisions should be documented in DESIGN.md and reviewed through screenshots and Playwright-captured visual evidence.
+
+<!-- CI-ADAPTED: {{UX_PRINCIPLES}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
 
 Use Playwright for browser automation. Launch a fresh Chromium instance per workflow run with `npx playwright install chromium`. Replace `$B <command>` patterns with Playwright API calls (`page.goto()`, `page.screenshot()`, `page.evaluate()`, etc.). Browser state does not persist between workflow runs.
 

@@ -16,6 +16,10 @@ allowed-tools:
   - Read
   - Write
   - WebSearch
+triggers:
+  - qa report only
+  - just report bugs
+  - test but dont fix
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->

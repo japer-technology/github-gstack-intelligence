@@ -9,12 +9,36 @@ description: |
   "visual brainstorm", or "I don't like how this looks".
   Proactively suggest when the user describes a UI feature but hasn't seen
   what it could look like. (gstack)
+triggers:
+  - explore design variants
+  - show me design options
+  - visual design brainstorm
 allowed-tools:
   - Bash
   - Read
   - Glob
   - Grep
   - Agent
+gbrain:
+  schema: 1
+  context_queries:
+    - id: prior-approved-variants
+      kind: filesystem
+      glob: ".github-gstack-intelligence/state/results/{repo_slug}/designs/*/approved.json"
+      sort: mtime_desc
+      limit: 5
+      render_as: "## Prior approved design variants for this project"
+    - id: design-md
+      kind: filesystem
+      glob: "DESIGN.md"
+      tail: 1
+      render_as: "## DESIGN.md (project design system)"
+    - id: recent-design-docs
+      kind: filesystem
+      glob: ".github-gstack-intelligence/state/results/{repo_slug}/*-design-*.md"
+      sort: mtime_desc
+      limit: 3
+      render_as: "## Recent design docs"
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->
@@ -45,6 +69,8 @@ side-by-side in the user's browser, and iterate until they approve a direction. 
 visual brainstorming, not a review process.
 
 Design mockup generation is not available in CI mode. Visual design decisions should be documented in DESIGN.md and reviewed through screenshots and Playwright-captured visual evidence.
+
+<!-- CI-ADAPTED: {{UX_PRINCIPLES}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
 
 ## Step 0: Session Detection
 
@@ -134,7 +160,14 @@ Two rounds max of context gathering, then proceed with what you have and note as
 
 ## Step 2: Taste Memory
 
-Read prior approved designs to bias generation toward the user's demonstrated taste:
+Read both the persistent taste profile (cross-session) AND the per-session approved
+designs to bias generation toward the user's demonstrated taste.
+
+**Persistent taste profile (v1 schema at `.github-gstack-intelligence/state/results/$SLUG/taste-profile.json`):**
+
+<!-- CI-ADAPTED: {{TASTE_PROFILE}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+
+**Per-session approved.json files (legacy, still supported):**
 
 ```bash
 setopt +o nomatch 2>/dev/null || true
@@ -142,13 +175,16 @@ _TASTE=$(find .github-gstack-intelligence/state/results/$SLUG/designs/ -name "ap
 ```
 
 If prior sessions exist, read each `approved.json` and extract patterns from the
-approved variants. Include a taste summary in the design brief:
-
-"The user previously approved designs with these characteristics: [high contrast,
-generous whitespace, modern sans-serif typography, etc.]. Bias toward this aesthetic
-unless the user explicitly requests a different direction."
+approved variants. Merge these into the taste-profile.json-derived signal — if the
+profile already says "user prefers Geist font" (from aggregated history), the
+approved.json files add the specific recent approval context.
 
 Limit to last 10 sessions. Try/catch JSON parse on each (skip corrupted files).
+
+**Updating taste profile after a design-shotgun session:** When the user picks a
+variant, call `<!-- CI-ADAPTED: {{BIN_DIR}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->/gstack-taste-update approved <variant-path>`. When they
+explicitly reject a variant, call `<!-- CI-ADAPTED: {{BIN_DIR}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->/gstack-taste-update rejected <variant-path>`.
+The CLI handles schema migration from approved.json, decay, and conflict flagging.
 
 ## Step 3: Generate Variants
 
@@ -156,7 +192,7 @@ Set up the output directory:
 
 ```bash
 eval "$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null)"
-_DESIGN_DIR=.github-gstack-intelligence/state/results/$SLUG/designs/<screen-name>-$(date +%Y%m%d)
+_DESIGN_DIR="$HOME/.github-gstack-intelligence/state/local/projects/$SLUG/designs/<screen-name>-$(date +%Y%m%d)"
 mkdir -p "$_DESIGN_DIR"
 echo "DESIGN_DIR: $_DESIGN_DIR"
 ```
@@ -178,6 +214,15 @@ C) "Name" — one-line visual description of this direction
 ```
 
 Draw on DESIGN.md, taste memory, and the user's request to make each concept distinct.
+
+**Anti-convergence directive (hard requirement):** Each variant MUST use a different
+font family, color palette, and layout approach. If two variants look like siblings
+— same typographic feel, overlapping color temperature, comparable layout rhythm —
+one of them failed. Regenerate the weaker one with a deliberately different direction.
+
+Concrete test: if someone could swap the headline text between two variants without
+noticing, they're too similar. Variants should feel like they came from three
+different design teams, not the same team at three different coffee levels.
 
 ### Step 3b: Concept Confirmation
 

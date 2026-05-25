@@ -1,6 +1,7 @@
 ---
 name: plan-devex-review
 preamble-tier: 3
+interactive: true
 version: 2.0.0
 description: |
   Interactive developer experience plan review. Explores developer personas,
@@ -26,6 +27,10 @@ allowed-tools:
   - Glob
   - Bash
   - WebSearch
+triggers:
+  - developer experience review
+  - dx plan review
+  - check developer onboarding
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->
@@ -73,7 +78,7 @@ is higher because you are a chef cooking for chefs.
 
 This skill IS a developer tool. Apply its own DX principles to itself.
 
-<!-- CI-ADAPTED: {{DX_FRAMEWORK}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+DX Framework: Score every developer-facing dimension on a 1-10 scale with evidence. Key dimensions: Getting Started (TTHW — Time To Hello World), API/CLI Ergonomics, Error Messages (actionable, not cryptic), Documentation (complete, accurate, findable), Upgrade Path (non-breaking, guided migration), Dev Environment (reproducible, fast), Community (responsive, welcoming), Measurement (analytics, feedback loops). Use `.github-gstack-intelligence/skills/references/devex-dx-hall-of-fame.md` as the competitive benchmark reference. A score below 7 in any dimension requires a concrete remediation plan in the review output.
 
 ## Priority Hierarchy Under Context Pressure
 
@@ -462,6 +467,8 @@ Pattern:
 
 **Anti-skip rule:** Never condense, abbreviate, or skip any review pass (1-8) regardless of plan type (strategy, spec, code, infra). Every pass in this skill exists for a reason. "This is a strategy doc so DX passes don't apply" is always wrong — DX gaps are where adoption breaks down. If a pass genuinely has zero findings, say "No issues found" and move on — but you must evaluate it.
 
+<!-- CI-ADAPTED: {{ANTI_SHORTCUT_CLAUSE}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+
 Search repository-local state and issue context first before making recommendations.
 
 ### DX Trend Check
@@ -680,8 +687,10 @@ DX reviews:
 * **Map to DX First Principles above.** One sentence connecting your recommendation
   to a specific principle (e.g., "This violates 'zero friction at T0' because
   [persona] needs 3 extra config steps before their first API call").
-* **Escape hatch:** If a section has no issues, say so and move on. If a gap has an
-  obvious fix, state what you'll add and move on, don't waste a question.
+* **Zero findings:** if a section has zero findings, state "No issues, moving on"
+  and proceed. Otherwise, use GitHub follow-up comment for each gap — a gap with an
+  "obvious fix" is still a gap and still needs user approval before any change
+  lands in the plan.
 * Assume the user hasn't looked at this window in 20 minutes. Re-ground every question.
 
 ## Required Outputs
@@ -785,27 +794,14 @@ DX IMPLEMENTATION CHECKLIST
 [ ] Community channel exists and is monitored
 ```
 
+{{TASKS_SECTION_EMIT:devex-review}}
+
 ### Unresolved Decisions
 If any GitHub follow-up comment goes unanswered, note here. Never silently default.
 
-## Review Log
-
-After producing the DX Scorecard above, persist the review result.
-
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes review metadata to
-`.github-gstack-intelligence/state/` (user config directory, not project files).
-
-```bash
-.github-gstack-intelligence/state/results/review/review-log.json '{"skill":"plan-devex-review","timestamp":"TIMESTAMP","status":"STATUS","initial_score":N,"overall_score":N,"product_type":"TYPE","tthw_current":"TTHW_CURRENT","tthw_target":"TTHW_TARGET","mode":"MODE","persona":"PERSONA","competitive_tier":"TIER","pass_scores":{"getting_started":N,"api_design":N,"errors":N,"docs":N,"upgrade":N,"dev_env":N,"community":N,"measurement":N},"unresolved":N,"commit":"COMMIT"}'
-```
-
-Substitute values from the DX Scorecard. MODE is EXPANSION/POLISH/TRIAGE.
-PERSONA is a short label (e.g., "yc-founder", "platform-eng").
-TIER is Champion/Competitive/NeedsWork/RedFlag.
-
 Check for prior review results in `.github-gstack-intelligence/state/results/` and GitHub PR review status.
 
-<!-- CI-ADAPTED: {{PLAN_FILE_REVIEW_REPORT}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+Display a Review Readiness Dashboard by reading all JSON entries from `.github-gstack-intelligence/state/results/review/review-log.json`. For each prior review, show: skill name, status (clean/issues_open), timestamp, and commit hash. Flag any review whose commit hash differs from the current HEAD as potentially stale. If the review log file does not exist or contains no entries, show an empty dashboard and note that no prior reviews have been recorded yet.
 
 Persist durable outcomes in `.github-gstack-intelligence/state/results/` when the lifecycle layer is ready to store them.
 
@@ -851,3 +847,5 @@ Outside voice| Recommended      | Recommended        | Skip
 * One sentence max per option.
 * After each pass, pause and wait for feedback before moving on.
 * Rate before and after each pass for scannability.
+
+<!-- CI-ADAPTED: {{EXIT_PLAN_MODE_GATE}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->

@@ -1,6 +1,7 @@
 ---
 name: plan-design-review
 preamble-tier: 3
+interactive: true
 version: 2.0.0
 description: |
   Designer's eye plan review — interactive, like CEO and Eng review.
@@ -16,6 +17,10 @@ allowed-tools:
   - Grep
   - Glob
   - Bash
+triggers:
+  - design plan review
+  - review ux plan
+  - check design decisions
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->
@@ -109,9 +114,11 @@ These aren't a checklist — they're how you see. The perceptual instincts that 
 11. **Design for trust** — Every design decision either builds or erodes trust. Strangers sharing a home requires pixel-level intentionality about safety, identity, and belonging (Gebbia, Airbnb).
 12. **Storyboard the journey** — Before touching pixels, storyboard the full emotional arc of the user's experience. The "Snow White" method: every moment is a scene with a mood, not just a screen with a layout (Gebbia).
 
-Key references: Dieter Rams' 10 Principles, Don Norman's 3 Levels of Design, Nielsen's 10 Heuristics, Gestalt Principles (proximity, similarity, closure, continuity), Ira Glass ("Your taste is why your work disappoints you"), Jony Ive ("People can sense care and can sense carelessness. Different and new is relatively easy. Doing something that's genuinely better is very hard."), Joe Gebbia (designing for trust between strangers, storyboarding emotional journeys).
+Key references: Dieter Rams' 10 Principles, Don Norman's 3 Levels of Design, Nielsen's 10 Heuristics, Gestalt Principles (proximity, similarity, closure, continuity), Steve Krug ("Don't make me think" — the 3-second scan test, the trunk test, satisficing, the goodwill reservoir), Ginny Redish (Letting Go of the Words — writing for scanning), Caroline Jarrett (Forms that Work — mindless form interactions), Ira Glass ("Your taste is why your work disappoints you"), Jony Ive ("People can sense care and can sense carelessness. Different and new is relatively easy. Doing something that's genuinely better is very hard."), Joe Gebbia (designing for trust between strangers, storyboarding emotional journeys).
 
 When reviewing a plan, empathy as simulation runs automatically. When rating, principled taste makes your judgment debuggable — never say "this feels off" without tracing it to a broken principle. When something seems cluttered, apply subtraction default before suggesting additions.
+
+<!-- CI-ADAPTED: {{UX_PRINCIPLES}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
 
 ## Priority Hierarchy Under Context Pressure
 
@@ -200,7 +207,7 @@ First, set up the output directory. Name it after the screen/feature being desig
 
 ```bash
 eval "$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null)"
-_DESIGN_DIR=.github-gstack-intelligence/state/results/$SLUG/designs/<screen-name>-$(date +%Y%m%d)
+_DESIGN_DIR="$HOME/.github-gstack-intelligence/state/local/projects/$SLUG/designs/<screen-name>-$(date +%Y%m%d)"
 mkdir -p "$_DESIGN_DIR"
 echo "DESIGN_DIR: $_DESIGN_DIR"
 ```
@@ -275,6 +282,8 @@ descriptions of what 10/10 looks like.
 ## Review Sections (7 passes, after scope is agreed)
 
 **Anti-skip rule:** Never condense, abbreviate, or skip any review pass (1-7) regardless of plan type (strategy, spec, code, infra). Every pass in this skill exists for a reason. "This is a strategy doc so design passes don't apply" is always wrong — design gaps are where implementation breaks down. If a pass genuinely has zero findings, say "No issues found" and move on — but you must evaluate it.
+
+<!-- CI-ADAPTED: {{ANTI_SHORTCUT_CLAUSE}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
 
 Search repository-local state and issue context first before making recommendations.
 
@@ -357,7 +366,7 @@ Follow the GitHub follow-up comment format from the Preamble above. Additional r
 * Present 2-3 options. For each: effort to specify now, risk if deferred.
 * **Map to Design Principles above.** One sentence connecting your recommendation to a specific principle.
 * Label with issue NUMBER + option LETTER (e.g., "3A", "3B").
-* **Escape hatch:** If a section has no issues, say so and move on. If a gap has an obvious fix, state what you'll add and move on — don't waste a question on it. Only use GitHub follow-up comment when there is a genuine design choice with meaningful tradeoffs.
+* **Zero findings:** if a section has zero findings, state "No issues, moving on" and proceed. Otherwise, use GitHub follow-up comment for each gap — a gap with an "obvious fix" is still a gap and still needs user approval before any change lands in the plan.
 * **NEVER use GitHub follow-up comment to ask which variant the user prefers.** Always create a comparison board first (`$D compare --serve`) and open it in the browser. The board has rating controls, comments, remix/regenerate buttons, and structured feedback output. Use GitHub follow-up comment ONLY to notify the user the board is open and wait for them to finish — not to present variants inline and ask "which do you prefer?" That is a degraded experience.
 
 ## Required Outputs
@@ -380,6 +389,8 @@ For design debt: missing a11y, unresolved responsive behavior, deferred empty st
 * **Depends on / blocked by:** Any prerequisites.
 
 Then present options: **A)** Add to TODOS.md **B)** Skip — not valuable enough **C)** Build it now in this PR instead of deferring.
+
+{{TASKS_SECTION_EMIT:design-review}}
 
 ### Completion Summary
 ```
@@ -451,7 +462,7 @@ Substitute values from the Completion Summary:
 
 Check for prior review results in `.github-gstack-intelligence/state/results/` and GitHub PR review status.
 
-<!-- CI-ADAPTED: {{PLAN_FILE_REVIEW_REPORT}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+Display a Review Readiness Dashboard by reading all JSON entries from `.github-gstack-intelligence/state/results/review/review-log.json`. For each prior review, show: skill name, status (clean/issues_open), timestamp, and commit hash. Flag any review whose commit hash differs from the current HEAD as potentially stale. If the review log file does not exist or contains no entries, show an empty dashboard and note that no prior reviews have been recorded yet.
 
 Persist durable outcomes in `.github-gstack-intelligence/state/results/` when the lifecycle layer is ready to store them.
 
@@ -484,3 +495,5 @@ Use GitHub follow-up comment to present the next step. Include only applicable o
 * One sentence max per option.
 * After each pass, pause and wait for feedback.
 * Rate before and after each pass for scannability.
+
+<!-- CI-ADAPTED: {{EXIT_PLAN_MODE_GATE}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->

@@ -18,6 +18,12 @@ allowed-tools:
   - Grep
   - Glob
   - WebSearch
+triggers:
+  - debug this
+  - fix this bug
+  - why is this broken
+  - root cause analysis
+  - investigate this error
 hooks:
   PreToolUse:
     - matcher: "Edit"
@@ -30,6 +36,28 @@ hooks:
         - type: command
           command: "bash ${CLAUDE_SKILL_DIR}/../freeze/bin/check-freeze.sh"
           statusMessage: "Checking debug scope boundary..."
+gbrain:
+  schema: 1
+  context_queries:
+    - id: prior-investigations
+      kind: list
+      filter:
+        type: timeline
+        tags_contains: "repo:{repo_slug}"
+        content_contains: "investigate"
+      sort: updated_at_desc
+      limit: 5
+      render_as: "## Prior investigations in this repo"
+    - id: project-learnings
+      kind: filesystem
+      glob: ".github-gstack-intelligence/state/results/{repo_slug}/learnings.jsonl"
+      tail: 10
+      render_as: "## Recent learnings (patterns + pitfalls)"
+    - id: recent-eureka
+      kind: filesystem
+      glob: ".github-gstack-intelligence/state/analytics/eureka.jsonl"
+      tail: 5
+      render_as: "## Recent eureka moments (cross-project)"
 ---
 
 <!-- GSTACK-INTELLIGENCE: GENERATED FILE -->
@@ -63,6 +91,8 @@ Fixing symptoms creates whack-a-mole debugging. Every fix that doesn't address r
 
 ---
 
+<!-- CI-ADAPTED: {{GBRAIN_CONTEXT_LOAD}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
+
 ## Phase 1: Root Cause Investigation
 
 Gather context before forming any hypothesis.
@@ -79,9 +109,25 @@ Gather context before forming any hypothesis.
 
 4. **Reproduce:** Can you trigger the bug deterministically? If not, gather more evidence before proceeding.
 
-Search repository-local state and issue context first before making recommendations.
+5. **Check investigation history:** Search prior learnings for investigations on the same files. Recurring bugs in the same area are an architectural smell. If prior investigations exist, note patterns and check if the root cause was structural.
+
+{{LEARNINGS_SEARCH:query=debug investigation root cause hypothesis bug fix}}
 
 Output: **"Root cause hypothesis: ..."** — a specific, testable claim about what is wrong and why.
+
+### Refresh learnings for the hypothesis you just named
+
+The top-of-skill learnings pull above is keyed to "debug investigation" broadly. Now that you have a specific hypothesis, re-pull learnings keyed to that hypothesis so prior fixes for the same problem-shape surface.
+
+Pick ONE keyword from the hypothesis. The keyword should be a noun: the failing component name, the basename of the file you suspect (without extension), or the bug noun. The keyword MUST be alphanumeric or hyphen only — no quotes, slashes, dots, colons, or whitespace. If your candidate has any of those, simplify to just the alphanumeric stem.
+
+Worked examples (investigate-specific): good keywords are `auth-cookie`, `session-expiry`, `redirect-loop`. Bad: `auth.ts:47`, `fix the auth bug`, `<hypothesis-keyword>`.
+
+```bash
+.github-gstack-intelligence/skills/bin/gstack-learnings-search --query "<your-keyword>" --limit 5 2>/dev/null || true
+```
+
+If any learnings come back, name which one applies to your investigation in one sentence. If none come back, continue without reference — the absence of a matching prior learning is itself useful information.
 
 ---
 
@@ -96,7 +142,8 @@ After forming your root cause hypothesis, lock edits to the affected module to p
 **If FREEZE_AVAILABLE:** Identify the narrowest directory containing the affected files. Write it to the freeze state file:
 
 ```bash
-STATE_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.gstack}"
+eval "$(.github-gstack-intelligence/skills/bin/gstack-paths)"
+STATE_DIR="$GSTACK_STATE_ROOT"
 mkdir -p "$STATE_DIR"
 echo "<detected-directory>/" > "$STATE_DIR/freeze-dir.txt"
 echo "Debug scope locked to: <detected-directory>/"
@@ -204,7 +251,15 @@ Status:          DONE | DONE_WITH_CONCERNS | BLOCKED
 ════════════════════════════════════════
 ```
 
+Log the investigation as a learning for future sessions. Use `type: "investigation"` and include the affected files so future investigations on the same area can find this:
+
+```bash
+.github-gstack-intelligence/skills/bin/gstack-learnings-log '{"skill":"investigate","type":"investigation","key":"ROOT_CAUSE_KEY","insight":"ROOT_CAUSE_SUMMARY","confidence":9,"source":"observed","files":["affected/file1.ts","affected/file2.ts"]}'
+```
+
 Persist durable outcomes in `.github-gstack-intelligence/state/results/` when the lifecycle layer is ready to store them.
+
+<!-- CI-ADAPTED: {{GBRAIN_SAVE_RESULTS}} expansion is omitted. Implement the GitHub-native replacement in the lifecycle layer when this skill is activated. -->
 
 ---
 
