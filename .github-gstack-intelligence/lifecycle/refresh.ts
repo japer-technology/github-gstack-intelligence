@@ -390,7 +390,7 @@ const COMMON_TOKEN_REPLACEMENTS: Array<[string, string]> = [
   ["{{DESIGN_SHOTGUN_LOOP}}", "Generate design variants sequentially in CI mode. Present comparison boards for human review through GitHub comments or issue attachments."],
 
   // Snapshot/command reference (root skill)
-  ["{{SNAPSHOT_FLAGS}}", "Snapshot system is replaced by Playwright's accessibility tree (`page.accessibility.snapshot()`) and screenshot capabilities in CI mode."],
+  ["{{SNAPSHOT_FLAGS}}", "Snapshot system is replaced by Playwright's accessibility tree (`locator.ariaSnapshot()`) and screenshot capabilities in CI mode."],
   ["{{COMMAND_REFERENCE}}", "Browse command reference is replaced by Playwright API in CI mode. Use `page.goto()`, `page.screenshot()`, `page.evaluate()`, `page.click()`, `page.fill()`, `page.locator()`, and `page.waitForSelector()` for equivalent functionality."],
 
   // Benefits-from and outside tooling

@@ -300,45 +300,20 @@ export async function testResponsiveLayouts(
 /**
  * Get an accessibility tree snapshot of the current page.
  *
- * Returns a structured text representation of the page's accessibility tree,
- * useful for understanding the semantic structure and identifying
- * accessibility issues.
+ * Returns a structured text representation of the page's accessibility tree
+ * (ARIA snapshot in YAML form), useful for understanding the semantic
+ * structure and identifying accessibility issues.
+ *
+ * Note: Playwright removed the legacy `page.accessibility.snapshot()` API,
+ * so this uses the `ariaSnapshot()` locator API instead.
  *
  * @param page - An active Playwright Page instance.
  * @returns    - A text representation of the accessibility tree.
  */
 export async function getAccessibilitySnapshot(page: Page): Promise<string> {
-  const snapshot = await page.accessibility.snapshot();
+  const snapshot = await page.locator("body").ariaSnapshot();
   if (!snapshot) return "No accessibility tree available.";
-  return formatAccessibilityNode(snapshot, 0);
-}
-
-/** Shape of a serialised accessibility-tree node returned by Playwright. */
-interface AccessibilityNode {
-  role?: string;
-  name?: string;
-  value?: string;
-  children?: AccessibilityNode[];
-}
-
-/**
- * Recursively format an accessibility node into a readable text tree.
- */
-function formatAccessibilityNode(node: AccessibilityNode, depth: number): string {
-  const indent = "  ".repeat(depth);
-  const role = node.role ?? "unknown";
-  const name = node.name ? `: "${node.name}"` : "";
-  const value = node.value ? ` [value: "${node.value}"]` : "";
-
-  let line = `${indent}${role}${name}${value}\n`;
-
-  if (node.children) {
-    for (const child of node.children) {
-      line += formatAccessibilityNode(child, depth + 1);
-    }
-  }
-
-  return line;
+  return snapshot;
 }
 
 // ─── CLI Interface ──────────────────────────────────────────────────────────
